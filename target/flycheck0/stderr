@@ -1,0 +1,499 @@
+   0.097677141s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `build_script_build` is newer than we are 1778802838.286594239s > 1778802691.176243454s "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.1"
+   0.097742404s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `build_script_build` is newer than we are 1778802838.187594214s > 1778802689.845236814s "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.186"
+   0.097829227s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `build_script_build` is newer than we are 1778802838.425594274s > 1778802691.520245156s "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/parking_lot_core-0.9.12"
+   0.099077161s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `build_script_build` is newer than we are 1778802838.421594273s > 1778802691.394244532s "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.228"
+   0.099558424s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `build_script_build` is newer than we are 1778802838.277594237s > 1778802690.123238208s "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/icu_normalizer_data-2.2.0"
+   0.099730367s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `build_script_build` is newer than we are 1778802838.316594247s > 1778802690.278238981s "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/icu_properties_data-2.2.0"
+   0.100016645s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `build_script_build` is newer than we are 1778802838.482594289s > 1778802691.208243613s "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-traits-0.2.19"
+   0.100578771s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
+   0.100587798s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-cbf55be55dc98f82/bin-mpdnavi`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   5: cargo::ops::cargo_compile::compile_ws
+   6: cargo::ops::cargo_compile::compile_with_exec
+   7: cargo::ops::cargo_compile::compile
+   8: cargo::commands::check::exec
+   9: <cargo::cli::Exec>::exec
+  10: cargo::cli::main
+  11: cargo::main
+  12: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  13: std::rt::lang_start::<()>::{closure#0}
+  14: std::rt::lang_start_internal
+  15: main
+  16: __libc_start_call_main
+  17: __libc_start_main_alias_2
+  18: _start
+   0.103883237s  INFO prepare_target{force=false package_id=clap v4.6.1 target="clap"}: cargo::core::compiler::fingerprint: fingerprint error for clap v4.6.1/Check { test: false }/TargetInner { benched: false, ..: lib_target("clap", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap-4.6.1/src/lib.rs", Edition2024) }
+   0.103892374s  INFO prepare_target{force=false package_id=clap v4.6.1 target="clap"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/clap-2c665199b027406b/lib-clap`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   6: cargo::ops::cargo_compile::compile_ws
+   7: cargo::ops::cargo_compile::compile_with_exec
+   8: cargo::ops::cargo_compile::compile
+   9: cargo::commands::check::exec
+  10: <cargo::cli::Exec>::exec
+  11: cargo::cli::main
+  12: cargo::main
+  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  14: std::rt::lang_start::<()>::{closure#0}
+  15: std::rt::lang_start_internal
+  16: main
+  17: __libc_start_call_main
+  18: __libc_start_main_alias_2
+  19: _start
+   0.104069406s  INFO prepare_target{force=false package_id=clap_builder v4.6.0 target="clap_builder"}: cargo::core::compiler::fingerprint: fingerprint error for clap_builder v4.6.0/Check { test: false }/TargetInner { benched: false, ..: lib_target("clap_builder", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_builder-4.6.0/src/lib.rs", Edition2024) }
+   0.104075598s  INFO prepare_target{force=false package_id=clap_builder v4.6.0 target="clap_builder"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/clap_builder-5fe019a241c20622/lib-clap_builder`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::cli::main
+  13: cargo::main
+  14: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  15: std::rt::lang_start::<()>::{closure#0}
+  16: std::rt::lang_start_internal
+  17: main
+  18: __libc_start_call_main
+  19: __libc_start_main_alias_2
+  20: _start
+   0.104212836s  INFO prepare_target{force=false package_id=anstream v1.0.0 target="anstream"}: cargo::core::compiler::fingerprint: fingerprint error for anstream v1.0.0/Check { test: false }/TargetInner { ..: lib_target("anstream", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstream-1.0.0/src/lib.rs", Edition2021) }
+   0.104218306s  INFO prepare_target{force=false package_id=anstream v1.0.0 target="anstream"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/anstream-6549693d284776b5/lib-anstream`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   8: cargo::ops::cargo_compile::compile_ws
+   9: cargo::ops::cargo_compile::compile_with_exec
+  10: cargo::ops::cargo_compile::compile
+  11: cargo::commands::check::exec
+  12: <cargo::cli::Exec>::exec
+  13: cargo::cli::main
+  14: cargo::main
+  15: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  16: std::rt::lang_start::<()>::{closure#0}
+  17: std::rt::lang_start_internal
+  18: main
+  19: __libc_start_call_main
+  20: __libc_start_main_alias_2
+  21: _start
+   0.104373077s  INFO prepare_target{force=false package_id=anstyle v1.0.14 target="anstyle"}: cargo::core::compiler::fingerprint: fingerprint error for anstyle v1.0.14/Check { test: false }/TargetInner { ..: lib_target("anstyle", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-1.0.14/src/lib.rs", Edition2021) }
+   0.104378547s  INFO prepare_target{force=false package_id=anstyle v1.0.14 target="anstyle"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/anstyle-eb8a6bcb512fee6e/lib-anstyle`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   9: cargo::ops::cargo_compile::compile_ws
+  10: cargo::ops::cargo_compile::compile_with_exec
+  11: cargo::ops::cargo_compile::compile
+  12: cargo::commands::check::exec
+  13: <cargo::cli::Exec>::exec
+  14: cargo::cli::main
+  15: cargo::main
+  16: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  17: std::rt::lang_start::<()>::{closure#0}
+  18: std::rt::lang_start_internal
+  19: main
+  20: __libc_start_call_main
+  21: __libc_start_main_alias_2
+  22: _start
+   0.104486379s  INFO prepare_target{force=false package_id=anstyle-parse v1.0.0 target="anstyle_parse"}: cargo::core::compiler::fingerprint: fingerprint error for anstyle-parse v1.0.0/Check { test: false }/TargetInner { ..: lib_target("anstyle_parse", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-parse-1.0.0/src/lib.rs", Edition2021) }
+   0.104493242s  INFO prepare_target{force=false package_id=anstyle-parse v1.0.0 target="anstyle_parse"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/anstyle-parse-3e93d363b9c9191e/lib-anstyle_parse`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   9: cargo::ops::cargo_compile::compile_ws
+  10: cargo::ops::cargo_compile::compile_with_exec
+  11: cargo::ops::cargo_compile::compile
+  12: cargo::commands::check::exec
+  13: <cargo::cli::Exec>::exec
+  14: cargo::cli::main
+  15: cargo::main
+  16: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  17: std::rt::lang_start::<()>::{closure#0}
+  18: std::rt::lang_start_internal
+  19: main
+  20: __libc_start_call_main
+  21: __libc_start_main_alias_2
+  22: _start
+   0.104600233s  INFO prepare_target{force=false package_id=utf8parse v0.2.2 target="utf8parse"}: cargo::core::compiler::fingerprint: fingerprint error for utf8parse v0.2.2/Check { test: false }/TargetInner { ..: lib_target("utf8parse", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/utf8parse-0.2.2/src/lib.rs", Edition2018) }
+   0.104605182s  INFO prepare_target{force=false package_id=utf8parse v0.2.2 target="utf8parse"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/utf8parse-027060e0c82615bd/lib-utf8parse`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  10: cargo::ops::cargo_compile::compile_ws
+  11: cargo::ops::cargo_compile::compile_with_exec
+  12: cargo::ops::cargo_compile::compile
+  13: cargo::commands::check::exec
+  14: <cargo::cli::Exec>::exec
+  15: cargo::cli::main
+  16: cargo::main
+  17: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  18: std::rt::lang_start::<()>::{closure#0}
+  19: std::rt::lang_start_internal
+  20: main
+  21: __libc_start_call_main
+  22: __libc_start_main_alias_2
+  23: _start
+   0.104684602s  INFO prepare_target{force=false package_id=anstyle-query v1.1.5 target="anstyle_query"}: cargo::core::compiler::fingerprint: fingerprint error for anstyle-query v1.1.5/Check { test: false }/TargetInner { ..: lib_target("anstyle_query", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/anstyle-query-1.1.5/src/lib.rs", Edition2021) }
+   0.104689300s  INFO prepare_target{force=false package_id=anstyle-query v1.1.5 target="anstyle_query"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/anstyle-query-110b72eaa2e9f539/lib-anstyle_query`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   9: cargo::ops::cargo_compile::compile_ws
+  10: cargo::ops::cargo_compile::compile_with_exec
+  11: cargo::ops::cargo_compile::compile
+  12: cargo::commands::check::exec
+  13: <cargo::cli::Exec>::exec
+  14: cargo::cli::main
+  15: cargo::main
+  16: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  17: std::rt::lang_start::<()>::{closure#0}
+  18: std::rt::lang_start_internal
+  19: main
+  20: __libc_start_call_main
+  21: __libc_start_main_alias_2
+  22: _start
+   0.104783447s  INFO prepare_target{force=false package_id=colorchoice v1.0.5 target="colorchoice"}: cargo::core::compiler::fingerprint: fingerprint error for colorchoice v1.0.5/Check { test: false }/TargetInner { ..: lib_target("colorchoice", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colorchoice-1.0.5/src/lib.rs", Edition2021) }
+   0.104788627s  INFO prepare_target{force=false package_id=colorchoice v1.0.5 target="colorchoice"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/colorchoice-0cbd7445232ce596/lib-colorchoice`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   9: cargo::ops::cargo_compile::compile_ws
+  10: cargo::ops::cargo_compile::compile_with_exec
+  11: cargo::ops::cargo_compile::compile
+  12: cargo::commands::check::exec
+  13: <cargo::cli::Exec>::exec
+  14: cargo::cli::main
+  15: cargo::main
+  16: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  17: std::rt::lang_start::<()>::{closure#0}
+  18: std::rt::lang_start_internal
+  19: main
+  20: __libc_start_call_main
+  21: __libc_start_main_alias_2
+  22: _start
+   0.104882072s  INFO prepare_target{force=false package_id=is_terminal_polyfill v1.70.2 target="is_terminal_polyfill"}: cargo::core::compiler::fingerprint: fingerprint error for is_terminal_polyfill v1.70.2/Check { test: false }/TargetInner { ..: lib_target("is_terminal_polyfill", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/is_terminal_polyfill-1.70.2/src/lib.rs", Edition2021) }
+   0.104887533s  INFO prepare_target{force=false package_id=is_terminal_polyfill v1.70.2 target="is_terminal_polyfill"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/is_terminal_polyfill-a56e428337f62126/lib-is_terminal_polyfill`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   9: cargo::ops::cargo_compile::compile_ws
+  10: cargo::ops::cargo_compile::compile_with_exec
+  11: cargo::ops::cargo_compile::compile
+  12: cargo::commands::check::exec
+  13: <cargo::cli::Exec>::exec
+  14: cargo::cli::main
+  15: cargo::main
+  16: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  17: std::rt::lang_start::<()>::{closure#0}
+  18: std::rt::lang_start_internal
+  19: main
+  20: __libc_start_call_main
+  21: __libc_start_main_alias_2
+  22: _start
+   0.104991528s  INFO prepare_target{force=false package_id=clap_lex v1.1.0 target="clap_lex"}: cargo::core::compiler::fingerprint: fingerprint error for clap_lex v1.1.0/Check { test: false }/TargetInner { benched: false, ..: lib_target("clap_lex", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_lex-1.1.0/src/lib.rs", Edition2024) }
+   0.104996567s  INFO prepare_target{force=false package_id=clap_lex v1.1.0 target="clap_lex"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/clap_lex-70402c86c0cb86f1/lib-clap_lex`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   8: cargo::ops::cargo_compile::compile_ws
+   9: cargo::ops::cargo_compile::compile_with_exec
+  10: cargo::ops::cargo_compile::compile
+  11: cargo::commands::check::exec
+  12: <cargo::cli::Exec>::exec
+  13: cargo::cli::main
+  14: cargo::main
+  15: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  16: std::rt::lang_start::<()>::{closure#0}
+  17: std::rt::lang_start_internal
+  18: main
+  19: __libc_start_call_main
+  20: __libc_start_main_alias_2
+  21: _start
+   0.105082208s  INFO prepare_target{force=false package_id=strsim v0.11.1 target="strsim"}: cargo::core::compiler::fingerprint: fingerprint error for strsim v0.11.1/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("strsim", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/strsim-0.11.1/src/lib.rs", Edition2015) }
+   0.105086827s  INFO prepare_target{force=false package_id=strsim v0.11.1 target="strsim"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/strsim-e9a8699e51d9e339/lib-strsim`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   8: cargo::ops::cargo_compile::compile_ws
+   9: cargo::ops::cargo_compile::compile_with_exec
+  10: cargo::ops::cargo_compile::compile
+  11: cargo::commands::check::exec
+  12: <cargo::cli::Exec>::exec
+  13: cargo::cli::main
+  14: cargo::main
+  15: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  16: std::rt::lang_start::<()>::{closure#0}
+  17: std::rt::lang_start_internal
+  18: main
+  19: __libc_start_call_main
+  20: __libc_start_main_alias_2
+  21: _start
+   0.105158511s  INFO prepare_target{force=false package_id=md5 v0.8.0 target="md5"}: cargo::core::compiler::fingerprint: fingerprint error for md5 v0.8.0/Check { test: false }/TargetInner { ..: lib_target("md5", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/md5-0.8.0/src/lib.rs", Edition2021) }
+   0.105162980s  INFO prepare_target{force=false package_id=md5 v0.8.0 target="md5"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/md5-ec0b5326329d3f2f/lib-md5`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   6: cargo::ops::cargo_compile::compile_ws
+   7: cargo::ops::cargo_compile::compile_with_exec
+   8: cargo::ops::cargo_compile::compile
+   9: cargo::commands::check::exec
+  10: <cargo::cli::Exec>::exec
+  11: cargo::cli::main
+  12: cargo::main
+  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  14: std::rt::lang_start::<()>::{closure#0}
+  15: std::rt::lang_start_internal
+  16: main
+  17: __libc_start_call_main
+  18: __libc_start_main_alias_2
+  19: _start
+   0.105233653s  INFO prepare_target{force=false package_id=mpd v0.1.0 target="mpd"}: cargo::core::compiler::fingerprint: fingerprint error for mpd v0.1.0/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("mpd", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mpd-0.1.0/src/lib.rs", Edition2018) }
+   0.105237961s  INFO prepare_target{force=false package_id=mpd v0.1.0 target="mpd"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/mpd-71c371ac7b58f591/lib-mpd`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   6: cargo::ops::cargo_compile::compile_ws
+   7: cargo::ops::cargo_compile::compile_with_exec
+   8: cargo::ops::cargo_compile::compile
+   9: cargo::commands::check::exec
+  10: <cargo::cli::Exec>::exec
+  11: cargo::cli::main
+  12: cargo::main
+  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  14: std::rt::lang_start::<()>::{closure#0}
+  15: std::rt::lang_start_internal
+  16: main
+  17: __libc_start_call_main
+  18: __libc_start_main_alias_2
+  19: _start
+   0.105317350s  INFO prepare_target{force=false package_id=bufstream v0.1.4 target="bufstream"}: cargo::core::compiler::fingerprint: fingerprint error for bufstream v0.1.4/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("bufstream", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bufstream-0.1.4/src/lib.rs", Edition2015) }
+   0.105321778s  INFO prepare_target{force=false package_id=bufstream v0.1.4 target="bufstream"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/bufstream-78477ff397bb3208/lib-bufstream`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::cli::main
+  13: cargo::main
+  14: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  15: std::rt::lang_start::<()>::{closure#0}
+  16: std::rt::lang_start_internal
+  17: main
+  18: __libc_start_call_main
+  19: __libc_start_main_alias_2
+  20: _start
+   0.105394495s  INFO prepare_target{force=false package_id=reqwest v0.13.3 target="reqwest"}: cargo::core::compiler::fingerprint: fingerprint error for reqwest v0.13.3/Check { test: false }/TargetInner { ..: lib_target("reqwest", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.3/src/lib.rs", Edition2021) }
+   0.105398923s  INFO prepare_target{force=false package_id=reqwest v0.13.3 target="reqwest"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/reqwest-5ed9a814e447bdc3/lib-reqwest`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   6: cargo::ops::cargo_compile::compile_ws
+   7: cargo::ops::cargo_compile::compile_with_exec
+   8: cargo::ops::cargo_compile::compile
+   9: cargo::commands::check::exec
+  10: <cargo::cli::Exec>::exec
+  11: cargo::cli::main
+  12: cargo::main
+  13: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  14: std::rt::lang_start::<()>::{closure#0}
+  15: std::rt::lang_start_internal
+  16: main
+  17: __libc_start_call_main
+  18: __libc_start_main_alias_2
+  19: _start
+   0.105781221s  INFO prepare_target{force=false package_id=base64 v0.22.1 target="base64"}: cargo::core::compiler::fingerprint: fingerprint error for base64 v0.22.1/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("base64", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/base64-0.22.1/src/lib.rs", Edition2018) }
+   0.105786831s  INFO prepare_target{force=false package_id=base64 v0.22.1 target="base64"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/base64-1b11db9fe22a927e/lib-base64`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   1: cargo_util::paths::read
+   2: cargo::core::compiler::fingerprint::prepare_target
+   3: cargo::core::compiler::compile
+   4: cargo::core::compiler::compile
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::cli::main
+  13: cargo::main
+  14: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  15: std::rt::lang_start::<()>::{closure#0}
+  16: std::rt::lang_start_internal
+  17: main
+  18: __libc_start_call_main
+  19: __libc_start_main_alias_2
+  20: _start
+   0.105890817s  INFO prepare_target{force=false package_id=bytes v1.11.1 target="bytes"}: cargo::core::compiler::fingerprint: fingerprint dirty for bytes v1.11.1/Check { test: false }/TargetInner { ..: lib_target("bytes", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/bytes-1.11.1/src/lib.rs", Edition2021) }
+   0.105897048s  INFO prepare_target{force=false package_id=bytes v1.11.1 target="bytes"}: cargo::core::compiler::fingerprint:     dirty: PathToSourceChanged
+error: failed to write `/home/will/git/mpdnavi/target/debug/.fingerprint/bytes-d0b86b271ab2baba/lib-bytes`
+
+Caused by:
+  Permission denied (os error 13)
