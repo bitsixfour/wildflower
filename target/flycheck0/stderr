@@ -1,5 +1,5 @@
-   0.105591172s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
-   0.105608945s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-1d69ac703bc9332e/bin-mpdnavi`
+   0.114666706s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
+   0.114683818s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-1d69ac703bc9332e/bin-mpdnavi`
 
 Caused by:
     No such file or directory (os error 2)
@@ -24,8 +24,8 @@ Stack backtrace:
   16: __libc_start_call_main
   17: __libc_start_main_alias_2
   18: _start
-   0.117018296s  INFO prepare_target{force=false package_id=rodio v0.22.2 target="rodio"}: cargo::core::compiler::fingerprint: fingerprint error for rodio v0.22.2/Check { test: false }/TargetInner { ..: lib_target("rodio", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rodio-0.22.2/src/lib.rs", Edition2021) }
-   0.117031862s  INFO prepare_target{force=false package_id=rodio v0.22.2 target="rodio"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/rodio-fd3db0ca745552e1/lib-rodio`
+   0.124892838s  INFO prepare_target{force=false package_id=rodio v0.22.2 target="rodio"}: cargo::core::compiler::fingerprint: fingerprint error for rodio v0.22.2/Check { test: false }/TargetInner { ..: lib_target("rodio", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rodio-0.22.2/src/lib.rs", Edition2021) }
+   0.124905241s  INFO prepare_target{force=false package_id=rodio v0.22.2 target="rodio"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/rodio-fd3db0ca745552e1/lib-rodio`
 
 Caused by:
     No such file or directory (os error 2)
@@ -51,8 +51,8 @@ Stack backtrace:
   17: __libc_start_call_main
   18: __libc_start_main_alias_2
   19: _start
-   0.117317306s  INFO prepare_target{force=false package_id=cpal v0.17.3 target="cpal"}: cargo::core::compiler::fingerprint: fingerprint error for cpal v0.17.3/Check { test: false }/TargetInner { ..: lib_target("cpal", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cpal-0.17.3/src/lib.rs", Edition2021) }
-   0.117324179s  INFO prepare_target{force=false package_id=cpal v0.17.3 target="cpal"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/cpal-5cafbafa1d97965e/lib-cpal`
+   0.125181048s  INFO prepare_target{force=false package_id=cpal v0.17.3 target="cpal"}: cargo::core::compiler::fingerprint: fingerprint error for cpal v0.17.3/Check { test: false }/TargetInner { ..: lib_target("cpal", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cpal-0.17.3/src/lib.rs", Edition2021) }
+   0.125187289s  INFO prepare_target{force=false package_id=cpal v0.17.3 target="cpal"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/cpal-5cafbafa1d97965e/lib-cpal`
 
 Caused by:
     No such file or directory (os error 2)
@@ -79,8 +79,8 @@ Stack backtrace:
   18: __libc_start_call_main
   19: __libc_start_main_alias_2
   20: _start
-   0.117510294s  INFO prepare_target{force=false package_id=alsa v0.11.0 target="alsa"}: cargo::core::compiler::fingerprint: fingerprint error for alsa v0.11.0/Check { test: false }/TargetInner { ..: lib_target("alsa", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-0.11.0/src/lib.rs", Edition2021) }
-   0.117516196s  INFO prepare_target{force=false package_id=alsa v0.11.0 target="alsa"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/alsa-cbf195246e9b9029/lib-alsa`
+   0.125388726s  INFO prepare_target{force=false package_id=alsa v0.11.0 target="alsa"}: cargo::core::compiler::fingerprint: fingerprint error for alsa v0.11.0/Check { test: false }/TargetInner { ..: lib_target("alsa", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-0.11.0/src/lib.rs", Edition2021) }
+   0.125395759s  INFO prepare_target{force=false package_id=alsa v0.11.0 target="alsa"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/alsa-cbf195246e9b9029/lib-alsa`
 
 Caused by:
     No such file or directory (os error 2)
@@ -108,8 +108,8 @@ Stack backtrace:
   19: __libc_start_call_main
   20: __libc_start_main_alias_2
   21: _start
-   0.117673937s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="alsa_sys"}: cargo::core::compiler::fingerprint: fingerprint error for alsa-sys v0.4.0/Check { test: false }/TargetInner { doctest: false, ..: lib_target("alsa_sys", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/src/lib.rs", Edition2021) }
-   0.117680108s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="alsa_sys"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/alsa-sys-e2701809cd7aefec/lib-alsa_sys`
+   0.125532886s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="alsa_sys"}: cargo::core::compiler::fingerprint: fingerprint error for alsa-sys v0.4.0/Check { test: false }/TargetInner { doctest: false, ..: lib_target("alsa_sys", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/src/lib.rs", Edition2021) }
+   0.125541151s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="alsa_sys"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/alsa-sys-e2701809cd7aefec/lib-alsa_sys`
 
 Caused by:
     No such file or directory (os error 2)
@@ -138,10 +138,10 @@ Stack backtrace:
   20: __libc_start_call_main
   21: __libc_start_main_alias_2
   22: _start
-   0.117926108s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint dirty for alsa-sys v0.4.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs", Edition2021) }
-   0.117933853s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="build-script-build"}: cargo::core::compiler::fingerprint:     dirty: EnvVarChanged { name: "PKG_CONFIG_PATH", old_value: Some("/nix/store/dnh2khilygss889136c1isrdvap0myf4-alsa-lib-1.2.15.3-dev/lib/pkgconfig"), new_value: None }
-   0.120027067s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
-   0.120035253s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-3c4c61e0154d3b27/test-bin-mpdnavi`
+   0.125776692s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint dirty for alsa-sys v0.4.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs", Edition2021) }
+   0.125783856s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="build-script-build"}: cargo::core::compiler::fingerprint:     dirty: EnvVarChanged { name: "PKG_CONFIG_PATH", old_value: Some("/nix/store/dnh2khilygss889136c1isrdvap0myf4-alsa-lib-1.2.15.3-dev/lib/pkgconfig"), new_value: None }
+   0.127631454s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
+   0.127639089s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-3c4c61e0154d3b27/test-bin-mpdnavi`
 
 Caused by:
     No such file or directory (os error 2)
@@ -193,7 +193,7 @@ Caused by:
 
   --- stderr
 
-  thread 'main' (76386) panicked at /home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs:13:19:
+  thread 'main' (79456) panicked at /home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs:13:19:
 
   pkg-config exited with status code 1
   > PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 pkg-config --libs --cflags alsa

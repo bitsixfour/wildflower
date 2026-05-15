@@ -9,8 +9,8 @@ pub struct NavidromeResponse {
 
 #[derive(Debug, Deserialize)]
 struct SubsonicResponse {
-    #[serde(rename = "nowPlaying")]
-    now_playing: Option<NowPlaying>,
+    #[serde(rename = "albumList2")]
+    album_list2: a,
 }
 
 #[derive(Debug, Deserialize)]
@@ -28,11 +28,27 @@ struct Entry {
 }
 
 pub struct Album {
-    pub album: &str,
-    pub artist: &str,
+    album: &str,
+    artist: &str,
 }
 
-pub struct NaviData {
-    pub data: HashMap<Album, String>
-    
+pub struct NaviData { /* may change later */
+    data: HashMap<Album, String>
 }
+
+
+
+impl Album {
+
+    pub fn new(str: &String) -> Album {
+        
+        
+    }
+
+
+}
+
+
+
+
+
