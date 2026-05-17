@@ -88,22 +88,30 @@ pub async fn navi_obj(client: &Client) -> Result<SubsonicResponse, reqwest::Erro
 }
 
 
-pub struct NaviData {
-    data: HashMap<Album, String>,
+pub struct NaviData<'a> {
+    pub data: HashMap<&'a str, &'a Album>
 }
-impl NaviData {
+impl NaviData<'a> {
 
     pub async fn new(client: &Client) -> NaviData {
-        let hmap: HashMap<Album, String> = HashMap::new();
-        let resp: SubsonicResponse = navi_obj(client).await.unwrap();
-        let size: Vec<Album> = resp.album_list_2.album;
+        let mut hmap: HashMap<Album, String> = HashMap::new();
+        let resp: SubsonicResponse = navi_obj(client).await.expect("Could not access Navidrome. Check the URL and Navidrome itself");
+        let album: Vec<Album> = resp.album_list_2.album;
         
-        for i in &size {
-            for int
-
+        for i in &album {
+            println!("adding to hashmap (dbg)");
+            let x: &str = i.name.as_str();
+            hmap.insert(i, x);
+ 
         }
         Ok(Self {
             data: hmap,
         })
+    }
+
+
+
+    pub async fn get_url(song_id: &str) -> String {
+a       
     }
 }
