@@ -94,7 +94,7 @@ pub async fn navi_obj(client: &Client) -> Result<SubsonicResponse, reqwest::Erro
     Ok(root.subsonic_response)
 }
 pub struct NaviData {
-    pub data: HashMap<String, Album>,
+    pub data: HashMap<String, Album>, /* test CLI utils */
     pub album_list: Vec<Album>,
 }
 
@@ -105,6 +105,8 @@ impl NaviData {
         let album: Vec<Album> = resp.album_list_2.album;
         for i in &album {
             let name = i.name.clone();
+            println!("Yes saar. We are importing this to {}",
+                name.);
             hmap.insert(name, i.clone()); 
         }
         Self {

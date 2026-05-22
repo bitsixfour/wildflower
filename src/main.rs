@@ -1,6 +1,9 @@
 use clap::Parser;
 use reqwest::Client;
 
+use tokio::net::TcpListener;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+
 mod navi;
 use crate::navi::{NaviData, SubsonicResponse};
 
@@ -49,5 +52,37 @@ async fn main() -> anyhow::Result<()> {
 //      Some(value) => println!("the full metadata for that album is {:?}", mat),
 //        None => println!("not found"),
 //    }
+    
+    /* actually start the hecking program... */
+    let listener = TcpListener::bind("127.0.0.1:6600").await.unwrap();
+    
+    loop {
+        let (socket, _) = listener.accept().await.unwrap();
+        tokio::spawn(handle_client(socket));
+    }
     Ok(())
+}
+async fn handle_client(socket: tokio::net::TcpStream) {
+    let (reader, mut writer) = socket.into_split();
+    let mut lines = BufReader::new(reader).lines();
+    
+    // handshake
+    writer.write_all(b"OK MPD 67.67.67\n").await.unwrap();
+    
+    while let Some(line) = lines.next_line().await.unwrap() {
+        match line.trim() {
+            "play" => {
+                // start playback somehow
+            }
+            "pause" => {
+                // pause playback somehow
+            }
+            "currentsong" => {
+                // get data from declared MPD Struct
+            }
+            _ => {
+                writer.write_all(b"OK\n").await.unwrap();
+            }
+        }
+    }
 }
