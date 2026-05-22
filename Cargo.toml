@@ -17,3 +17,5 @@ mpd = "0.1.0"
 clap = { version = "4.6.1", features = ["derive"] }
 anyhow = "1.0.102"
 indexmap = "2.14.0"
+symphonia = "0.6.0"
+rodio = "0.22.2"

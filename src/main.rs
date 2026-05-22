@@ -5,9 +5,9 @@ use tokio::net::TcpListener;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 
 mod navi;
+mod song;
 use crate::navi::{NaviData, SubsonicResponse};
 
-mod mpd;
 
 
 #[derive(Parser, Debug)]
@@ -65,8 +65,9 @@ async fn main() -> anyhow::Result<()> {
 async fn handle_client(socket: tokio::net::TcpStream) {
     let (reader, mut writer) = socket.into_split();
     let mut lines = BufReader::new(reader).lines();
-    
-    // handshake
+
+
+    println("dbg see if this works");
     writer.write_all(b"OK MPD 67.67.67\n").await.unwrap();
     
     while let Some(line) = lines.next_line().await.unwrap() {
