@@ -1,5 +1,6 @@
 use clap::Parser;
 use reqwest::Client;
+use event_listener::{Event, Listener};
 
 use tokio::net::TcpListener;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
@@ -60,7 +61,7 @@ async fn handle_client(socket: tokio::net::TcpStream) {
     let mut lines = BufReader::new(reader).lines();
 
 
-    println("dbg see if this works");
+    println!("dbg see if this works");
     writer.write_all(b"OK MPD 67.67.67\n").await.unwrap();
     
     while let Some(line) = lines.next_line().await.unwrap() {
@@ -72,7 +73,7 @@ async fn handle_client(socket: tokio::net::TcpStream) {
                 // pause playback somehow
             }
             "currentsong" => {
-                // get data from declared MPD Struct
+                mpd::getSong();
             }
             _ => {
                 writer.write_all(b"OK\n").await.unwrap();
