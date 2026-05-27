@@ -5,8 +5,10 @@ use tokio::net::TcpListener;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 
 mod navi;
-mod search;
+mod tracklist;
 mod mpd;
+mod search;
+mod parser;
 use crate::navi::{NaviData, SubsonicResponse};
 
 
