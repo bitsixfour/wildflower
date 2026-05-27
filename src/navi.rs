@@ -109,7 +109,7 @@ impl NaviData {
                 .to_lowercase();
             println!("Yes saar. We are importing this to navidrome");
             hmap.insert(name, i.clone()); 
-            album.add(i);
+            album.push(i.clone());
         }
         Self {
             data: hmap,
