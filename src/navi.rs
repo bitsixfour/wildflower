@@ -78,7 +78,7 @@ pub fn get_url(song_id: &str) -> String {
 
 pub async fn navi_obj(client: &Client) -> Result<SubsonicResponse, reqwest::Error> {
     let root = client
-        .get("http://192.168.1.20:8097/rest/getAlbumList2?u=nix&p=2008&v=1.16.1&c=test&f=json&type=alphabeticalByName&size=500")
+        .get("http://192.168.1.20:8097/rest/getAlbumList2?u=nix&p=2008&v=1.16.1&c=test&f=json&type=alphabeticalByName&size=500") /* YEAH YOU HAVE MY PASSWORD */
         .query(&[
             ("f", "json"),
             ("type", "alphabeticalByName"),
