@@ -73,7 +73,7 @@ pub struct ReplayGain {
     pub album_peak: f32,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Song {
     pub id: String,
     pub parent: String,
@@ -138,7 +138,7 @@ pub struct MpdAlbum<'a> {
 impl SubsIDResponse {
     async fn new(client: &Client, alb: &NaviData, ser: &str) -> SubsIDResponse{
         println!("currentsong");
-        let uid: &str = alb.data.get("ser").unwrap();
+        let uid: &str = alb.data.get(ser).unwrap().id.as_str();
         let url = format!("http://192.168.1.20:8097/rest/getAlbum?id={}=nix&p=2008&v=1.8.0&c=myapp&f=json", uid);
         let root = client
             .get(url)
@@ -149,14 +149,12 @@ impl SubsIDResponse {
                 ("offset", "0"),
             ])
             .send()
-            .await?
-            .error_for_status()?
+            .await.unwrap()
+            .error_for_status().unwrap()
             .json::<SubsIDResponse>()
-        .await?;
+        .await.unwrap();
+        root
 
-        Self {
-            subsonic_response: root,
-        }
         
     }
     fn return_mpd_searchup(&self) -> Vec<&str> {
@@ -164,10 +162,15 @@ impl SubsIDResponse {
         let album_list: Vec<Song> = self
             .subsonic_response
             .album
-            .song;
+            .song.clone();
         println!("array of song found (dbg");
-        for i in & {
-            let current_song: Song = album_list[i].clone();
+        for track in album_list {
+            let mpdretrn: &str = format!("
+                file: {} \n
+                Title: {} \n
+                Artist {} \n
+                A
+                ");
 
         }
 
