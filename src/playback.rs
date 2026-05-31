@@ -16,7 +16,6 @@ impl Queue {
     fn next(&mut self) -> Option<&SongData> { self.cursor += 1; self.current() }
     fn prev(&mut self) -> Option<&SongData> { self.cursor = self.cursor.saturating_sub(1); self.current() }
     fn add(&mut self, song: SongData) { self.items.push(song); }
-    fn remove(&mut self, idx: usize) { self.items.remove(idx); /* adjust cursor */ }
 }
 impl CurrentSong {
 
