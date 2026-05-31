@@ -1,8 +1,10 @@
+// return tracklist as specified in MPD protocol
+
+
 use std::collections::HashMap;
 use reqwest::Client;
 use serde::Deserialize;
 use crate::NaviData;
-
 
 #[derive(Debug, Deserialize)]
 pub struct SubsIDResponse {

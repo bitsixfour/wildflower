@@ -6,7 +6,7 @@ use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 
 mod navi;
 mod tracklist;
-mod mpd;
+mod playback;
 mod search;
 mod parser;
 use crate::navi::{NaviData, SubsonicResponse};

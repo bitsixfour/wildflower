@@ -18,12 +18,14 @@ pub enum Expr {
 pub struct Field {
     pub field: String,
     pub op: bool,
-    pub value: String,
+    pub value String,
 }
 
 impl Field {
     pub fn matches(&self, album: &Album) -> bool {
         let eq = match self.field.as_str() {
+            // Future me: check if MPD clients can do both or only either
+            // one of em
             "id" | "Id"               => album.id == self.value,
             "name" | "Name"           => album.name == self.value,
             "artist" | "Artist"       => album.artist == self.value,
@@ -40,7 +42,6 @@ impl Field {
             "sortName" | "sort_name"  => album.sort_name.as_deref() == Some(&self.value),
             _ => false,
         };
-
         if self.op {
             eq
         } else {

@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use serde::Deserialize;
 use reqwest::Client;
-
+// main way to get metadata and parse actual library. TODO: it's 500 max albums but for a POC (for
+// now) it's good enough
 const URL: &str = "http://192.168.1.20:8097";
 const USR: &str = "nix";
 
