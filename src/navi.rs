@@ -95,13 +95,12 @@ pub async fn navi_obj(client: &Client) -> Result<SubsonicResponse, reqwest::Erro
 
 
 
-pub enum Metadata {
-    Album(String),
-    Artist(String),
-    Year(String),
-    /* ain't doing allat
-    Genres(Vec<String>),
-    */
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Expr {
+    And(Field, Field),
+    Or(Field, Field),
+    Def(Field),
+    Empty,
 }
 
 pub struct NaviData {
@@ -110,7 +109,7 @@ pub struct NaviData {
 }
 
 impl NaviData {
-    pub async fn new(resp: SubsonicResponse) -> Self {
+    pub async fn new(resp: SubsonicResponse, search: Metadata) -> Self {
         let mut hmap: HashMap<String, Album> = HashMap::new();
         println!("new struct");
         let album: Vec<Album> = resp.album_list_2.album;
