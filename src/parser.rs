@@ -1,16 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Expr {
-    And(Field, Field),
-    Or(Field, Field),
-    Def(Field),
-    Empty,
-}
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Field {
-    pub field: String,
-    pub op: bool,
-    pub value: String
-}
+use crate::search::{Expr, Field};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum Token {

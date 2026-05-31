@@ -95,13 +95,6 @@ pub async fn navi_obj(client: &Client) -> Result<SubsonicResponse, reqwest::Erro
 
 
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Expr {
-    And(Field, Field),
-    Or(Field, Field),
-    Def(Field),
-    Empty,
-}
 
 pub struct NaviData {
     pub data: HashMap<String, Album>, /* test CLI utils */
