@@ -49,22 +49,22 @@ pub struct Album {
 
     pub created: String,
 
-    year: Option<u32>,
-    genre: Option<String>,
+    pub year: Option<u32>,
+    pub genre: Option<String>,
 
     #[serde(rename = "userRating")]
-    user_rating: Option<u32>,
+    pub user_rating: Option<u32>,
 
     genres: Vec<Genre>,
 
     #[serde(rename = "musicBrainzId")]
-    music_brainz_id: Option<String>,
+    pub music_brainz_id: Option<String>,
 
     #[serde(rename = "isCompilation")]
-    is_compilation: bool,
+    pub is_compilation: bool,
 
     #[serde(rename = "sortName")]
-    sort_name: Option<String>,
+    pub sort_name: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Eq, Hash, PartialEq, Clone)]
