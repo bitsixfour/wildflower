@@ -1,11 +1,12 @@
 use rodio::{Decoder, DeviceSinkBuilder, MixerDeviceSink, Player, source::Source};
+use rodio::Player;
 use std::io::Cursor;
 const URL: &str = "192.168.1.20:8097";
 
 pub struct CurrentSong {
     song_id: Arc<Mutex<String>>,
-    token: &str,
     stream: Cursor<Bytes>, 
+    audo_sink: MixerDeviceSink,
 }
 pub struct Queue {
     items: Vec<Song>,
@@ -28,9 +29,11 @@ impl CurrentSong {
             .unwrap()
             .bytes()
             .await?;
+        let sink_handle = rodio::DeviceSinkBuilder::open_default_sink().unwrap();
         Self {
             song_id: Arc::new(Mutex::new(format!(song_id))),
             stream: bytes,
+            audo_sink: sink_handle,
 
         }
 
@@ -40,8 +43,6 @@ impl CurrentSong {
             URL,
             io);
         endpnt
-
-
     }
     
 
