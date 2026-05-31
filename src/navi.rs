@@ -102,17 +102,14 @@ pub struct NaviData {
 }
 
 impl NaviData {
-    pub async fn new(resp: SubsonicResponse, search: Metadata) -> Self {
+    pub async fn new(resp: SubsonicResponse) -> Self {
         let mut hmap: HashMap<String, Album> = HashMap::new();
         println!("new struct");
         let album: Vec<Album> = resp.album_list_2.album;
         for i in &album {
-            let name = i.name
-                .clone()
-                .to_lowercase();
+            let name = i.name.clone().to_lowercase();
             println!("Yes saar. We are importing this to navidrome");
-            hmap.insert(name, i.clone()); 
-            album.push(i.clone());
+            hmap.insert(name, i.clone());
         }
         Self {
             data: hmap,

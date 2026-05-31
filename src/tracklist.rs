@@ -138,7 +138,7 @@ impl SubsIDResponse {
     async fn new(client: &Client, alb: &NaviData, ser: &str) -> SubsIDResponse{
         println!("currentsong");
         let uid: &str = alb.data.get(ser).unwrap().id.as_str();
-        let url = format!("http://192.168.1.20:8097/rest/getAlbum?id={}=nix&p=2008&v=1.8.0&c=myapp&f=json", uid);
+        let url = format!("http://192.168.1.20:8097/rest/getAlbum?id={}&u=nix&p=2008&v=1.8.0&c=myapp&f=json", uid);
         let root = client
             .get(url)
             .query(&[
