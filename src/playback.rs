@@ -13,11 +13,12 @@ pub struct Queue {
     items: Vec<Song>,
     cursor: i32,
 }
-impl Queue {
-    fn current(&self) -> Option<&SongData> { self.items.get(self.cursor).unwrap() }
-    fn next(&mut self) -> Option<&SongData> { self.cursor += 1; self.current() }
-    fn prev(&mut self) -> Option<&SongData> { self.cursor = self.cursor.saturating_sub(1); self.current() }
-    fn add(&mut self, song: SongData) { self.items.push(song); }
+pub enum PlaybackStatus {
+    Statu1
+    
+
+
+
 }
 impl CurrentSong {
     pub async fn new(song_id: &str, client: &Client) -> Self {
@@ -36,30 +37,11 @@ impl CurrentSong {
             stream: bytes,
             var: handle,
             player: plr,
-            
-
         }
 
     }
-    // play [SONGPOS] (mpd documentation says you have to get an input arg)
-    pub fn rodio_play(&self, x: u32)  {
-        let pos = Duration::from_secs_f32(x);
-        &self.player.try_seek(pos);
-    }
-    /* rodio library already implements most of these. note: dont make retarded wrapper 
-     * classes for these
-    pub fn rodio_stop(&self) => bool {
-        
+    pub fn handle(&self, enum: PlaybackStatus) -> anyhow::Result<String> {
 
-
-
-    }
-    */
-    pub fn rodio_seek(&self, pos: u8)  {
-        let pos = Duration::from_secs_f32(pos);
-        &self.player.try_seek(pos);
-
-        
 
 
     }
@@ -72,12 +54,15 @@ impl CurrentSong {
     }
     
 
+}
+impl NaviApiParse for CurrentSong { 
+    fn get_length(&self) -> String {
 
 
+    }
+    fn get_url(&self) -> String {
 
-
-
-
+    }
 
 
 

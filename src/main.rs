@@ -32,8 +32,9 @@ pub struct MpdSong {
 }
 /* Trait for actual Mpd and
  * the Navidrome api */
-pub trait SongData {
+pub trait SubsonicParse {
     pub fn get_length() -> String;
+    pub fn get_url() -> String;
 }
 
 
