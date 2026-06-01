@@ -18,7 +18,7 @@ pub enum Expr {
 pub struct Field {
     pub field: String,
     pub op: bool,
-    pub value String,
+    pub value: String,
 }
 
 impl Field {

@@ -28,16 +28,13 @@ pub struct MpdSong {
     title: String,
     artist: String,
     album: String,
-    duration: f32,
+    // length: i32,
 }
 /* Trait for actual Mpd and
  * the Navidrome api */
-pub trait AlbumData {
-    fn get_id(var: &str) -> String;
-    fn get_dur(var: &str) -> String;
+pub trait SongData {
+    pub fn get_length() -> String;
 }
-
-
 
 
 
@@ -53,7 +50,7 @@ async fn main() -> anyhow::Result<()> {
     
     
     loop {
-        let (socket, _) = listener.accept().await.unwrap();
+        let (socket, _) = client.accept().await.unwrap();
         tokio::spawn(handle_client(socket));
     }
     Ok(())
