@@ -31,11 +31,15 @@ pub struct MpdSong {
     album: String,
     // length: i32,
 }
+
 /* Trait for actual Mpd and
  * the Navidrome api */
 pub trait SubsonicParse {
     pub fn get_length() -> String;
     pub fn get_url() -> String;
+    pub fn navi_to_song(var: &Song) -> MpdSong;
+
+
 }
 
 

@@ -11,18 +11,26 @@ pub struct CurrentSong {
     var: MixerDeviceSink, // Player depends on Mixer (it says on rust document dont forget this)
     player: Player,
 }
-pub struct Queue {
+pub struct PlaybackQueue {
     items: Vec<Song>,
     cursor: i32,
 }
+
+
+
 pub enum PlaybackStatus {
     Status,
-
-    
-
-
-
+    Seek,
+    Next(),
+    Pause,
+    Play,
+    PlayId(&str),
+    Previous,
+    SeekId(&str),
+    Stop,
 }
+
+
 impl CurrentSong {
     pub async fn new(song_id: &str, client: &Client) -> Self {
         let le_url: String = CurrentSong::fmt_url(song_id);
@@ -43,7 +51,20 @@ impl CurrentSong {
         }
 
     }
-    pub fn handle(&self, enum: PlaybackStatus) -> anyhow::Result<String> {
+    pub fn handle(&self,command: PlaybackStatus)  {
+        match command {
+            PlaybackStatus::Next() => {
+                println!("dbg... we're going to the next song...");
+                self.player.skip_one();
+            }
+            PlaybackStatus::Pause(u8) => {
+
+            }
+
+
+
+
+        }
 
 
 
