@@ -1,5 +1,5 @@
 use crate::search::{Expr, Field};
-
+use crate::MpdSong;
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum Token {
     And,

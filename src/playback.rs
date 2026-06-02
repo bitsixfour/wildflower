@@ -1,6 +1,8 @@
 use rodio::{Decoder, DeviceSinkBuilder, MixerDeviceSink, Player, source::Source};
 use rodio::Player;
 use std::io::Cursor;
+use crate::MpdSong;
+
 const URL: &str = "192.168.1.20:8097";
 
 pub struct CurrentSong {
@@ -14,7 +16,8 @@ pub struct Queue {
     cursor: i32,
 }
 pub enum PlaybackStatus {
-    Statu1
+    Status,
+
     
 
 
@@ -52,6 +55,7 @@ impl CurrentSong {
             io);
         endpnt
     }
+    pub fn playlistinfo(&self) -> MpdSong
     
 
 }

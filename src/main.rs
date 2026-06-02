@@ -9,6 +9,7 @@ mod tracklist;
 mod playback;
 mod search;
 mod parser;
+mod queue;
 use crate::navi::{NaviData, SubsonicResponse};
 
 
