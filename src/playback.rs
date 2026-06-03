@@ -19,14 +19,14 @@ pub struct PlaybackQueue {
 
 
 pub enum PlaybackStatus {
-    Status,
-    Seek,
+    Seek(u32),
     Next(),
-    Pause,
+    Pause(u8),
     Play,
     PlayId(&str),
     Previous,
     SeekId(&str),
+    SeekCur(u32),
     Stop,
 }
 
@@ -57,7 +57,31 @@ impl CurrentSong {
                 println!("dbg... we're going to the next song...");
                 self.player.skip_one();
             }
-            PlaybackStatus::Pause(u8) => {
+            PlaybackStatus::Pause(io) => {
+
+
+            }
+            PlaybackStatus::Play => {
+
+            }
+            PlaybackStatus::PlayId(io) => {
+
+
+            }
+            PlaybackStatus::Previous => {
+
+            }
+            PlaybackStatus::Seek(io) => {
+
+            }
+            PlaybackStatus::SeekId(id) => {
+
+            }
+            PlaybackStatus::SeekCur(io) => {
+
+            }
+            PlaybackStatus::Stop => {
+
 
             }
 
