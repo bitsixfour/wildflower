@@ -21,8 +21,8 @@ pub struct PlaybackQueue {
 pub enum PlaybackStatus {
     Seek(u32),
     Next(),
-    Pause(u8),
-    Play,
+    Pause(i32),
+    Play(Duration),
     PlayId(&str),
     Previous,
     SeekId(&str),
@@ -58,10 +58,25 @@ impl CurrentSong {
                 self.player.skip_one();
             }
             PlaybackStatus::Pause(io) => {
-
-
+                println!("pause");
+                match io {
+                    0 => {
+                        &self.player.pause();
+                    }
+                    1 => {
+                        &self.player.play();
+                    }
+                    _ => {
+                        println!("unexpected args..");
+                    }
+                }
             }
-            PlaybackStatus::Play => {
+            PlaybackStatus::Play(io) => {
+                println!("play");
+                let delta = (io - &self.player.len());
+                for _ in 0..delta { 
+                    &self.player.skip_one();
+                }
 
             }
             PlaybackStatus::PlayId(io) => {
