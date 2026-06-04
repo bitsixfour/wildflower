@@ -1,3 +1,7 @@
+use std::time::Duration;
+
+
+use reqwest::header::ALLOW;
 use rodio::{Decoder, DeviceSinkBuilder, MixerDeviceSink, Player, source::Source};
 use rodio::Player;
 use std::io::Cursor;
@@ -7,9 +11,9 @@ const URL: &str = "192.168.1.20:8097";
 
 pub struct CurrentSong {
     song_id: Arc<Mutex<String>>,
-    stream: Cursor<Bytes>, 
     var: MixerDeviceSink, // Player depends on Mixer (it says on rust document dont forget this)
     player: Player,
+    queue: PlaybackQueue,
 }
 pub struct PlaybackQueue {
     items: Vec<Song>,
@@ -19,14 +23,14 @@ pub struct PlaybackQueue {
 
 
 pub enum PlaybackStatus {
-    Seek(u32),
+    Seek(f32),
     Next(),
     Pause(i32),
     Play(Duration),
-    PlayId(&str),
+    PlayId(String),
     Previous,
     SeekId(&str),
-    SeekCur(u32),
+    SeekCur(f32),
     Stop,
 }
 
@@ -45,13 +49,16 @@ impl CurrentSong {
         let plr = rodio::Player::connect_new(&handle.mixer());
         Self {
             song_id: Arc::new(Mutex::new(format!(song_id))),
-            stream: bytes,
             var: handle,
             player: plr,
+            queue: PlaybackQueue {
+                items: Vec::new(),
+                cursor: 0,
+            }
         }
 
     }
-    pub fn handle(&self,command: PlaybackStatus)  {
+    pub fn handle(&mut self,command: PlaybackStatus)  {
         match command {
             PlaybackStatus::Next() => {
                 println!("dbg... we're going to the next song...");
@@ -79,14 +86,35 @@ impl CurrentSong {
                 }
 
             }
+            #[allow(unused_variables)]
             PlaybackStatus::PlayId(io) => {
+                println!("play by id");
+                let mut cnt;
+                for idx in 0..self.queue.items.len() {
+                    match &self.queue.items.get(idx) {
+                        io => {
+                            println!("match id");
+                            for itr in 0..idx {
+                                println!("{itr}");
+                                &self.player.skip_one();
+                            }
+                        }
+                    }
+                }
+
 
 
             }
             PlaybackStatus::Previous => {
+                println!("previous");
+                &self.queue.cursor.saturating_sub(1);
+                // finish when queue is more polished
 
             }
             PlaybackStatus::Seek(io) => {
+                let dur = Duration::from_secs_f32(io);
+                &self.player.try_seek(io);
+
 
             }
             PlaybackStatus::SeekId(id) => {
