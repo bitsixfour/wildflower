@@ -12,12 +12,12 @@ const URL: &str = "192.168.1.20:8097";
 pub struct CurrentSong {
     song_id: Arc<Mutex<String>>,
     var: MixerDeviceSink, // Player depends on Mixer (it says on rust document dont forget this)
-    player: Player,
     queue: PlaybackQueue,
 }
 pub struct PlaybackQueue {
     items: Vec<Song>,
     cursor: i32,
+    player: Player,
 }
 
 
@@ -46,14 +46,15 @@ impl CurrentSong {
             .bytes()
             .await?;
         let handle = rodio::DeviceSinkBuilder::open_default_sink().unwrap();
-        let plr = rodio::Player::connect_new(&handle.mixer());
+        //let plr = rodio::Player::connect_new(&handle.mixer());
         Self {
             song_id: Arc::new(Mutex::new(format!(song_id))),
             var: handle,
-            player: plr,
+            //player: plr,
             queue: PlaybackQueue {
                 items: Vec::new(),
                 cursor: 0,
+                player: rodio::Player::connect_new(&handle.mixer()),
             }
         }
 
@@ -62,16 +63,16 @@ impl CurrentSong {
         match command {
             PlaybackStatus::Next() => {
                 println!("dbg... we're going to the next song...");
-                self.player.skip_one();
+                self.queue.player.skip_one();
             }
             PlaybackStatus::Pause(io) => {
                 println!("pause");
                 match io {
                     0 => {
-                        &self.player.pause();
+                        &self.queue.player.pause();
                     }
                     1 => {
-                        &self.player.play();
+                        &self.queue.player.play();
                     }
                     _ => {
                         println!("unexpected args..");
@@ -80,9 +81,9 @@ impl CurrentSong {
             }
             PlaybackStatus::Play(io) => {
                 println!("play");
-                let delta = (io - &self.player.len());
+                let delta = Duration::as_secs(&io - &self.queue.player.len());
                 for _ in 0..delta { 
-                    &self.player.skip_one();
+                    &self.queue.player.skip_one();
                 }
 
             }
@@ -96,7 +97,7 @@ impl CurrentSong {
                             println!("match id");
                             for itr in 0..idx {
                                 println!("{itr}");
-                                &self.player.skip_one();
+                                &self.queue.player.skip_one();
                             }
                         }
                     }
@@ -113,7 +114,7 @@ impl CurrentSong {
             }
             PlaybackStatus::Seek(io) => {
                 let dur = Duration::from_secs_f32(io);
-                &self.player.try_seek(io);
+                &self.queue.player.try_seek(dur);
 
 
             }
@@ -143,7 +144,6 @@ impl CurrentSong {
             io);
         endpnt
     }
-    pub fn playlistinfo(&self) -> MpdSong
     
 
 }
@@ -159,3 +159,42 @@ impl NaviApiParse for CurrentSong {
 
 
 }
+   impl PlaybackQueue {
+       pub fn next(&mut self) {
+           if self.cursor < self.items.len() as i32 - 1 {
+               self.cursor += 1;
+               self.player.skip_one();
+           }
+       }
+
+       pub fn previous(&mut self) {
+           self.cursor = self.cursor.saturating_sub(1);
+           self.rebuild();
+       }
+
+       pub fn remove(&mut self, index: usize) {
+           self.items.remove(index);
+           if (index as i32) <= self.cursor {
+               self.cursor = self.cursor.saturating_sub(1);
+           }
+           self.rebuild();
+       }
+
+       pub fn jump_to(&mut self, index: usize) {
+           self.cursor = index as i32;
+           self.rebuild();
+       }
+
+       fn rebuild(&mut self) {
+           self.player.stop();
+           for song in &self.items[self.cursor as usize..] {
+               self.player.append(song_to_source(song));
+           }
+       }
+
+       fn play_current(&mut self) {
+           if let Some(song) = self.items.get(self.cursor as usize) {
+               self.player.append(song_to_source(song));
+           }
+       }
+   }
