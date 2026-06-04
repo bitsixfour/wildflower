@@ -118,14 +118,47 @@ impl CurrentSong {
 
 
             }
+            #[allow(unused_variables)]
             PlaybackStatus::SeekId(id) => {
+                for idx in 0..self.queue.items.len() {
+                    match &self.queue.items.get(idx) {
+                        id => for i in 0..self.queue.items.len() {
+                            println!("found id");
+                            &self.queue.jump_to(0);
+
+                        }
+
+
+
+                    }
+
+                }
+
 
             }
             PlaybackStatus::SeekCur(io) => {
+                let var = self.queue.player.get_pos().clone();
+                let delta = Duration::from_secs_f32(io);
+                for idx in 0..self.queue.items.len() {
+                    match self.queue.items.get(idx) {
+                        id => for i in 0..self.queue.items.len() {
+                            println!("found id");
+                            self.queue.jump_to(0);
+                            self.queue.player.try_seek(var + delta);
+                        }
+
+
+
+                    }
+
+                }
+
+
 
             }
             PlaybackStatus::Stop => {
-
+                println!("stop!");
+                &self.queue.player.stop();
 
             }
 
@@ -147,54 +180,43 @@ impl CurrentSong {
     
 
 }
-impl NaviApiParse for CurrentSong { 
-    fn get_length(&self) -> String {
-
-
-    }
-    fn get_url(&self) -> String {
-
-    }
-
-
-
-}
-   impl PlaybackQueue {
-       pub fn next(&mut self) {
-           if self.cursor < self.items.len() as i32 - 1 {
-               self.cursor += 1;
-               self.player.skip_one();
-           }
-       }
-
-       pub fn previous(&mut self) {
-           self.cursor = self.cursor.saturating_sub(1);
-           self.rebuild();
-       }
-
-       pub fn remove(&mut self, index: usize) {
-           self.items.remove(index);
-           if (index as i32) <= self.cursor {
-               self.cursor = self.cursor.saturating_sub(1);
-           }
-           self.rebuild();
-       }
-
-       pub fn jump_to(&mut self, index: usize) {
-           self.cursor = index as i32;
-           self.rebuild();
-       }
-
-       fn rebuild(&mut self) {
-           self.player.stop();
-           for song in &self.items[self.cursor as usize..] {
-               self.player.append(song_to_source(song));
-           }
-       }
-
-       fn play_current(&mut self) {
-           if let Some(song) = self.items.get(self.cursor as usize) {
-               self.player.append(song_to_source(song));
-           }
+#[allow(unused_variables)]
+impl PlaybackQueue {
+   pub fn next(&mut self) {
+       if self.cursor < self.items.len() as i32 - 1 {
+           self.cursor += 1;
+           self.player.skip_one();
        }
    }
+
+   pub fn previous(&mut self) {
+       self.cursor = self.cursor.saturating_sub(1);
+       self.rebuild();
+   }
+
+   pub fn remove(&mut self, index: usize) {
+       self.items.remove(index);
+       if (index as i32) <= self.cursor {
+           self.cursor = self.cursor.saturating_sub(1);
+       }
+       self.rebuild();
+   }
+
+   pub fn jump_to(&mut self, index: usize) {
+       self.cursor = index as i32;
+       self.rebuild();
+   }
+
+   fn rebuild(&mut self) {
+       self.player.stop();
+       for song in &self.items[self.cursor as usize..] {
+          // self.player.append();
+       }
+   }
+
+   fn play_current(&mut self) {
+       if let Some(song) = self.items.get(self.cursor as usize) {
+         //self.player.append(song_to_source(song));
+       }
+   }
+}
