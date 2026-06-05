@@ -99,21 +99,28 @@ pub async fn navi_obj(client: &Client) -> Result<SubsonicResponse, reqwest::Erro
 
 pub struct NaviData {
     pub data: HashMap<String, Album>, /* test CLI utils */
+    pub data_id: HashMap<String, Album>, /* test CLI utils */
     pub album_list: Vec<Album>,
 }
 
 impl NaviData {
     pub async fn new(resp: SubsonicResponse) -> Self {
         let mut hmap: HashMap<String, Album> = HashMap::new();
+        let mut hmap_2: HashMap<String, Album> = HashMap::new();
         println!("new struct");
         let album: Vec<Album> = resp.album_list_2.album;
         for i in &album {
             let name = i.name.clone().to_lowercase();
+            let id = i.id.clone().to_lowercase();
             println!("Yes saar. We are importing this to navidrome");
+            println!("Yes saar. We are importing this to navidrome (2)");
             hmap.insert(name, i.clone());
+            hmap_2.insert(id,i.clone());
+            
         }
         Self {
             data: hmap,
+            data_id: hmap_2,
             album_list: album,
         }
     }

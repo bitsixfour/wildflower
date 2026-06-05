@@ -6,7 +6,9 @@
 
 use crate::navi::Album;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+
+
+#[derive(Debug, Clone)]
 pub enum Expr {
     And(Field, Field),
     Or(Field, Field),
@@ -82,6 +84,32 @@ mod database {
     
 
     pub fn handle(handle: HandleDatabase) {
+        match handle {
+            HandleDatabase::AlbumArt(io) => {
+                database::parse_album_art(io);
+
+
+            }
+
+
+
+
+            _ => {
+                println!("unexpected args"); 
+            }
+
+
+
+
+        }
+
+
+    }
+    fn parse_album_art(io: &str) {
+
+
+
+
 
 
 
