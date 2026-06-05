@@ -94,11 +94,13 @@ mod parse_exp {
         tokens
     }
 }
+/*
 enum Check {
     And,
     Or,
     None,
-}
+} 
+*/
 
 impl Expr {
     fn create_eval(tkn: Vec<Token>) -> Option<Expr> { 

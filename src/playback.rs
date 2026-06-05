@@ -63,7 +63,7 @@ impl CurrentSong {
         match command {
             PlaybackStatus::Next() => {
                 println!("dbg... we're going to the next song...");
-                self.queue.player.skip_one();
+                self.queue.next();
             }
             PlaybackStatus::Pause(io) => {
                 println!("pause");
@@ -108,8 +108,8 @@ impl CurrentSong {
             }
             PlaybackStatus::Previous => {
                 println!("previous");
-                &self.queue.cursor.saturating_sub(1);
-                // finish when queue is more polished
+                self.queue.previous();
+
 
             }
             PlaybackStatus::Seek(io) => {
@@ -170,18 +170,19 @@ impl CurrentSong {
 
 
     }
-
+/*
     pub fn fmt_url(io: &str) -> String {
         let endpnt = format!("http://{}/rest/stream?u=nix&p=2008&v=1.16.1&c=test&id={}",
             URL,
             io);
         endpnt
     }
-    
+*/  
 
 }
 #[allow(unused_variables)]
 impl PlaybackQueue {
+
    pub fn next(&mut self) {
        if self.cursor < self.items.len() as i32 - 1 {
            self.cursor += 1;
