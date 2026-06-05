@@ -14,6 +14,21 @@ pub enum Expr {
     Empty,
 }
 
+
+#[derive(Debug,Clone)] 
+pub enum HandleDatabase {
+    AlbumArt(&str, i32),
+    Count(&str),
+    GetFinger(&str),
+    LsInfo(&str),
+    LFiles(&str),
+    ReadComments(&str),
+    /* no sane client uses these commands.. not gonna implement it
+    ListAll(),
+    ListAllInfo(),
+    */
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Field {
     pub field: String,
@@ -59,4 +74,25 @@ impl Expr {
             Expr::Empty => true,
         }
     }
+}
+
+
+#[allow(unused_variables)]
+mod database {
+    
+
+    pub fn handle(handle: HandleDatabase) {
+
+
+
+    }
+
+    
+
+
+
+
+
+
+
 }
