@@ -104,7 +104,16 @@ pub struct NaviData {
 }
 
 impl NaviData {
-    pub async fn new(resp: SubsonicResponse) -> Self {
+    pub fn init_empty() -> Self {
+        Self {
+            data: Hashmap::new(),
+            data_id: Hashmap::new(),
+            album_list: Vec::new(),
+        }
+
+
+    }
+    pub async fn updt(&self, resp: SubsonicResponse) -> Self {
         let mut hmap: HashMap<String, Album> = HashMap::new();
         let mut hmap_2: HashMap<String, Album> = HashMap::new();
         println!("new struct");

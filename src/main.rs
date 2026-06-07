@@ -9,8 +9,13 @@ mod tracklist;
 mod playback;
 mod search;
 mod parser;
-mod queue;
 use crate::navi::{NaviData, SubsonicResponse};
+use crate::playback::CurrentSong;
+
+
+
+
+const PORT: i32 = 6600;
 
 
 
@@ -47,42 +52,42 @@ pub trait SubsonicParse {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     println!("starting ze mpd server....");
+    let test_id: &str = "23M5Qz4SmDa79E5MR0woPr";
+    let heckin_reqwest: Client = reqwest::Client::new();
+    let client = TcpListener::bind("127.0.0.1:{PORT}").await?; // 6600 is where MPD lives 
+    println!("We are ze running at port {PORT}"); 
 
-    let client: Client = reqwest::Client::new();
-
-    let res: SubsonicResponse = navi::navi_obj(&client).await?;
-    let navi: NaviData = NaviData::new(res).await;
-
+    let playback_engine: CurrentSong = CurrentSong::new(&test_id, &heckin_reqwest).await?;
+    let navi: NaviData = NaviData::init_empty();
     
     
     loop {
         let (socket, _) = client.accept().await.unwrap();
-        tokio::spawn(handle_client(socket));
+        tokio::init_client(client, playback_engine);
     }
     Ok(())
 }
-async fn handle_client(socket: tokio::net::TcpStream) {
-    let (reader, mut writer) = socket.into_split();
-    let mut lines = BufReader::new(reader).lines();
+async fn init_client(mut socket: TcpStream, mut music_stream: CurrentSong) {
+    print!("OK");
+    let reader_socket = socket.try_clone().unwrap();
+    let reader = BufReader::new(reader_socket);
 
+    for line in reader.lines() {
+        let line = match line {
+            Ok(l) => l,
+            Err(_) => break,
+        };
 
-    println!("dbg see if this works");
-    writer.write_all(b"OK MPD 67.67.67\n").await.unwrap();
-    
-    while let Some(line) = lines.next_line().await.unwrap() {
-        match line.trim() {
-            "play" => {
-                // start playback somehow
-            }
-            "pause" => {
-                // pause playback somehow
-            }
-            "currentsong" => {
-                mpd::getSong();
-            }
-            _ => {
-                writer.write_all(b"OK\n").await.unwrap();
-            }
+        let response = handle_case(&line);
+
+        if socket.write_all(response.as_bytes()).is_err() {
+            break;
+        }
+
+        if line.trim() == "close" {
+            break;
         }
     }
 }
+/* THE actual handling of mpd jorunal reqwests or whatever */
+async fn handle_case(

@@ -21,7 +21,6 @@ pub struct PlaybackQueue {
 }
 
 
-
 pub enum PlaybackStatus {
     Seek(f32),
     Next(),
@@ -108,7 +107,7 @@ impl CurrentSong {
             }
             PlaybackStatus::Previous => {
                 println!("previous");
-                self.queue.previous();
+                self.player.previous();
 
 
             }
@@ -170,14 +169,12 @@ impl CurrentSong {
 
 
     }
-/*
     pub fn fmt_url(io: &str) -> String {
         let endpnt = format!("http://{}/rest/stream?u=nix&p=2008&v=1.16.1&c=test&id={}",
             URL,
             io);
         endpnt
     }
-*/  
 
 }
 #[allow(unused_variables)]
