@@ -65,15 +65,13 @@ async fn main() -> anyhow::Result<()> {
 
     let (tx, mut rx) = tokio::sync::mpsc::channel::<PlaybackStatus>(100);
     tokio::spawn(async move {
-        let mut engine = CurrentSong::new(&test_id, &heckin_reqwest).await.unwrap();
+        let mut engine: CurrentSong = CurrentSong::new(&test_id, &heckin_reqwest).await?;
         while let Some(cmd) = rx.recv().await {
             engine.handle(cmd);
         }
     });
 
     loop {
-        let (socket, _) = listener.accept().await.unwrap();
-        let tx = tx.clone();
         tokio::spawn(async move {
             init_client(socket, tx).await;
         });
@@ -87,8 +85,9 @@ async fn init_client(mut socket: TcpStream, tx: tokio::sync::mpsc::Sender<Playba
 
     while let Ok(Some(line)) = lines.next_line().await {
         let response = handle_case(&line);
+        let handle: &str = response.await?;
 
-        if socket.write_all(response.as_bytes()).await.is_err() {
+        if socket.write_all(handle.as_bytes()).await.is_err() {
             break;
         }
 
@@ -98,4 +97,9 @@ async fn init_client(mut socket: TcpStream, tx: tokio::sync::mpsc::Sender<Playba
     }
 }
 /* THE actual handling of mpd jorunal reqwests or whatever */
-async fn handle_case(
+async fn handle_case(input: &str) -> &str {
+
+
+
+
+}
