@@ -10,7 +10,7 @@ mod playback;
 mod search;
 mod parser;
 use crate::navi::{NaviData, SubsonicResponse};
-use crate::playback::CurrentSong;
+use crate::playback::{CurrentSong, PlaybackStatus};
 
 
 
@@ -54,33 +54,41 @@ async fn main() -> anyhow::Result<()> {
     println!("starting ze mpd server....");
     let test_id: &str = "23M5Qz4SmDa79E5MR0woPr";
     let heckin_reqwest: Client = reqwest::Client::new();
-    let client = TcpListener::bind("127.0.0.1:{PORT}").await?; // 6600 is where MPD lives 
-    println!("We are ze running at port {PORT}"); 
+    let listener = TcpListener::bind(format!("127.0.0.1:{}", PORT)).await?; // 6600 is where MPD lives
+    println!("We are ze running at port {PORT}");
 
-    let playback_engine: CurrentSong = CurrentSong::new(&test_id, &heckin_reqwest).await?;
     let navi: NaviData = NaviData::init_empty();
     
-    
+
+
+
+
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<PlaybackStatus>(100);
+    tokio::spawn(async move {
+        let mut engine = CurrentSong::new(&test_id, &heckin_reqwest).await.unwrap();
+        while let Some(cmd) = rx.recv().await {
+            engine.handle(cmd);
+        }
+    });
+
     loop {
-        let (socket, _) = client.accept().await.unwrap();
-        tokio::init_client(client, playback_engine);
+        let (socket, _) = listener.accept().await.unwrap();
+        let tx = tx.clone();
+        tokio::spawn(async move {
+            init_client(socket, tx).await;
+        });
     }
     Ok(())
 }
-async fn init_client(mut socket: TcpStream, mut music_stream: CurrentSong) {
-    print!("OK");
+async fn init_client(mut socket: TcpStream, tx: tokio::sync::mpsc::Sender<PlaybackStatus>) {
     let reader_socket = socket.try_clone().unwrap();
     let reader = BufReader::new(reader_socket);
+    let mut lines = reader.lines();
 
-    for line in reader.lines() {
-        let line = match line {
-            Ok(l) => l,
-            Err(_) => break,
-        };
-
+    while let Ok(Some(line)) = lines.next_line().await {
         let response = handle_case(&line);
 
-        if socket.write_all(response.as_bytes()).is_err() {
+        if socket.write_all(response.as_bytes()).await.is_err() {
             break;
         }
 

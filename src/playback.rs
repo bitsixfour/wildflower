@@ -28,7 +28,7 @@ pub enum PlaybackStatus {
     Play(Duration),
     PlayId(String),
     Previous,
-    SeekId(&str),
+    SeekId(String),
     SeekCur(f32),
     Stop,
 }
