@@ -106,8 +106,8 @@ pub struct NaviData {
 impl NaviData {
     pub fn init_empty() -> Self {
         Self {
-            data: Hashmap::new(),
-            data_id: Hashmap::new(),
+            data: HashMap::new(),
+            data_id: HashMap::new(),
             album_list: Vec::new(),
         }
 

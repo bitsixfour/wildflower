@@ -1,7 +1,10 @@
+use std::sync::Arc;
+use std::time::Duration;
+
 use clap::Parser;
 use reqwest::Client;
 use event_listener::{Event, Listener};
-use tokio::net::TcpListener;
+use tokio::net::{TcpListener, TcpStream};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 
 mod navi;
@@ -9,8 +12,10 @@ mod tracklist;
 mod playback;
 mod search;
 mod parser;
+mod rodio_stub;
 use crate::navi::{NaviData, SubsonicResponse};
-use crate::playback::{CurrentSong, PlaybackStatus};
+use crate::tracklist::Song;
+use crate::playback::{CurrentSong, PlaybackStatus, PlayerState, AudioState, SharedState};
 
 
 
@@ -40,9 +45,9 @@ pub struct MpdSong {
 /* Trait for actual Mpd and
  * the Navidrome api */
 pub trait SubsonicParse {
-    pub fn get_length() -> String;
-    pub fn get_url() -> String;
-    pub fn navi_to_song(var: &Song) -> MpdSong;
+    fn get_length() -> String;
+    fn get_url() -> String;
+    fn navi_to_song(var: &Song) -> MpdSong;
 
 
 }
@@ -61,45 +66,180 @@ async fn main() -> anyhow::Result<()> {
     
 
 
+    let shared_state: SharedState = Arc::new(tokio::sync::RwLock::new(PlayerState {
+        volume: 100,
+        state: AudioState::Stop,
+        song_pos: None,
+        song_id: None,
+        elapsed: Duration::from_secs(0),
+        duration: Duration::from_secs(0),
+        playlist_length: 0,
+        playlist_version: 0,
+    }));
 
+    let (cmd_tx, mut cmd_rx) = tokio::sync::mpsc::channel::<PlaybackStatus>(100);
 
-    let (tx, mut rx) = tokio::sync::mpsc::channel::<PlaybackStatus>(100);
+    let engine_state = Arc::clone(&shared_state);
     tokio::spawn(async move {
-        let mut engine: CurrentSong = CurrentSong::new(&test_id, &heckin_reqwest).await?;
-        while let Some(cmd) = rx.recv().await {
+        let mut engine = CurrentSong::new(&test_id, &heckin_reqwest).await;
+        while let Some(cmd) = cmd_rx.recv().await {
             engine.handle(cmd);
+            /* sync the lightweight state after every command */
+            let mut st = engine_state.write().await;
+            st.state = AudioState::Play; // TODO: actually ask engine what it is
+            st.song_pos = Some(engine.get_queue_cursor() as usize);
+            st.playlist_length = engine.get_queue_len();
         }
     });
 
     loop {
+        let (socket, _) = listener.accept().await.unwrap();
+        let client_tx = cmd_tx.clone();
+        let client_state = Arc::clone(&shared_state);
         tokio::spawn(async move {
-            init_client(socket, tx).await;
+            init_client(socket, client_tx, client_state).await;
         });
     }
-    Ok(())
 }
-async fn init_client(mut socket: TcpStream, tx: tokio::sync::mpsc::Sender<PlaybackStatus>) {
-    let reader_socket = socket.try_clone().unwrap();
-    let reader = BufReader::new(reader_socket);
-    let mut lines = reader.lines();
 
-    while let Ok(Some(line)) = lines.next_line().await {
-        let response = handle_case(&line);
-        let handle: &str = response.await?;
+async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<PlaybackStatus>, state: SharedState) {
+    /* mpd greeting */
+    let (reader, mut writer) = tokio::io::split(socket);
+    let mut reader = BufReader::new(reader);
+    let _ = writer.write_all(b"OK MPD 0.25.0\n").await;
 
-        if socket.write_all(handle.as_bytes()).await.is_err() {
-            break;
-        }
-
-        if line.trim() == "close" {
-            break;
+    let mut line = String::new();
+    loop {
+        line.clear();
+        match reader.read_line(&mut line).await {
+            Ok(0) => break,
+            Ok(_) => {
+                let trimmed = line.trim_end();
+                if trimmed.is_empty() { continue; }
+                let response = handle_case(trimmed, &cmd_tx, &state).await;
+                if writer.write_all(response.as_bytes()).await.is_err() {
+                    break;
+                }
+                if trimmed == "close" {
+                    break;
+                }
+            }
+            Err(_) => break,
         }
     }
 }
+
 /* THE actual handling of mpd jorunal reqwests or whatever */
-async fn handle_case(input: &str) -> &str {
+async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackStatus>, state: &SharedState) -> String {
+    let trimmed = input.trim();
+    let mut parts: Vec<String> = Vec::new();
+    let mut in_quotes = false;
+    let mut current = String::new();
 
+    for c in trimmed.chars() {
+        match c {
+            '"' => in_quotes = !in_quotes,
+            ' ' | '\t' if !in_quotes => {
+                if !current.is_empty() {
+                    parts.push(current.clone());
+                    current.clear();
+                }
+            }
+            _ => current.push(c),
+        }
+    }
+    if !current.is_empty() {
+        parts.push(current);
+    }
 
+    let cmd = parts.get(0).map(|s| s.as_str()).unwrap_or("");
 
+    match cmd {
+        /* === PLAYBACK COMMANDS (fire into the engine) === */
+        "play" => {
+            let status = match parts.get(1).and_then(|s| s.parse().ok()) {
+                Some(pos) => PlaybackStatus::PlayPos(pos),
+                None => PlaybackStatus::Play,
+            };
+            let _ = cmd_tx.send(status).await;
+            "OK\n".to_string()
+        }
+        "pause" => {
+            let arg = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(1);
+            let _ = cmd_tx.send(PlaybackStatus::Pause(arg)).await;
+            "OK\n".to_string()
+        }
+        "next" => {
+            let _ = cmd_tx.send(PlaybackStatus::Next()).await;
+            "OK\n".to_string()
+        }
+        "previous" => {
+            let _ = cmd_tx.send(PlaybackStatus::Previous).await;
+            "OK\n".to_string()
+        }
+        "stop" => {
+            let _ = cmd_tx.send(PlaybackStatus::Stop).await;
+            "OK\n".to_string()
+        }
+        "seekcur" => {
+            if let Some(time) = parts.get(1).and_then(|s| s.parse().ok()) {
+                let _ = cmd_tx.send(PlaybackStatus::SeekCur(time)).await;
+                "OK\n".to_string()
+            } else {
+                "ACK [2@0] {seekcur} bad arguments\n".to_string()
+            }
+        }
 
+        /* === QUERY COMMANDS (read from shared state instantly) === */
+        "status" => {
+            let st = state.read().await;
+            let mut out = String::new();
+            out.push_str(&format!("volume: {}\n", st.volume));
+            out.push_str("repeat: 0\n");
+            out.push_str("random: 0\n");
+            out.push_str("single: 0\n");
+            out.push_str("consume: 0\n");
+            out.push_str(&format!("playlist: {}\n", st.playlist_version));
+            out.push_str(&format!("playlistlength: {}\n", st.playlist_length));
+            out.push_str(&format!("state: {}\n", match st.state {
+                AudioState::Play => "play",
+                AudioState::Stop => "stop",
+                AudioState::Pause => "pause",
+            }));
+            if let Some(pos) = st.song_pos {
+                out.push_str(&format!("song: {}\n", pos));
+            }
+            if let Some(ref id) = st.song_id {
+                out.push_str(&format!("songid: {}\n", id));
+            }
+            out.push_str(&format!("elapsed: {:.3}\n", st.elapsed.as_secs_f64()));
+            if st.duration > Duration::from_secs(0) {
+                out.push_str(&format!("duration: {:.3}\n", st.duration.as_secs_f64()));
+            }
+            out.push_str("OK\n");
+            out
+        }
+        "currentsong" => {
+            let st = state.read().await;
+            let mut out = String::new();
+            if let Some(ref id) = st.song_id {
+                out.push_str(&format!("file: {}\n", id));
+                out.push_str(&format!("Id: {}\n", id));
+            }
+            out.push_str("OK\n");
+            out
+        }
+        "playlistinfo" => {
+            let st = state.read().await;
+            let mut out = String::new();
+            /* TODO: iterate queue when its actually populated */
+            out.push_str("OK\n");
+            out
+        }
+        "ping" => "OK\n".to_string(),
+        "close" => "OK\n".to_string(),
+
+        /* === FALLBACK === */
+        _ => format!("ACK [5@0] {{{cmd}}} unknown command\n"),
+    }
 }

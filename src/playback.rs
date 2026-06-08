@@ -1,11 +1,14 @@
 use std::time::Duration;
+use std::sync::{Arc, Mutex};
 
 
 use reqwest::header::ALLOW;
-use rodio::{Decoder, DeviceSinkBuilder, MixerDeviceSink, Player, source::Source};
-use rodio::Player;
+use reqwest::Client;
+use crate::rodio_stub::{Decoder, DeviceSinkBuilder, MixerDeviceSink, Player, source::Source};
+use crate::rodio_stub::Player as RodioPlayer;
 use std::io::Cursor;
 use crate::MpdSong;
+use crate::tracklist::Song;
 
 const URL: &str = "192.168.1.20:8097";
 
@@ -25,13 +28,35 @@ pub enum PlaybackStatus {
     Seek(f32),
     Next(),
     Pause(i32),
-    Play(Duration),
+    Play,              // resume / play with no arg
+    PlayPos(usize),    // play [songpos]
     PlayId(String),
     Previous,
     SeekId(String),
     SeekCur(f32),
     Stop,
 }
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AudioState {
+    Play,
+    Stop,
+    Pause,
+}
+
+#[derive(Clone, Debug)]
+pub struct PlayerState {
+    pub volume: i32,
+    pub state: AudioState,
+    pub song_pos: Option<usize>,
+    pub song_id: Option<String>,
+    pub elapsed: Duration,
+    pub duration: Duration,
+    pub playlist_length: usize,
+    pub playlist_version: u32,
+}
+
+pub type SharedState = Arc<tokio::sync::RwLock<PlayerState>>;
 
 
 impl CurrentSong {
@@ -43,17 +68,17 @@ impl CurrentSong {
             .await
             .unwrap()
             .bytes()
-            .await?;
-        let handle = rodio::DeviceSinkBuilder::open_default_sink().unwrap();
+            .await.unwrap();
+        let handle = DeviceSinkBuilder::open_default_sink().unwrap();
         //let plr = rodio::Player::connect_new(&handle.mixer());
         Self {
-            song_id: Arc::new(Mutex::new(format!(song_id))),
-            var: handle,
+            song_id: Arc::new(Mutex::new(song_id.to_string())),
+            var: handle.clone(),
             //player: plr,
             queue: PlaybackQueue {
                 items: Vec::new(),
                 cursor: 0,
-                player: rodio::Player::connect_new(&handle.mixer()),
+                player: Player::connect_new(&handle.mixer()),
             }
         }
 
@@ -78,18 +103,17 @@ impl CurrentSong {
                     }
                 }
             }
-            PlaybackStatus::Play(io) => {
-                println!("play");
-                let delta = Duration::as_secs(&io - &self.queue.player.len());
-                for _ in 0..delta { 
-                    &self.queue.player.skip_one();
-                }
-
+            PlaybackStatus::Play => {
+                println!("play (resume)");
+                self.queue.player.play();
+            }
+            PlaybackStatus::PlayPos(pos) => {
+                println!("play pos {}", pos);
+                self.queue.jump_to(pos);
             }
             #[allow(unused_variables)]
             PlaybackStatus::PlayId(io) => {
                 println!("play by id");
-                let mut cnt;
                 for idx in 0..self.queue.items.len() {
                     match &self.queue.items.get(idx) {
                         io => {
@@ -107,9 +131,7 @@ impl CurrentSong {
             }
             PlaybackStatus::Previous => {
                 println!("previous");
-                self.player.previous();
-
-
+                self.queue.previous();
             }
             PlaybackStatus::Seek(io) => {
                 let dur = Duration::from_secs_f32(io);
@@ -174,6 +196,12 @@ impl CurrentSong {
             URL,
             io);
         endpnt
+    }
+    pub fn get_queue_cursor(&self) -> i32 {
+        self.queue.cursor
+    }
+    pub fn get_queue_len(&self) -> usize {
+        self.queue.items.len()
     }
 
 }

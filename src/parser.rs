@@ -18,6 +18,8 @@ struct Parser {
 
 
 mod parse_exp {
+    use crate::parser::Token;
+
     fn new(needed_data: &str) -> Vec<Token> {
         let vec: Vec<Token> = tokenize_and_filter(needed_data);
         vec
@@ -117,8 +119,8 @@ impl Expr {
 
                 }
                 Token::Or => {
-                   let arg_1 = create_arg_struct(tkn, 0);
-                   let arg_2 = create_arg_struct(tkn.clone(), 3);
+                   let arg_1 = create_arg_struct(tkn.clone(), 0);
+                   let arg_2 = create_arg_struct(tkn, 3);
                    special = true;
                    return Some(Expr::Or(arg_1, arg_2))
                 }

@@ -19,12 +19,12 @@ pub enum Expr {
 
 #[derive(Debug,Clone)] 
 pub enum HandleDatabase {
-    AlbumArt(&str, i32),
-    Count(&str),
-    GetFinger(&str),
-    LsInfo(&str),
-    LFiles(&str),
-    ReadComments(&str),
+    AlbumArt(String, i32),
+    Count(String),
+    GetFinger(String),
+    LsInfo(String),
+    LFiles(String),
+    ReadComments(String),
     /* no sane client uses these commands.. not gonna implement it
     ListAll(),
     ListAllInfo(),
@@ -81,12 +81,12 @@ impl Expr {
 
 #[allow(unused_variables)]
 mod database {
-    
+    use crate::search::HandleDatabase;
 
     pub fn handle(handle: HandleDatabase) {
         match handle {
-            HandleDatabase::AlbumArt(io) => {
-                database::parse_album_art(io);
+            HandleDatabase::AlbumArt(io, _) => {
+                parse_album_art(&io);
 
 
             }
