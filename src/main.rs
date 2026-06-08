@@ -129,7 +129,9 @@ async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<Playba
     }
 }
 
-/* THE actual handling of mpd jorunal reqwests or whatever */
+
+
+/* Giant monolithic handling of all 50+ MPD functions. */
 async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackStatus>, state: &SharedState) -> String {
     let trimmed = input.trim();
     let mut parts: Vec<String> = Vec::new();
@@ -155,7 +157,8 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
     let cmd = parts.get(0).map(|s| s.as_str()).unwrap_or("");
 
     match cmd {
-        /* === PLAYBACK COMMANDS (fire into the engine) === */
+
+        // basic commands 
         "play" => {
             let status = match parts.get(1).and_then(|s| s.parse().ok()) {
                 Some(pos) => PlaybackStatus::PlayPos(pos),
@@ -232,14 +235,14 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
         "playlistinfo" => {
             let st = state.read().await;
             let mut out = String::new();
-            /* TODO: iterate queue when its actually populated */
             out.push_str("OK\n");
             out
         }
         "ping" => "OK\n".to_string(),
         "close" => "OK\n".to_string(),
 
-        /* === FALLBACK === */
+        
+        // error...
         _ => format!("ACK [5@0] {{{cmd}}} unknown command\n"),
     }
 }

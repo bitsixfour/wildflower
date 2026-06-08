@@ -1,60 +1,12 @@
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on build directory
-   2.527228847s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
-   2.527254105s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-24c59d727313326b/bin-mpdnavi`
-
-Caused by:
-    No such file or directory (os error 2)
-
-Stack backtrace:
-   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
-   1: cargo_util::paths::read
-   2: cargo::core::compiler::fingerprint::prepare_target
-   3: cargo::core::compiler::compile
-   4: <cargo::core::compiler::build_runner::BuildRunner>::compile
-   5: cargo::ops::cargo_compile::compile_ws
-   6: cargo::ops::cargo_compile::compile_with_exec
-   7: cargo::ops::cargo_compile::compile
-   8: cargo::commands::check::exec
-   9: <cargo::cli::Exec>::exec
-  10: cargo::cli::main
-  11: cargo::main
-  12: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
-  13: std::rt::lang_start::<()>::{closure#0}
-  14: std::rt::lang_start_internal
-  15: main
-  16: __libc_start_call_main
-  17: __libc_start_main_alias_2
-  18: _start
-   2.545483681s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
-   2.545501385s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-dddd9e4b4f5bcd62/test-bin-mpdnavi`
-
-Caused by:
-    No such file or directory (os error 2)
-
-Stack backtrace:
-   0: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
-   1: cargo_util::paths::read
-   2: cargo::core::compiler::fingerprint::prepare_target
-   3: cargo::core::compiler::compile
-   4: <cargo::core::compiler::build_runner::BuildRunner>::compile
-   5: cargo::ops::cargo_compile::compile_ws
-   6: cargo::ops::cargo_compile::compile_with_exec
-   7: cargo::ops::cargo_compile::compile
-   8: cargo::commands::check::exec
-   9: <cargo::cli::Exec>::exec
-  10: cargo::cli::main
-  11: cargo::main
-  12: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
-  13: std::rt::lang_start::<()>::{closure#0}
-  14: std::rt::lang_start_internal
-  15: main
-  16: __libc_start_call_main
-  17: __libc_start_main_alias_2
-  18: _start
+   0.106956113s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: stale: changed "/home/will/git/mpdnavi/src/main.rs"
+   0.106972854s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:           (vs) "/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-24c59d727313326b/dep-bin-mpdnavi"
+   0.106975980s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1780895207, nanos: 601677135 } < FileTime { seconds: 1780895248, nanos: 595858490 }
+   0.107209560s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint dirty for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
+   0.107222314s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-24c59d727313326b/dep-bin-mpdnavi", reference_mtime: FileTime { seconds: 1780895207, nanos: 601677135 }, stale: "/home/will/git/mpdnavi/src/main.rs", stale_mtime: FileTime { seconds: 1780895248, nanos: 595858490 } }))
+   0.119598902s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: stale: changed "/home/will/git/mpdnavi/src/main.rs"
+   0.119611636s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:           (vs) "/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-dddd9e4b4f5bcd62/dep-test-bin-mpdnavi"
+   0.119614582s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1780895207, nanos: 601677135 } < FileTime { seconds: 1780895248, nanos: 595858490 }
+   0.119683381s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint dirty for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
+   0.119692157s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-dddd9e4b4f5bcd62/dep-test-bin-mpdnavi", reference_mtime: FileTime { seconds: 1780895207, nanos: 601677135 }, stale: "/home/will/git/mpdnavi/src/main.rs", stale_mtime: FileTime { seconds: 1780895248, nanos: 595858490 } }))
     Checking mpdnavi v0.1.0 (/home/will/git/mpdnavi)
-error: could not compile `mpdnavi` (bin "mpdnavi" test) due to 40 previous errors; 15 warnings emitted
-warning: build failed, waiting for other jobs to finish...
-error: could not compile `mpdnavi` (bin "mpdnavi") due to 40 previous errors; 15 warnings emitted
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.39s
