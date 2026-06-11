@@ -1,5 +1,6 @@
 use std::time::Duration;
 use std::sync::{Arc, Mutex};
+use bytes::Bytes;
 
 
 use reqwest::header::ALLOW;
@@ -14,6 +15,7 @@ const URL: &str = "192.168.1.20:8097";
 
 pub struct CurrentSong {
     song_id: Arc<Mutex<String>>,
+    bytes: Bytes,
     var: MixerDeviceSink, // Player depends on Mixer (it says on rust document dont forget this)
     queue: PlaybackQueue,
 }
@@ -60,7 +62,7 @@ pub type SharedState = Arc<tokio::sync::RwLock<PlayerState>>;
 
 
 impl CurrentSong {
-    pub async fn new(song_id: &str, client: &Client) -> Self {
+    pub async fn new(song_id: &str, client: Client) -> Self {
         let le_url: String = CurrentSong::fmt_url(song_id);
         let bytes = client
             .get(&le_url)
@@ -74,6 +76,7 @@ impl CurrentSong {
         Self {
             song_id: Arc::new(Mutex::new(song_id.to_string())),
             var: handle.clone(),
+            bytes: bytes,
             //player: plr,
             queue: PlaybackQueue {
                 items: Vec::new(),

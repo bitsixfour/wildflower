@@ -33,7 +33,7 @@ pub struct Args {
     #[arg(short, long, default_value_t = 1)]
     count: u8,
 }
-
+#[allow(dead_code)]
 pub struct MpdSong {
     id: String,
     title: String,
@@ -43,7 +43,6 @@ pub struct MpdSong {
 }
 
 /* Trait for actual Mpd and
- * the Navidrome api */
 pub trait SubsonicParse {
     fn get_length() -> String;
     fn get_url() -> String;
@@ -51,10 +50,12 @@ pub trait SubsonicParse {
 
 
 }
+*/
 
 
 
 #[tokio::main]
+#[allow(unused_variables)]
 async fn main() -> anyhow::Result<()> {
     println!("starting ze mpd server....");
     let test_id: &str = "23M5Qz4SmDa79E5MR0woPr";
@@ -64,7 +65,6 @@ async fn main() -> anyhow::Result<()> {
 
     let navi: NaviData = NaviData::init_empty();
     
-
 
     let shared_state: SharedState = Arc::new(tokio::sync::RwLock::new(PlayerState {
         volume: 100,
@@ -79,14 +79,18 @@ async fn main() -> anyhow::Result<()> {
 
     let (cmd_tx, mut cmd_rx) = tokio::sync::mpsc::channel::<PlaybackStatus>(100);
 
+
+
+
+
+
     let engine_state = Arc::clone(&shared_state);
     tokio::spawn(async move {
-        let mut engine = CurrentSong::new(&test_id, &heckin_reqwest).await;
+        let mut engine = CurrentSong::new(&test_id, heckin_reqwest).await;
         while let Some(cmd) = cmd_rx.recv().await {
             engine.handle(cmd);
-            /* sync the lightweight state after every command */
             let mut st = engine_state.write().await;
-            st.state = AudioState::Play; // TODO: actually ask engine what it is
+            st.state = AudioState::Play; 
             st.song_pos = Some(engine.get_queue_cursor() as usize);
             st.playlist_length = engine.get_queue_len();
         }
@@ -103,7 +107,6 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<PlaybackStatus>, state: SharedState) {
-    /* mpd greeting */
     let (reader, mut writer) = tokio::io::split(socket);
     let mut reader = BufReader::new(reader);
     let _ = writer.write_all(b"OK MPD 0.25.0\n").await;
@@ -158,13 +161,11 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
 
     match cmd {
 
-        // basic commands 
         "play" => {
-            let status = match parts.get(1).and_then(|s| s.parse().ok()) {
-                Some(pos) => PlaybackStatus::PlayPos(pos),
-                None => PlaybackStatus::Play,
-            };
-            let _ = cmd_tx.send(status).await;
+            // let arg = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(1);
+            let _ = cmd_tx.send(PlaybackStatus::Play).await;
+
+
             "OK\n".to_string()
         }
         "pause" => {
@@ -193,7 +194,6 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             }
         }
 
-        /* === QUERY COMMANDS (read from shared state instantly) === */
         "status" => {
             let st = state.read().await;
             let mut out = String::new();

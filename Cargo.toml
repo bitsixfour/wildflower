@@ -20,3 +20,4 @@ indexmap = "2.14.0"
 symphonia = "0.6.0"
 # rodio = "0.22.2"  # re-enable when libasound2-dev is installed
 event-listener = "5.4.1"
+bytes = "1.11.1"
