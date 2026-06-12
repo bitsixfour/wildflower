@@ -161,6 +161,9 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
 
     match cmd {
 
+
+
+        /* Controlling playback segment on mpd.readthedocs.io */
         "play" => {
             // let arg = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(1);
             let _ = cmd_tx.send(PlaybackStatus::Play).await;
@@ -169,9 +172,24 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             "OK\n".to_string()
         }
         "pause" => {
-            let arg = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(1);
-            let _ = cmd_tx.send(PlaybackStatus::Pause(arg)).await;
+            let arg: i32 = parts.get(1).unwrap().parse().unwrap();
+            match arg {
+                0..1 =>  {
+                    let _ = cmd_tx.send(PlaybackStatus::Pause(arg)).await;
+                    "Ok\n".to_string()
+                    
+                }
+                _ => {
+                    "ACK\n".to_string()
+                }
+            }
+        }
+        "playid" => {
+            let arg = parts.get(1).unwrap().parse::<usize>().unwrap() as usize;
+            let _ = cmd_tx.send(PlaybackStatus::PlayPos(arg)).await;
             "OK\n".to_string()
+
+
         }
         "next" => {
             let _ = cmd_tx.send(PlaybackStatus::Next()).await;
@@ -185,12 +203,21 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             let _ = cmd_tx.send(PlaybackStatus::Stop).await;
             "OK\n".to_string()
         }
+        "seek" => {
+            
+
+
+        }
+        "seekid" => {
+
+
+        }
         "seekcur" => {
             if let Some(time) = parts.get(1).and_then(|s| s.parse().ok()) {
                 let _ = cmd_tx.send(PlaybackStatus::SeekCur(time)).await;
                 "OK\n".to_string()
             } else {
-                "ACK [2@0] {seekcur} bad arguments\n".to_string()
+                "ACK [2@0] {seekcur} bad args\n".to_string()
             }
         }
 
