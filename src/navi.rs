@@ -98,8 +98,8 @@ pub async fn navi_obj(client: &Client) -> Result<SubsonicResponse, reqwest::Erro
 
 
 pub struct NaviData {
-    pub data: HashMap<String, Album>, /* test CLI utils */
-    pub data_id: HashMap<String, Album>, /* test CLI utils */
+    pub data: HashMap<String, Album>, 
+    pub data_id: HashMap<String, Album>, 
     pub album_list: Vec<Album>,
 }
 

@@ -72,12 +72,10 @@ impl CurrentSong {
             .bytes()
             .await.unwrap();
         let handle = DeviceSinkBuilder::open_default_sink().unwrap();
-        //let plr = rodio::Player::connect_new(&handle.mixer());
         Self {
             song_id: le_url,
             var: handle.clone(),
             stream: bytes,
-            //player: plr,
             queue: PlaybackQueue {
                 items: Vec::new(),
                 cursor: 0,
@@ -217,41 +215,42 @@ impl CurrentSong {
 
 #[allow(unused_variables)]
 impl PlaybackQueue {
-
-   pub fn next(&mut self) {
-       if self.cursor < self.items.len() as i32 - 1 {
-           self.cursor += 1;
-           
-           self.player.skip_one();
-       }
-   }
-
-   pub fn previous(&mut self) {
-       self.cursor = self.cursor.saturating_sub(1);
-       self.rebuild();
-   }
+    
 
 
-   pub fn remove(&mut self, index: usize) {
-       self.items.remove(index);
-       if (index as i32) <= self.cursor {
-           self.cursor = self.cursor.saturating_sub(1);
-       }
-       self.rebuild();
-   }
 
-   pub fn jump_to(&mut self, index: usize) {
-       self.cursor = index as i32;
-       self.rebuild();
-   }
 
-   fn rebuild(&mut self) {
-       self.player.stop();
-       for song in &self.items[self.cursor as usize..] {
-       }
-   }
 
-   fn play_current(&mut self, sink: Sink) {
-       
-   }
+    pub fn next(&mut self) {
+
+    }
+
+    pub fn previous(&mut self) {
+    }
+
+
+    pub fn remove(&mut self, index: usize) {
+    }
+
+    pub fn jump_to(&mut self, index: usize) {
+    }
+
+
+
+
+    /* heckin backend functions */
+
+    fn sink_current(&mut self, sink: Sink) {
+
+      
+    }
+    fn sink_backward(&mut self, sink: Sink) {
+
+
+    }
+    fn sink_init(&mut self, sink: &Sink) {
+        sink.play();
+
+
+    }
 }

@@ -12,7 +12,8 @@ mod tracklist;
 mod playback;
 mod search;
 mod parser;
-mod rodio_stub;
+mod audio;
+// mod rodio_stub;
 use crate::navi::{NaviData, SubsonicResponse};
 use crate::tracklist::Song;
 use crate::playback::{CurrentSong, PlaybackStatus, PlayerState, AudioState, SharedState};
@@ -101,12 +102,12 @@ async fn main() -> anyhow::Result<()> {
         let client_tx = cmd_tx.clone();
         let client_state = Arc::clone(&shared_state);
         tokio::spawn(async move {
-            init_client(socket, client_tx, client_state).await;
+            init_client(socket, client_tx, client_state, navi).await;
         });
     }
 }
 
-async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<PlaybackStatus>, state: SharedState) {
+async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<PlaybackStatus>, state: SharedState, music_data: NaviData) {
     let (reader, mut writer) = tokio::io::split(socket);
     let mut reader = BufReader::new(reader);
     let _ = writer.write_all(b"OK MPD 0.25.0\n").await;

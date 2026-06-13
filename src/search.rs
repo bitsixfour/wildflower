@@ -5,6 +5,7 @@
  */
 
 use crate::navi::Album;
+use crate::search::HandleDatabase;
 
 
 
@@ -81,7 +82,6 @@ impl Expr {
 
 #[allow(unused_variables)]
 mod database {
-    use crate::search::HandleDatabase;
 
     pub fn handle(handle: HandleDatabase) {
         match handle {
