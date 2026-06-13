@@ -27,15 +27,15 @@ pub struct PlaybackQueue {
 
 
 pub enum PlaybackStatus {
-    Seek(f32),
+    Seek((u64, String)),
     Next(),
     Pause(i32),
     Play,              // resume / play with no arg
     PlayPos(usize),    // play [songpos]
     PlayId(String),
     Previous,
-    SeekId(String),
-    SeekCur(f32),
+    SeekId((u64, String)),
+    SeekCur(u64),
     Stop,
 }
 
@@ -123,7 +123,7 @@ impl CurrentSong {
                             println!("match id");
                             for itr in 0..idx {
                                 println!("{itr}");
-                                &self.queue.player.skip_one();
+                                self.queue.player.skip_one();
                             }
                         }
                     }
@@ -137,22 +137,22 @@ impl CurrentSong {
                 self.queue.previous();
             }
             PlaybackStatus::Seek(io) => {
-                let dur = Duration::from_secs_f32(io);
-                &self.queue.player.try_seek(dur);
-
+                let pos_seek = Duration::from_secs(io.0);
+                self.queue.jump_to(io.0 as usize);
+                self.queue.player.try_seek(pos_seek);
 
             }
             #[allow(unused_variables)]
             PlaybackStatus::SeekId(id) => {
+                let sec_seek = Duration::from_secs(id.0); 
                 for idx in 0..self.queue.items.len() {
-                    match &self.queue.items.get(idx) {
+                    match self.queue.items.get(idx) {
                         id => for i in 0..self.queue.items.len() {
                             println!("found id");
-                            &self.queue.jump_to(0);
+                            self.queue.jump_to(i);
+                            self.queue.player.try_seek(sec_seek);
 
                         }
-
-
 
                     }
 
@@ -160,6 +160,7 @@ impl CurrentSong {
 
 
             }
+            #[allow(unused_variables)]
             PlaybackStatus::SeekCur(io) => {
                 let var = self.queue.player.get_pos().clone();
                 let delta = Duration::from_secs_f32(io);
@@ -182,7 +183,7 @@ impl CurrentSong {
             }
             PlaybackStatus::Stop => {
                 println!("stop!");
-                &self.queue.player.stop();
+                self.queue.player.stop();
 
             }
 

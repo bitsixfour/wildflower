@@ -204,21 +204,31 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             "OK\n".to_string()
         }
         "seek" => {
-            
+            let songpos: u64 = parts.get(1).unwrap().parse::<u64>().unwrap();
+            let time: String = parts.get(2).unwrap().parse::<String>().unwrap();
+            let turp = (songpos, time);
+            let _ = cmd_tx.send(PlaybackStatus::SeekId(turp)).await;
+
+            "Ok\n".to_string()
+
 
 
         }
         "seekid" => {
+            let songpos: u64 = parts.get(1).unwrap().parse::<u64>().unwrap();
+            let time: String = parts.get(2).unwrap().parse::<String>().unwrap();
+            let turp = (songpos, time);
+            let _ = cmd_tx.send(PlaybackStatus::SeekId(turp)).await;
+
+            "Ok\n".to_string()
+
 
 
         }
         "seekcur" => {
-            if let Some(time) = parts.get(1).and_then(|s| s.parse().ok()) {
-                let _ = cmd_tx.send(PlaybackStatus::SeekCur(time)).await;
-                "OK\n".to_string()
-            } else {
-                "ACK [2@0] {seekcur} bad args\n".to_string()
-            }
+            let dur = parts.get(1).unwrap().parse::<u64>().unwrap();
+            let _ = cmd_tx.send(PlaybackStatus::SeekCur(dur)).await;
+            "Ok\n".to_string()
         }
 
         "status" => {
