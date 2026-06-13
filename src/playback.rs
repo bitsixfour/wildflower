@@ -3,19 +3,19 @@ use std::sync::{Arc, Mutex};
 use bytes::Bytes;
 
 
-use reqwest::header::ALLOW;
+// use reqwest::header::ALLOW;
 use reqwest::Client;
-use crate::rodio_stub::{Decoder, DeviceSinkBuilder, MixerDeviceSink, Player, source::Source};
-use crate::rodio_stub::Player as RodioPlayer;
 use std::io::Cursor;
+use rodio::{Decoder, OutputStream, Sink, source::Source};
+use std::io::BufReader;
 use crate::MpdSong;
 use crate::tracklist::Song;
 
 const URL: &str = "192.168.1.20:8097";
 
 pub struct CurrentSong {
-    song_id: Arc<Mutex<String>>,
-    bytes: Bytes,
+    song_id: String,
+    stream: Bytes,
     var: MixerDeviceSink, // Player depends on Mixer (it says on rust document dont forget this)
     queue: PlaybackQueue,
 }
@@ -74,9 +74,9 @@ impl CurrentSong {
         let handle = DeviceSinkBuilder::open_default_sink().unwrap();
         //let plr = rodio::Player::connect_new(&handle.mixer());
         Self {
-            song_id: Arc::new(Mutex::new(song_id.to_string())),
+            song_id: le_url,
             var: handle.clone(),
-            bytes: bytes,
+            stream: bytes,
             //player: plr,
             queue: PlaybackQueue {
                 items: Vec::new(),
@@ -96,10 +96,10 @@ impl CurrentSong {
                 println!("pause");
                 match io {
                     0 => {
-                        &self.queue.player.pause();
+                        self.queue.player.pause();
                     }
                     1 => {
-                        &self.queue.player.play();
+                        self.queue.player.play();
                     }
                     _ => {
                         println!("unexpected args..");
@@ -113,6 +113,7 @@ impl CurrentSong {
             PlaybackStatus::PlayPos(pos) => {
                 println!("play pos {}", pos);
                 self.queue.jump_to(pos);
+                self.queue.play_current();
             }
             #[allow(unused_variables)]
             PlaybackStatus::PlayId(io) => {
@@ -128,6 +129,7 @@ impl CurrentSong {
                         }
                     }
                 }
+                self.queue.play_current();
 
 
 
@@ -163,7 +165,7 @@ impl CurrentSong {
             #[allow(unused_variables)]
             PlaybackStatus::SeekCur(io) => {
                 let var = self.queue.player.get_pos().clone();
-                let delta = Duration::from_secs_f32(io);
+                let delta = Duration::from_secs(io);
                 for idx in 0..self.queue.items.len() {
                     match self.queue.items.get(idx) {
                         id => for i in 0..self.queue.items.len() {
@@ -209,12 +211,17 @@ impl CurrentSong {
     }
 
 }
+/* sink such that the actual rodio crate s.t. it's really only 1 active source, but we hide this
+ * by just using a vec which we display out using the mpd spec...
+ */
+
 #[allow(unused_variables)]
 impl PlaybackQueue {
 
    pub fn next(&mut self) {
        if self.cursor < self.items.len() as i32 - 1 {
            self.cursor += 1;
+           
            self.player.skip_one();
        }
    }
@@ -223,6 +230,7 @@ impl PlaybackQueue {
        self.cursor = self.cursor.saturating_sub(1);
        self.rebuild();
    }
+
 
    pub fn remove(&mut self, index: usize) {
        self.items.remove(index);
@@ -240,13 +248,10 @@ impl PlaybackQueue {
    fn rebuild(&mut self) {
        self.player.stop();
        for song in &self.items[self.cursor as usize..] {
-          // self.player.append();
        }
    }
 
-   fn play_current(&mut self) {
-       if let Some(song) = self.items.get(self.cursor as usize) {
-         //self.player.append(song_to_source(song));
-       }
+   fn play_current(&mut self, sink: Sink) {
+       
    }
 }

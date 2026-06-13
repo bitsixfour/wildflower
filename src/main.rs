@@ -231,6 +231,20 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             "Ok\n".to_string()
         }
 
+
+        "stop" => {
+            let _ = cmd_tx.send(PlaybackStatus::Stop).await;
+
+            "Ok\n".to_string()
+
+        }
+        /* The Queue (Section on MPD API SPEC 
+         *
+         */
+
+
+
+
         "status" => {
             let st = state.read().await;
             let mut out = String::new();
