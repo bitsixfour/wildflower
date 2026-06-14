@@ -1,6 +1,8 @@
 use std::time::Duration;
 use std::sync::{Arc, Mutex};
 use bytes::Bytes;
+use std::collections::VecDeque;
+
 
 
 // use reqwest::header::ALLOW;
@@ -20,7 +22,7 @@ pub struct CurrentSong {
     queue: PlaybackQueue,
 }
 pub struct PlaybackQueue {
-    items: Vec<Song>,
+    items: VecDeque<Song>,
     cursor: i32,
     player: Player,
 }
@@ -77,9 +79,9 @@ impl CurrentSong {
             var: handle.clone(),
             stream: bytes,
             queue: PlaybackQueue {
-                items: Vec::new(),
+                items: VecDeque::new(),
                 cursor: 0,
-                player: Player::connect_new(&handle.mixer()),
+                player: rodio::Sink::connect_new(&handle.mixer()),
             }
         }
 
@@ -215,13 +217,15 @@ impl CurrentSong {
 
 #[allow(unused_variables)]
 impl PlaybackQueue {
-    
-
-
-
+    j
 
 
     pub fn next(&mut self) {
+        self.items.pop_front();
+        
+
+
+
 
     }
 
@@ -245,12 +249,72 @@ impl PlaybackQueue {
       
     }
     fn sink_backward(&mut self, sink: Sink) {
+        
 
 
     }
-    fn sink_init(&mut self, sink: &Sink) {
+    fn sink_init(&mut self, sink: &Sink, stream: Vec<u8> ) {
+        let cursor = Cursor::new(stream);
+        let source = Decoder::new(cursor);
+        sink.append(source);
         sink.play();
+    }
+    /* buffer up to two at a time for "gapless" playback*/
+    async fn rebuild_buffer(&mut self, sink: &Sink, client: &Client) {
+        match (self.items.front(), self.items.get(1)) {
+            (Some(x), Some(y)) => {
+                let str = Self::get_audio_stream(client, &x.id);
+                let str_2 = Self::get_audio_stream(client, &x.id);
+                let source_1 = Decoder::new(Cursor::new(str));
+                let source_2 = Decoder::new(Cursor::new(str_2));
+                self.player.append(source_1);
+                self.player.append(source_2);
+
+
+
+            }
+            (Some(x), None) => {
+                let str = Self::get_audio_stream(client, &x.id);
+                let source = Decoder::new(Cursor::new(str));
+                self.player.append(source);
+
+
+            }
+            _ => {
+                println!("msg: no need to buffer");
+
+
+            }
+
+
+
+
+        }
+
+
+
 
 
     }
+    // todo: hide in interface later
+    async fn get_audio_stream(client: &Client, search_id: &str) -> Vec<u8> {
+        let req = format!(STR, search_id);
+        let mut vec: Vec<u8> = Vec::new();
+        let mut bytes: Vec<u8> = reqwest::Client::new()
+            .get(req)
+            .send().await?
+            .error_for_status()?
+            .bytes().await?
+            .to_vec();
+        vec.append(&mut bytes);
+
+
+        vec
+
+
+        
+
+        }
+        
+
 }

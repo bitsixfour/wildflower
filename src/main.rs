@@ -164,7 +164,7 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
 
 
 
-        /* Controlling playback segment on mpd.readthedocs.io */
+      /* Controlling playback segment on mpd.readthedocs.io */
         "play" => {
             // let arg = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(1);
             let _ = cmd_tx.send(PlaybackStatus::Play).await;
