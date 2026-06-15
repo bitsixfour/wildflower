@@ -16,14 +16,14 @@ use crate::tracklist::Song;
 const URL: &str = "192.168.1.20:8097";
 
 pub struct CurrentSong {
-    song_id: String,
-    stream: Bytes,
-    var: MixerDeviceSink, // Player depends on Mixer (it says on rust document dont forget this)
-    queue: PlaybackQueue,
+    pub song_id: String,
+    pub stream: Bytes,
+    pub var: MixerDeviceSink, // Player depends on Mixer (it says on rust document dont forget this)
+    pub queue: PlaybackQueue,
 }
 pub struct PlaybackQueue {
-    items: Vec<Song>,
-    cursor: i32,
+    pub items: Vec<Song>,
+    pub cursor: i32,
     player: Player,
 }
 
@@ -200,6 +200,10 @@ impl CurrentSong {
 
 
     }
+
+
+
+
     pub fn fmt_url(io: &str) -> String {
         let endpnt = format!("http://{}/rest/stream?u=nix&p=2008&v=1.16.1&c=test&id={}",
             URL,

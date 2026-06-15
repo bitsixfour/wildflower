@@ -12,7 +12,6 @@ mod tracklist;
 mod playback;
 mod search;
 mod parser;
-mod audio;
 // mod rodio_stub;
 use crate::navi::{NaviData, SubsonicResponse};
 use crate::tracklist::Song;
@@ -56,7 +55,6 @@ pub trait SubsonicParse {
 
 
 #[tokio::main]
-#[allow(unused_variables)]
 async fn main() -> anyhow::Result<()> {
     println!("starting ze mpd server....");
     let test_id: &str = "23M5Qz4SmDa79E5MR0woPr";
@@ -89,11 +87,11 @@ async fn main() -> anyhow::Result<()> {
     tokio::spawn(async move {
         let mut engine = CurrentSong::new(&test_id, heckin_reqwest).await;
         while let Some(cmd) = cmd_rx.recv().await {
-            engine.handle(cmd);
+            engine.handle(cmd, &heckin_reqwest);
             let mut st = engine_state.write().await;
             st.state = AudioState::Play; 
-            st.song_pos = Some(engine.get_queue_cursor() as usize);
-            st.playlist_length = engine.get_queue_len();
+            st.song_pos = engine.queue.cursor.clone();
+            st.playlist_length = engine.queue.items.get_length().clone();
         }
     });
 
@@ -121,9 +119,7 @@ async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<Playba
                 let trimmed = line.trim_end();
                 if trimmed.is_empty() { continue; }
                 let response = handle_case(trimmed, &cmd_tx, &state).await;
-                if writer.write_all(response.as_bytes()).await.is_err() {
-                    break;
-                }
+
                 if trimmed == "close" {
                     break;
                 }
