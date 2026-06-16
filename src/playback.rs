@@ -8,7 +8,7 @@ use std::collections::VecDeque;
 // use reqwest::header::ALLOW;
 use reqwest::Client;
 use std::io::Cursor;
-use rodio::{Decoder, Player, source::Source};
+use rodio::{Decoder, Player, MixerDeviceSink};
 use std::io::BufReader;
 use crate::MpdSong;
 use crate::tracklist::Song;
@@ -18,7 +18,7 @@ const URL: &str = "192.168.1.20:8097";
 pub struct CurrentSong {
     pub song_id: String,
     pub stream: Bytes,
-    pub var: MixerDeviceSink, // Player depends on Mixer (it says on rust document dont forget this)
+    var: MixerDeviceSink, // Player depends on Mixer (it says on rust document dont forget this)
     pub queue: PlaybackQueue,
 }
 pub struct PlaybackQueue {
@@ -64,7 +64,7 @@ pub type SharedState = Arc<tokio::sync::RwLock<PlayerState>>;
 
 
 impl CurrentSong {
-    pub async fn new(song_id: &str, client: Client) -> Self {
+    pub async fn new(song_id: &str, client: &Client) -> Self {
         let le_url: String = CurrentSong::fmt_url(song_id);
         let bytes = client
             .get(&le_url)
@@ -73,15 +73,16 @@ impl CurrentSong {
             .unwrap()
             .bytes()
             .await.unwrap();
-        let handle = DeviceSinkBuilder::open_default_sink().unwrap();
+        let handle = rodio::DeviceSinkBuilder::open_default_sink().unwrap();
+        let mixer = handle.mixer().clone();
         Self {
             song_id: le_url,
-            var: handle.clone(),
+            var: handle,
             stream: bytes,
             queue: PlaybackQueue {
                 items: Vec::new(),
                 cursor: 0,
-                player: Player::connect_new(&handle.mixer()),
+                player: Player::connect_new(&mixer),
             }
         }
 
@@ -252,23 +253,24 @@ impl PlaybackQueue {
 
     /* heckin backend functions */
     fn sink_init(&mut self, stream: Vec<u8>, client: &Client) {
-        let source = Decoder::new(Cursor::new(stream));
+        let source = Decoder::new(Cursor::new(stream)).unwrap();
         self.player.append(source);
         self.rebuild_buffer(client);
         self.player.play();
     }
     /* true to decrement */
     async fn buffer(&mut self, client: &Client, backwards: bool) {
-        let var: i32 = 1;
+        let mut var: i32 = 1;
         if backwards {
             var = var - 2;
         }
         let now: i32 = self.cursor.clone() + var;
-        match self.items.get(now) {
+        let item_id = self.items.get(now as usize).map(|item| item.id.clone()).unwrap();
+        match self.items.get(now as usize) {
             Some(now) => {
-                let stream = self.get_audio_stream(&now.id, client).await;
+                let stream = self.get_audio_stream(item_id.as_str(), client).await;
                 let buf_next = Decoder::new(Cursor::new(stream));
-                self.player.append(buf_next);
+                self.player.append(buf_next.unwrap());
 
 
             }
@@ -286,42 +288,41 @@ impl PlaybackQueue {
         self.player.clear();
     }
     /* queue up to two at a time for "gapless" playback for now"*/
-    async fn rebuild_buffer(&mut self, client: &Client) {
-        let var: usize = self.cursor.clone() as usize;
-        match (self.items.get(var - 1), self.items.get(var)) {
-            (Some(x), Some(y)) => {
-                let str = self.get_audio_stream(&x.id, client).await;
-                let str_2 = self.get_audio_stream(&y.id, client).await;
-                let source_1 = Decoder::new(Cursor::new(str));
-                let source_2 = Decoder::new(Cursor::new(str_2));
-                self.player.append(source_1);
-                self.player.append(source_2);
-
-
-            }
-            (Some(x), None) => {
-                let str = self.get_audio_stream(&x.id, client).await;
-                let source = Decoder::new(Cursor::new(str));
-                self.player.append(source);
-
-
-            }
-            _ => {
-                println!("msg: no need to buffer");
-
-
-            }
-        }
+    async fn rebuild_buffer(&mut self, client: &Client) {                   
+       let var = self.cursor as usize;                                     
+                                                                           
+       let id_prev = self.items.get(var - 1).map(|s| s.id.clone());        
+       let id_curr = self.items.get(var).map(|s| s.id.clone());            
+                                                                           
+       match (id_prev, id_curr) {                                          
+           (Some(ref x_id), Some(ref y_id)) => {                           
+               let str = self.get_audio_stream(x_id, client).await;        
+               let str_2 = self.get_audio_stream(y_id, client).await;      
+               let source_1 = Decoder::new(Cursor::new(str));              
+               let source_2 = Decoder::new(Cursor::new(str_2));            
+               self.player.append(source_1.unwrap());                      
+               self.player.append(source_2.unwrap());                      
+           }                                                               
+           (Some(ref x_id), None) => {                                     
+               let str = self.get_audio_stream(x_id, client).await;        
+               let source = Decoder::new(Cursor::new(str));                
+               self.player.append(source.unwrap());                        
+           }                                                               
+           _ => {                                                          
+               println!("msg: no need to buffer");                         
+           }                                                               
+       }                                                                   
     }
-
+    /* return Result<T> later, but use unwrap now
+     * until later */
     async fn get_audio_stream(&mut self, search_id: &str, client: &Client) -> Vec<u8> {
-        let req = format!(STR, search_id);
+        let req = format!("http://nix:2008@192.168.1.20:8097/rest/stream.view?u=nix&p=2008&v=1.16.1& c=app&id={}", search_id);
         let mut vec: Vec<u8> = Vec::new();
         let mut bytes: Vec<u8> = reqwest::Client::new()
             .get(req)
-            .send().await?
-            .error_for_status()?
-            .bytes().await?
+            .send().await.unwrap()
+            .error_for_status().unwrap()
+            .bytes().await.unwrap()
             .to_vec();
         vec.append(&mut bytes);
 

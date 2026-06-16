@@ -18,8 +18,9 @@ clap = { version = "4.6.1", features = ["derive"] }
 anyhow = "1.0.102"
 indexmap = "2.14.0"
 symphonia = "0.6.0"
-# rodio = "0.22.2"  # re-enable when libasound2-dev is installed
+
+
 event-listener = "5.4.1"
 bytes = "1.11.1"
-rodio = "0.22.2"
+rodio = { version = "0.22.2", features = ["playback"] }
 io = "0.0.2"

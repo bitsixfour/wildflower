@@ -5,8 +5,7 @@
  */
 
 use crate::navi::Album;
-use crate::search::HandleDatabase;
-
+// use crate::search::HandleDatabase;
 
 
 #[derive(Debug, Clone)]
@@ -81,41 +80,30 @@ impl Expr {
 
 
 #[allow(unused_variables)]
-mod database {
 
-    pub fn handle(handle: HandleDatabase) {
-        match handle {
-            HandleDatabase::AlbumArt(io, _) => {
-                parse_album_art(&io);
-
-
-            }
-
-
-
-
-            _ => {
-                println!("unexpected args"); 
-            }
-
-
+pub fn handle(handle: HandleDatabase) {
+    match handle {
+        HandleDatabase::AlbumArt(io, _) => {
+            parse_album_art(&io);
 
 
         }
 
 
+
+
+        _ => {
+            println!("unexpected args"); 
+        }
+
+
+
+
     }
-    fn parse_album_art(io: &str) {
 
 
-
-
-
-
-
-    }
-
-    
+}
+fn parse_album_art(io: &str) {
 
 
 
@@ -124,3 +112,12 @@ mod database {
 
 
 }
+
+
+
+
+
+
+
+
+

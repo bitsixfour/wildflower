@@ -96,7 +96,7 @@ pub async fn navi_obj(client: &Client) -> Result<SubsonicResponse, reqwest::Erro
 
 
 
-
+#[derive(Clone)]
 pub struct NaviData {
     pub data: HashMap<String, Album>, 
     pub data_id: HashMap<String, Album>, 

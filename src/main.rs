@@ -85,13 +85,14 @@ async fn main() -> anyhow::Result<()> {
 
     let engine_state = Arc::clone(&shared_state);
     tokio::spawn(async move {
-        let mut engine = CurrentSong::new(&test_id, heckin_reqwest).await;
+        let mut engine = CurrentSong::new(&test_id, &heckin_reqwest).await;
         while let Some(cmd) = cmd_rx.recv().await {
             engine.handle(cmd, &heckin_reqwest);
             let mut st = engine_state.write().await;
+            let pos: i32 = engine.queue.cursor;
             st.state = AudioState::Play; 
-            st.song_pos = engine.queue.cursor.clone();
-            st.playlist_length = engine.queue.items.get_length().clone();
+            st.song_pos = pos.try_into().ok();
+            st.playlist_length = engine.queue.items.len();
         }
     });
 
@@ -99,6 +100,7 @@ async fn main() -> anyhow::Result<()> {
         let (socket, _) = listener.accept().await.unwrap();
         let client_tx = cmd_tx.clone();
         let client_state = Arc::clone(&shared_state);
+        let navi = navi.clone();
         tokio::spawn(async move {
             init_client(socket, client_tx, client_state, navi).await;
         });
