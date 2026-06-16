@@ -8,6 +8,8 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 
 mod navi;
+mod art;
+mod database;
 mod tracklist;
 mod playback;
 mod search;

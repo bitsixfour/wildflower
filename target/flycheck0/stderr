@@ -1,14 +1,67 @@
-   0.155469630s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: stale: changed "/home/will/git/mpdnavi/src/main.rs"
-   0.155482154s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:           (vs) "/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-ff4a66df317c06a4/dep-bin-mpdnavi"
-   0.155485109s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1781576760, nanos: 330937592 } < FileTime { seconds: 1781578479, nanos: 56320723 }
-   0.155725581s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint dirty for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
-   0.155735841s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-ff4a66df317c06a4/dep-bin-mpdnavi", reference_mtime: FileTime { seconds: 1781576760, nanos: 330937592 }, stale: "/home/will/git/mpdnavi/src/main.rs", stale_mtime: FileTime { seconds: 1781578479, nanos: 56320723 } }))
-   0.178175262s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: stale: changed "/home/will/git/mpdnavi/src/main.rs"
-   0.178188597s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:           (vs) "/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-aa7ea7a3701579be/dep-test-bin-mpdnavi"
-   0.178191673s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 1781576760, nanos: 330937592 } < FileTime { seconds: 1781578479, nanos: 56320723 }
-   0.178271894s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint dirty for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
-   0.178283586s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "/home/will/git/mpdnavi/target/debug/.fingerprint/mpdnavi-aa7ea7a3701579be/dep-test-bin-mpdnavi", reference_mtime: FileTime { seconds: 1781576760, nanos: 330937592 }, stale: "/home/will/git/mpdnavi/src/main.rs", stale_mtime: FileTime { seconds: 1781578479, nanos: 56320723 } }))
-    Checking mpdnavi v0.1.0 (/home/will/git/mpdnavi)
-error: could not compile `mpdnavi` (bin "mpdnavi" test) due to 1 previous error
-warning: build failed, waiting for other jobs to finish...
-error: could not compile `mpdnavi` (bin "mpdnavi") due to 1 previous error
+   0.155530770s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `rodio` is newer than we are 1781650332.426232037s > 1781576760.330937592s "/home/will/git/mpdnavi"
+   0.155739243s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint dirty for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
+   0.155749151s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(240) }
+   0.170389613s  INFO prepare_target{force=false package_id=rodio v0.22.2 target="rodio"}: cargo::core::compiler::fingerprint: fingerprint dirty for rodio v0.22.2/Check { test: false }/TargetInner { ..: lib_target("rodio", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rodio-0.22.2/src/lib.rs", Edition2021) }
+   0.170418216s  INFO prepare_target{force=false package_id=rodio v0.22.2 target="rodio"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(59) }
+   0.170848056s  INFO prepare_target{force=false package_id=cpal v0.17.3 target="cpal"}: cargo::core::compiler::fingerprint: fingerprint dirty for cpal v0.17.3/Check { test: false }/TargetInner { ..: lib_target("cpal", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cpal-0.17.3/src/lib.rs", Edition2021) }
+   0.170855099s  INFO prepare_target{force=false package_id=cpal v0.17.3 target="cpal"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(4) }
+   0.171083389s  INFO prepare_target{force=false package_id=alsa v0.11.0 target="alsa"}: cargo::core::compiler::fingerprint: fingerprint dirty for alsa v0.11.0/Check { test: false }/TargetInner { ..: lib_target("alsa", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-0.11.0/src/lib.rs", Edition2021) }
+   0.171091745s  INFO prepare_target{force=false package_id=alsa v0.11.0 target="alsa"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(5) }
+   0.171253079s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="alsa_sys"}: cargo::core::compiler::fingerprint: fingerprint dirty for alsa-sys v0.4.0/Check { test: false }/TargetInner { doctest: false, ..: lib_target("alsa_sys", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/src/lib.rs", Edition2021) }
+   0.171259801s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="alsa_sys"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(7) }
+   0.171475848s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint dirty for alsa-sys v0.4.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs", Edition2021) }
+   0.171482561s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="build-script-build"}: cargo::core::compiler::fingerprint:     dirty: EnvVarChanged { name: "PKG_CONFIG", old_value: Some("pkg-config"), new_value: None }
+   0.174679040s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `rodio` is newer than we are 1781650332.426232037s > 1781576760.330937592s "/home/will/git/mpdnavi"
+   0.174760634s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint dirty for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
+   0.174770923s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(240) }
+   Compiling alsa-sys v0.4.0
+error: failed to run custom build command for `alsa-sys v0.4.0`
+note: To improve backtraces for build dependencies, set the CARGO_PROFILE_DEV_BUILD_OVERRIDE_DEBUG=true environment variable to enable debug information generation.
+
+Caused by:
+  process didn't exit successfully: `/home/will/git/mpdnavi/target/debug/build/alsa-sys-f1df8dbf47cfee0c/build-script-build` (exit status: 101)
+  --- stdout
+  cargo:rerun-if-env-changed=ALSA_NO_PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_PATH
+  cargo:rerun-if-env-changed=PKG_CONFIG_PATH
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_LIBDIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_SYSROOT_DIR
+  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR
+
+  --- stderr
+
+  thread 'main' (224962) panicked at /home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs:13:19:
+
+  pkg-config exited with status code 1
+  > PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 pkg-config --libs --cflags alsa
+
+  pkg-config output:
+    Package alsa was not found in the pkg-config search path.
+    Perhaps you should add the directory containing `alsa.pc'
+    to the PKG_CONFIG_PATH environment variable
+    No package 'alsa' found
+
+  The system library `alsa` required by crate `alsa-sys` was not found.
+  The file `alsa.pc` needs to be installed and the PKG_CONFIG_PATH environment variable must contain its parent directory.
+  The PKG_CONFIG_PATH environment variable is not set.
+
+  HINT: if you have installed the library, try setting PKG_CONFIG_PATH to the directory containing `alsa.pc`.
+
+  stack backtrace:
+     0: __rustc::rust_begin_unwind
+     1: core::panicking::panic_fmt
+     2: core::panicking::panic_display
+     3: build_script_build::main
+     4: core::ops::function::FnOnce::call_once
+  note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.

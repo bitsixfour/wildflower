@@ -41,7 +41,8 @@ pub enum PlaybackStatus {
     Stop,
 }
 
-/* Move this somewhere else when all core functions are satisfied */
+/* Move these two args 
+ * somewhere else when all core functions are satisfied */
 pub enum QueueStatus {
     Add(String, i32),
     AddId(String, i32),
@@ -53,18 +54,37 @@ pub enum QueueStatus {
     MoveId(String, String),
     // Playlist(),
     Playlistfind(String, String),
-
     PlaylistId(String),
-    
-
-
-
-
-
-
-
-
+    PlaylistInfo(String),
+    PlaylistSearch(String),
+    PiChanges(String, (i32, i32)),
+    PiChangesPos(String, (i32, i32)),
+    Prio(i32, (i32, i32)),
+    PrioId(i32, (i32, i32))
 }
+/*
+pub enum DatabaseStatus {
+    AlbumArt(String, i64),
+    Count(String, String),
+    //GetFinderPrint2(String),
+    Find(String, String),
+    FindAdd(Vec<&str>),
+    Lis(Vec<&str>),
+    ListAll(Box<&str>),
+    ListAllInfo(Box<&str>),
+    ListFiles(&str),
+    LsInfo(&str),
+    ReadComment(&str),
+    ReadPicture(&str),
+    SearchAdd(Vec<&str>),
+    Searchaddpi(Vec<&str>),
+    SearchCount(Vec<&str>),
+    Update(),
+    Rescan()
+}
+*/
+
+
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AudioState {
@@ -159,9 +179,6 @@ impl CurrentSong {
                     }
                 }
                 self.queue.player.play();
-
-
-
             }
             PlaybackStatus::Previous => {
                 println!("previous");
@@ -171,7 +188,6 @@ impl CurrentSong {
                 let pos_seek = io.0.clone();
                 // self.queue.jump_to(client, pos_seek);
                 self.queue.jump_to(client, pos_seek as i32);
-
             }
             #[allow(unused_variables)]
             PlaybackStatus::SeekId(id) => {
@@ -182,14 +198,9 @@ impl CurrentSong {
                             println!("found id");
                             self.queue.jump_to(client, i as i32);
                             self.queue.player.try_seek(sec_seek);
-
                         }
-
                     }
-
                 }
-
-
             }
             #[allow(unused_variables)]
             PlaybackStatus::SeekCur(io) => {
@@ -202,21 +213,15 @@ impl CurrentSong {
                             self.queue.jump_to(client, i as i32);
                             self.queue.player.try_seek(var + delta);
                         }
-
-
-
                     }
-
                 }
-
-
-
             }
             PlaybackStatus::Stop => {
                 println!("stop!");
                 self.queue.player.stop();
 
             }
+            // move later 
 
 
 
