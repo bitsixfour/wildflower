@@ -159,15 +159,10 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
     let cmd = parts.get(0).map(|s| s.as_str()).unwrap_or("");
 
     match cmd {
-
-
-
       /* Controlling playback segment on mpd.readthedocs.io */
         "play" => {
             // let arg = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(1);
             let _ = cmd_tx.send(PlaybackStatus::Play).await;
-
-
             "OK\n".to_string()
         }
         "pause" => {
@@ -176,7 +171,6 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
                 0..1 =>  {
                     let _ = cmd_tx.send(PlaybackStatus::Pause(arg)).await;
                     "Ok\n".to_string()
-                    
                 }
                 _ => {
                     "ACK\n".to_string()
@@ -187,8 +181,6 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             let arg = parts.get(1).unwrap().parse::<usize>().unwrap() as usize;
             let _ = cmd_tx.send(PlaybackStatus::PlayPos(arg)).await;
             "OK\n".to_string()
-
-
         }
         "next" => {
             let _ = cmd_tx.send(PlaybackStatus::Next()).await;
@@ -198,48 +190,35 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             let _ = cmd_tx.send(PlaybackStatus::Previous).await;
             "OK\n".to_string()
         }
-        "stop" => {
-            let _ = cmd_tx.send(PlaybackStatus::Stop).await;
-            "OK\n".to_string()
-        }
         "seek" => {
             let songpos: u64 = parts.get(1).unwrap().parse::<u64>().unwrap();
             let time: String = parts.get(2).unwrap().parse::<String>().unwrap();
             let turp = (songpos, time);
             let _ = cmd_tx.send(PlaybackStatus::SeekId(turp)).await;
-
             "Ok\n".to_string()
-
-
-
         }
         "seekid" => {
             let songpos: u64 = parts.get(1).unwrap().parse::<u64>().unwrap();
             let time: String = parts.get(2).unwrap().parse::<String>().unwrap();
             let turp = (songpos, time);
             let _ = cmd_tx.send(PlaybackStatus::SeekId(turp)).await;
-
             "Ok\n".to_string()
-
-
-
         }
         "seekcur" => {
             let dur = parts.get(1).unwrap().parse::<u64>().unwrap();
             let _ = cmd_tx.send(PlaybackStatus::SeekCur(dur)).await;
             "Ok\n".to_string()
         }
-
-
         "stop" => {
             let _ = cmd_tx.send(PlaybackStatus::Stop).await;
-
             "Ok\n".to_string()
+        }
+        /* The Queue (Section on MPD API SPEC) */ 
+        "add" => {
+            let _ = cmd_tx.send(
+
 
         }
-        /* The Queue (Section on MPD API SPEC 
-         *
-         */
 
 
 

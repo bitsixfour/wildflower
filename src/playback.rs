@@ -41,6 +41,31 @@ pub enum PlaybackStatus {
     Stop,
 }
 
+/* Move this somewhere else when all core functions are satisfied */
+pub enum QueueStatus {
+    Add(String, i32),
+    AddId(String, i32),
+    Clear(), 
+    Delete(String),
+    DeleteId(String),
+    // parse regex for this 
+    Move(String),
+    MoveId(String, String),
+    // Playlist(),
+    Playlistfind(String, String),
+
+    PlaylistId(String),
+    
+
+
+
+
+
+
+
+
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AudioState {
     Play,
