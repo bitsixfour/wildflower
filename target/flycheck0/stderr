@@ -1,67 +1,401 @@
-   0.155530770s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `rodio` is newer than we are 1781650332.426232037s > 1781576760.330937592s "/home/will/git/mpdnavi"
-   0.155739243s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint dirty for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
-   0.155749151s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(240) }
-   0.170389613s  INFO prepare_target{force=false package_id=rodio v0.22.2 target="rodio"}: cargo::core::compiler::fingerprint: fingerprint dirty for rodio v0.22.2/Check { test: false }/TargetInner { ..: lib_target("rodio", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rodio-0.22.2/src/lib.rs", Edition2021) }
-   0.170418216s  INFO prepare_target{force=false package_id=rodio v0.22.2 target="rodio"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(59) }
-   0.170848056s  INFO prepare_target{force=false package_id=cpal v0.17.3 target="cpal"}: cargo::core::compiler::fingerprint: fingerprint dirty for cpal v0.17.3/Check { test: false }/TargetInner { ..: lib_target("cpal", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cpal-0.17.3/src/lib.rs", Edition2021) }
-   0.170855099s  INFO prepare_target{force=false package_id=cpal v0.17.3 target="cpal"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(4) }
-   0.171083389s  INFO prepare_target{force=false package_id=alsa v0.11.0 target="alsa"}: cargo::core::compiler::fingerprint: fingerprint dirty for alsa v0.11.0/Check { test: false }/TargetInner { ..: lib_target("alsa", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-0.11.0/src/lib.rs", Edition2021) }
-   0.171091745s  INFO prepare_target{force=false package_id=alsa v0.11.0 target="alsa"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(5) }
-   0.171253079s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="alsa_sys"}: cargo::core::compiler::fingerprint: fingerprint dirty for alsa-sys v0.4.0/Check { test: false }/TargetInner { doctest: false, ..: lib_target("alsa_sys", ["lib"], "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/src/lib.rs", Edition2021) }
-   0.171259801s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="alsa_sys"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(7) }
-   0.171475848s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint dirty for alsa-sys v0.4.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs", Edition2021) }
-   0.171482561s  INFO prepare_target{force=false package_id=alsa-sys v0.4.0 target="build-script-build"}: cargo::core::compiler::fingerprint:     dirty: EnvVarChanged { name: "PKG_CONFIG", old_value: Some("pkg-config"), new_value: None }
-   0.174679040s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: dependency on `rodio` is newer than we are 1781650332.426232037s > 1781576760.330937592s "/home/will/git/mpdnavi"
-   0.174760634s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint dirty for mpdnavi v0.1.0 (/home/will/git/mpdnavi)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/mpdnavi/src/main.rs", Edition2021) }
-   0.174770923s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/mpdnavi) target="mpdnavi"}: cargo::core::compiler::fingerprint:     dirty: UnitDependencyInfoChanged { unit: UnitIndex(240) }
-   Compiling alsa-sys v0.4.0
-error: failed to run custom build command for `alsa-sys v0.4.0`
-note: To improve backtraces for build dependencies, set the CARGO_PROFILE_DEV_BUILD_OVERRIDE_DEBUG=true environment variable to enable debug information generation.
+   0.146670375s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/Users/darwin/git/wildflower)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/Users/darwin/git/wildflower/src/main.rs", Edition2021) }
+   0.146687208s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/mpdnavi-01cd13c222f85774/bin-mpdnavi`
 
 Caused by:
-  process didn't exit successfully: `/home/will/git/mpdnavi/target/debug/build/alsa-sys-f1df8dbf47cfee0c/build-script-build` (exit status: 101)
-  --- stdout
-  cargo:rerun-if-env-changed=ALSA_NO_PKG_CONFIG
-  cargo:rerun-if-env-changed=PKG_CONFIG_x86_64-unknown-linux-gnu
-  cargo:rerun-if-env-changed=PKG_CONFIG_x86_64_unknown_linux_gnu
-  cargo:rerun-if-env-changed=HOST_PKG_CONFIG
-  cargo:rerun-if-env-changed=PKG_CONFIG
-  cargo:rerun-if-env-changed=PKG_CONFIG_PATH_x86_64-unknown-linux-gnu
-  cargo:rerun-if-env-changed=PKG_CONFIG_PATH_x86_64_unknown_linux_gnu
-  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_PATH
-  cargo:rerun-if-env-changed=PKG_CONFIG_PATH
-  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR_x86_64-unknown-linux-gnu
-  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR_x86_64_unknown_linux_gnu
-  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_LIBDIR
-  cargo:rerun-if-env-changed=PKG_CONFIG_LIBDIR
-  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR_x86_64-unknown-linux-gnu
-  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR_x86_64_unknown_linux_gnu
-  cargo:rerun-if-env-changed=HOST_PKG_CONFIG_SYSROOT_DIR
-  cargo:rerun-if-env-changed=PKG_CONFIG_SYSROOT_DIR
+    No such file or directory (os error 2)
 
-  --- stderr
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::cli::main
+  13: cargo::main
+  14: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  15: std::rt::lang_start::<()>::{closure#0}
+  16: std::rt::lang_start_internal
+  17: _main
+   0.159546000s  INFO prepare_target{force=false package_id=reqwest v0.13.3 target="reqwest"}: cargo::core::compiler::fingerprint: fingerprint error for reqwest v0.13.3/Check { test: false }/TargetInner { ..: lib_target("reqwest", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.3/src/lib.rs", Edition2021) }
+   0.159561041s  INFO prepare_target{force=false package_id=reqwest v0.13.3 target="reqwest"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/reqwest-f04686579cc8707f/lib-reqwest`
 
-  thread 'main' (224962) panicked at /home/will/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/alsa-sys-0.4.0/build.rs:13:19:
+Caused by:
+    No such file or directory (os error 2)
 
-  pkg-config exited with status code 1
-  > PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 pkg-config --libs --cflags alsa
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   8: cargo::ops::cargo_compile::compile_ws
+   9: cargo::ops::cargo_compile::compile_with_exec
+  10: cargo::ops::cargo_compile::compile
+  11: cargo::commands::check::exec
+  12: <cargo::cli::Exec>::exec
+  13: cargo::cli::main
+  14: cargo::main
+  15: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  16: std::rt::lang_start::<()>::{closure#0}
+  17: std::rt::lang_start_internal
+  18: _main
+   0.161661208s  INFO prepare_target{force=false package_id=hyper-rustls v0.27.9 target="hyper_rustls"}: cargo::core::compiler::fingerprint: fingerprint error for hyper-rustls v0.27.9/Check { test: false }/TargetInner { ..: lib_target("hyper_rustls", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/hyper-rustls-0.27.9/src/lib.rs", Edition2021) }
+   0.161671041s  INFO prepare_target{force=false package_id=hyper-rustls v0.27.9 target="hyper_rustls"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/hyper-rustls-752e6930f3170af9/lib-hyper_rustls`
 
-  pkg-config output:
-    Package alsa was not found in the pkg-config search path.
-    Perhaps you should add the directory containing `alsa.pc'
-    to the PKG_CONFIG_PATH environment variable
-    No package 'alsa' found
+Caused by:
+    No such file or directory (os error 2)
 
-  The system library `alsa` required by crate `alsa-sys` was not found.
-  The file `alsa.pc` needs to be installed and the PKG_CONFIG_PATH environment variable must contain its parent directory.
-  The PKG_CONFIG_PATH environment variable is not set.
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   9: cargo::ops::cargo_compile::compile_ws
+  10: cargo::ops::cargo_compile::compile_with_exec
+  11: cargo::ops::cargo_compile::compile
+  12: cargo::commands::check::exec
+  13: <cargo::cli::Exec>::exec
+  14: cargo::cli::main
+  15: cargo::main
+  16: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  17: std::rt::lang_start::<()>::{closure#0}
+  18: std::rt::lang_start_internal
+  19: _main
+   0.162324041s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="rustls"}: cargo::core::compiler::fingerprint: fingerprint error for rustls v0.23.40/Check { test: false }/TargetInner { ..: lib_target("rustls", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.40/src/lib.rs", Edition2021) }
+   0.162329958s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="rustls"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-f7f90be822bd9ac9/lib-rustls`
 
-  HINT: if you have installed the library, try setting PKG_CONFIG_PATH to the directory containing `alsa.pc`.
+Caused by:
+    No such file or directory (os error 2)
 
-  stack backtrace:
-     0: __rustc::rust_begin_unwind
-     1: core::panicking::panic_fmt
-     2: core::panicking::panic_display
-     3: build_script_build::main
-     4: core::ops::function::FnOnce::call_once
-  note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  10: cargo::ops::cargo_compile::compile_ws
+  11: cargo::ops::cargo_compile::compile_with_exec
+  12: cargo::ops::cargo_compile::compile
+  13: cargo::commands::check::exec
+  14: <cargo::cli::Exec>::exec
+  15: cargo::cli::main
+  16: cargo::main
+  17: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  18: std::rt::lang_start::<()>::{closure#0}
+  19: std::rt::lang_start_internal
+  20: _main
+   0.162609250s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="aws_lc_rs"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-rs v1.17.0/Check { test: false }/TargetInner { ..: lib_target("aws_lc_rs", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-rs-1.17.0/src/lib.rs", Edition2021) }
+   0.162614541s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="aws_lc_rs"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-rs-c3ac20ab4e4b2a06/lib-aws_lc_rs`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: cargo::core::compiler::compile
+  10: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  11: cargo::ops::cargo_compile::compile_ws
+  12: cargo::ops::cargo_compile::compile_with_exec
+  13: cargo::ops::cargo_compile::compile
+  14: cargo::commands::check::exec
+  15: <cargo::cli::Exec>::exec
+  16: cargo::cli::main
+  17: cargo::main
+  18: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  19: std::rt::lang_start::<()>::{closure#0}
+  20: std::rt::lang_start_internal
+  21: _main
+   0.162873458s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-rs v1.17.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-rs-1.17.0/build.rs", Edition2021) }
+   0.162879041s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-rs-43553a7a8e2eeda1/run-build-script-build-script-build`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::custom_build::build_work
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: cargo::core::compiler::compile
+  10: cargo::core::compiler::compile
+  11: cargo::core::compiler::compile
+  12: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  13: cargo::ops::cargo_compile::compile_ws
+  14: cargo::ops::cargo_compile::compile_with_exec
+  15: cargo::ops::cargo_compile::compile
+  16: cargo::commands::check::exec
+  17: <cargo::cli::Exec>::exec
+  18: cargo::cli::main
+  19: cargo::main
+  20: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  21: std::rt::lang_start::<()>::{closure#0}
+  22: std::rt::lang_start_internal
+  23: _main
+   0.163082958s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="build-script-main"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-sys v0.41.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-main", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-sys-0.41.0/builder/main.rs", Edition2021) }
+   0.163087916s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="build-script-main"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-sys-9d2b35ae8dce73f1/run-build-script-build-script-main`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::custom_build::build_work
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: cargo::core::compiler::compile
+  10: cargo::core::compiler::compile
+  11: cargo::core::compiler::compile
+  12: cargo::core::compiler::compile
+  13: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  14: cargo::ops::cargo_compile::compile_ws
+  15: cargo::ops::cargo_compile::compile_with_exec
+  16: cargo::ops::cargo_compile::compile
+  17: cargo::commands::check::exec
+  18: <cargo::cli::Exec>::exec
+  19: cargo::cli::main
+  20: cargo::main
+  21: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  22: std::rt::lang_start::<()>::{closure#0}
+  23: std::rt::lang_start_internal
+  24: _main
+   0.163172833s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="build-script-main"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-sys v0.41.0/Build/TargetInner { ..: custom_build_target("build-script-main", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-sys-0.41.0/builder/main.rs", Edition2021) }
+   0.163176375s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="build-script-main"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-sys-eee6b83fddf3b2e0/build-script-build-script-main`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: cargo::core::compiler::compile
+  10: cargo::core::compiler::compile
+  11: cargo::core::compiler::compile
+  12: cargo::core::compiler::compile
+  13: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  14: cargo::ops::cargo_compile::compile_ws
+  15: cargo::ops::cargo_compile::compile_with_exec
+  16: cargo::ops::cargo_compile::compile
+  17: cargo::commands::check::exec
+  18: <cargo::cli::Exec>::exec
+  19: cargo::cli::main
+  20: cargo::main
+  21: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  22: std::rt::lang_start::<()>::{closure#0}
+  23: std::rt::lang_start_internal
+  24: _main
+   0.163820000s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="aws_lc_sys"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-sys v0.41.0/Check { test: false }/TargetInner { ..: lib_target("aws_lc_sys", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-sys-0.41.0/src/lib.rs", Edition2021) }
+   0.163825500s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="aws_lc_sys"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-sys-acb3caac0758ae17/lib-aws_lc_sys`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: cargo::core::compiler::compile
+  10: cargo::core::compiler::compile
+  11: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  12: cargo::ops::cargo_compile::compile_ws
+  13: cargo::ops::cargo_compile::compile_with_exec
+  14: cargo::ops::cargo_compile::compile
+  15: cargo::commands::check::exec
+  16: <cargo::cli::Exec>::exec
+  17: cargo::cli::main
+  18: cargo::main
+  19: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  20: std::rt::lang_start::<()>::{closure#0}
+  21: std::rt::lang_start_internal
+  22: _main
+   0.164070708s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for rustls v0.23.40/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.40/build.rs", Edition2021) }
+   0.164075875s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-6b69f9ffd7799cb7/run-build-script-build-script-build`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::custom_build::build_work
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: cargo::core::compiler::compile
+  10: cargo::core::compiler::compile
+  11: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  12: cargo::ops::cargo_compile::compile_ws
+  13: cargo::ops::cargo_compile::compile_with_exec
+  14: cargo::ops::cargo_compile::compile
+  15: cargo::commands::check::exec
+  16: <cargo::cli::Exec>::exec
+  17: cargo::cli::main
+  18: cargo::main
+  19: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  20: std::rt::lang_start::<()>::{closure#0}
+  21: std::rt::lang_start_internal
+  22: _main
+   0.164244083s  INFO prepare_target{force=false package_id=rustls-webpki v0.103.13 target="webpki"}: cargo::core::compiler::fingerprint: fingerprint error for rustls-webpki v0.103.13/Check { test: false }/TargetInner { ..: lib_target("webpki", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-webpki-0.103.13/src/lib.rs", Edition2021) }
+   0.164248458s  INFO prepare_target{force=false package_id=rustls-webpki v0.103.13 target="webpki"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-webpki-a763c6a309620f6b/lib-webpki`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: cargo::core::compiler::compile
+  10: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  11: cargo::ops::cargo_compile::compile_ws
+  12: cargo::ops::cargo_compile::compile_with_exec
+  13: cargo::ops::cargo_compile::compile
+  14: cargo::commands::check::exec
+  15: <cargo::cli::Exec>::exec
+  16: cargo::cli::main
+  17: cargo::main
+  18: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  19: std::rt::lang_start::<()>::{closure#0}
+  20: std::rt::lang_start_internal
+  21: _main
+   0.164478625s  INFO prepare_target{force=false package_id=tokio-rustls v0.26.4 target="tokio_rustls"}: cargo::core::compiler::fingerprint: fingerprint error for tokio-rustls v0.26.4/Check { test: false }/TargetInner { ..: lib_target("tokio_rustls", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-rustls-0.26.4/src/lib.rs", Edition2021) }
+   0.164482791s  INFO prepare_target{force=false package_id=tokio-rustls v0.26.4 target="tokio_rustls"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/tokio-rustls-32661f1271dc7106/lib-tokio_rustls`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: cargo::core::compiler::compile
+   9: <cargo::core::compiler::build_runner::BuildRunner>::compile
+  10: cargo::ops::cargo_compile::compile_ws
+  11: cargo::ops::cargo_compile::compile_with_exec
+  12: cargo::ops::cargo_compile::compile
+  13: cargo::commands::check::exec
+  14: <cargo::cli::Exec>::exec
+  15: cargo::cli::main
+  16: cargo::main
+  17: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  18: std::rt::lang_start::<()>::{closure#0}
+  19: std::rt::lang_start_internal
+  20: _main
+   0.164705041s  INFO prepare_target{force=false package_id=rustls-platform-verifier v0.7.0 target="rustls_platform_verifier"}: cargo::core::compiler::fingerprint: fingerprint error for rustls-platform-verifier v0.7.0/Check { test: false }/TargetInner { ..: lib_target("rustls_platform_verifier", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-platform-verifier-0.7.0/src/lib.rs", Edition2021) }
+   0.164709166s  INFO prepare_target{force=false package_id=rustls-platform-verifier v0.7.0 target="rustls_platform_verifier"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-platform-verifier-1e09810bb8c98168/lib-rustls_platform_verifier`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: cargo::core::compiler::compile
+   7: cargo::core::compiler::compile
+   8: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   9: cargo::ops::cargo_compile::compile_ws
+  10: cargo::ops::cargo_compile::compile_with_exec
+  11: cargo::ops::cargo_compile::compile
+  12: cargo::commands::check::exec
+  13: <cargo::cli::Exec>::exec
+  14: cargo::cli::main
+  15: cargo::main
+  16: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  17: std::rt::lang_start::<()>::{closure#0}
+  18: std::rt::lang_start_internal
+  19: _main
+   0.170687750s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/Users/darwin/git/wildflower)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/Users/darwin/git/wildflower/src/main.rs", Edition2021) }
+   0.170694708s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/mpdnavi-94e4c9e9762f1c81/test-bin-mpdnavi`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <std::backtrace::Backtrace>::create
+   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
+   2: cargo_util::paths::read
+   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
+   4: cargo::core::compiler::fingerprint::prepare_target
+   5: cargo::core::compiler::compile
+   6: <cargo::core::compiler::build_runner::BuildRunner>::compile
+   7: cargo::ops::cargo_compile::compile_ws
+   8: cargo::ops::cargo_compile::compile_with_exec
+   9: cargo::ops::cargo_compile::compile
+  10: cargo::commands::check::exec
+  11: <cargo::cli::Exec>::exec
+  12: cargo::cli::main
+  13: cargo::main
+  14: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  15: std::rt::lang_start::<()>::{closure#0}
+  16: std::rt::lang_start_internal
+  17: _main
+   Compiling aws-lc-sys v0.41.0
+error: could not compile `aws-lc-sys` (build script) due to 1 previous error

@@ -40,13 +40,14 @@ pub enum DatabaseStatus {
 
 
 
-pub fn database_handle(command: DatabaseStatus, client: &Client) {
+pub fn database_handle(command: DatabaseStatus, client: &Client) -> String {
     match command {
         AlbumArt(id, ost) => {
-
+            let resp = art::return_album_art(id, ost);
+            resp
 
         }
-        _ => println!("unexpected args?")
+        _ => format!("ACK-!")
 
 
 

@@ -123,7 +123,7 @@ async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<Playba
                 let trimmed = line.trim_end();
                 if trimmed.is_empty() { continue; }
                 let response = handle_case(trimmed, &cmd_tx, &state).await;
-
+                let _ = writer.write_all(response.as_bytes()).await;
                 if trimmed == "close" {
                     break;
                 }
