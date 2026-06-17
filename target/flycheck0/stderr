@@ -1,5 +1,5 @@
-   0.275970375s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/Users/darwin/git/wildflower)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/Users/darwin/git/wildflower/src/main.rs", Edition2021) }
-   0.276004083s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/mpdnavi-01cd13c222f85774/bin-mpdnavi`
+   0.522574459s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/Users/darwin/git/wildflower)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/Users/darwin/git/wildflower/src/main.rs", Edition2021) }
+   0.522596167s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/mpdnavi-01cd13c222f85774/bin-mpdnavi`
 
 Caused by:
     No such file or directory (os error 2)
@@ -23,8 +23,8 @@ Stack backtrace:
   15: std::rt::lang_start::<()>::{closure#0}
   16: std::rt::lang_start_internal
   17: _main
-   0.303979041s  INFO prepare_target{force=false package_id=reqwest v0.13.3 target="reqwest"}: cargo::core::compiler::fingerprint: fingerprint error for reqwest v0.13.3/Check { test: false }/TargetInner { ..: lib_target("reqwest", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.3/src/lib.rs", Edition2021) }
-   0.304004750s  INFO prepare_target{force=false package_id=reqwest v0.13.3 target="reqwest"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/reqwest-f04686579cc8707f/lib-reqwest`
+   0.597273042s  INFO prepare_target{force=false package_id=reqwest v0.13.3 target="reqwest"}: cargo::core::compiler::fingerprint: fingerprint error for reqwest v0.13.3/Check { test: false }/TargetInner { ..: lib_target("reqwest", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/reqwest-0.13.3/src/lib.rs", Edition2021) }
+   0.597294334s  INFO prepare_target{force=false package_id=reqwest v0.13.3 target="reqwest"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/reqwest-f04686579cc8707f/lib-reqwest`
 
 Caused by:
     No such file or directory (os error 2)
@@ -49,8 +49,8 @@ Stack backtrace:
   16: std::rt::lang_start::<()>::{closure#0}
   17: std::rt::lang_start_internal
   18: _main
-   0.308473000s  INFO prepare_target{force=false package_id=hyper-rustls v0.27.9 target="hyper_rustls"}: cargo::core::compiler::fingerprint: fingerprint error for hyper-rustls v0.27.9/Check { test: false }/TargetInner { ..: lib_target("hyper_rustls", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/hyper-rustls-0.27.9/src/lib.rs", Edition2021) }
-   0.308503083s  INFO prepare_target{force=false package_id=hyper-rustls v0.27.9 target="hyper_rustls"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/hyper-rustls-752e6930f3170af9/lib-hyper_rustls`
+   0.603227500s  INFO prepare_target{force=false package_id=hyper-rustls v0.27.9 target="hyper_rustls"}: cargo::core::compiler::fingerprint: fingerprint error for hyper-rustls v0.27.9/Check { test: false }/TargetInner { ..: lib_target("hyper_rustls", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/hyper-rustls-0.27.9/src/lib.rs", Edition2021) }
+   0.603248125s  INFO prepare_target{force=false package_id=hyper-rustls v0.27.9 target="hyper_rustls"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/hyper-rustls-752e6930f3170af9/lib-hyper_rustls`
 
 Caused by:
     No such file or directory (os error 2)
@@ -76,8 +76,8 @@ Stack backtrace:
   17: std::rt::lang_start::<()>::{closure#0}
   18: std::rt::lang_start_internal
   19: _main
-   0.310174708s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="rustls"}: cargo::core::compiler::fingerprint: fingerprint error for rustls v0.23.40/Check { test: false }/TargetInner { ..: lib_target("rustls", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.40/src/lib.rs", Edition2021) }
-   0.310195083s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="rustls"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-f7f90be822bd9ac9/lib-rustls`
+   0.605283750s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="rustls"}: cargo::core::compiler::fingerprint: fingerprint error for rustls v0.23.40/Check { test: false }/TargetInner { ..: lib_target("rustls", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.40/src/lib.rs", Edition2021) }
+   0.605300959s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="rustls"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-f7f90be822bd9ac9/lib-rustls`
 
 Caused by:
     No such file or directory (os error 2)
@@ -104,8 +104,8 @@ Stack backtrace:
   18: std::rt::lang_start::<()>::{closure#0}
   19: std::rt::lang_start_internal
   20: _main
-   0.310806666s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="aws_lc_rs"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-rs v1.17.0/Check { test: false }/TargetInner { ..: lib_target("aws_lc_rs", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-rs-1.17.0/src/lib.rs", Edition2021) }
-   0.310817291s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="aws_lc_rs"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-rs-c3ac20ab4e4b2a06/lib-aws_lc_rs`
+   0.605793042s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="aws_lc_rs"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-rs v1.17.0/Check { test: false }/TargetInner { ..: lib_target("aws_lc_rs", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-rs-1.17.0/src/lib.rs", Edition2021) }
+   0.605800875s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="aws_lc_rs"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-rs-c3ac20ab4e4b2a06/lib-aws_lc_rs`
 
 Caused by:
     No such file or directory (os error 2)
@@ -133,8 +133,8 @@ Stack backtrace:
   19: std::rt::lang_start::<()>::{closure#0}
   20: std::rt::lang_start_internal
   21: _main
-   0.311379666s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-rs v1.17.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-rs-1.17.0/build.rs", Edition2021) }
-   0.311388750s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-rs-43553a7a8e2eeda1/run-build-script-build-script-build`
+   0.606225334s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-rs v1.17.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-rs-1.17.0/build.rs", Edition2021) }
+   0.606232459s  INFO prepare_target{force=false package_id=aws-lc-rs v1.17.0 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-rs-43553a7a8e2eeda1/run-build-script-build-script-build`
 
 Caused by:
     No such file or directory (os error 2)
@@ -164,8 +164,8 @@ Stack backtrace:
   21: std::rt::lang_start::<()>::{closure#0}
   22: std::rt::lang_start_internal
   23: _main
-   0.311816375s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="build-script-main"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-sys v0.41.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-main", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-sys-0.41.0/builder/main.rs", Edition2021) }
-   0.311824583s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="build-script-main"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-sys-9d2b35ae8dce73f1/run-build-script-build-script-main`
+   0.606594625s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="build-script-main"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-sys v0.41.0/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-main", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-sys-0.41.0/builder/main.rs", Edition2021) }
+   0.606601542s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="build-script-main"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-sys-9d2b35ae8dce73f1/run-build-script-build-script-main`
 
 Caused by:
     No such file or directory (os error 2)
@@ -196,40 +196,8 @@ Stack backtrace:
   22: std::rt::lang_start::<()>::{closure#0}
   23: std::rt::lang_start_internal
   24: _main
-   0.311993458s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="build-script-main"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-sys v0.41.0/Build/TargetInner { ..: custom_build_target("build-script-main", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-sys-0.41.0/builder/main.rs", Edition2021) }
-   0.312000666s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="build-script-main"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-sys-eee6b83fddf3b2e0/build-script-build-script-main`
-
-Caused by:
-    No such file or directory (os error 2)
-
-Stack backtrace:
-   0: <std::backtrace::Backtrace>::create
-   1: <std::io::error::Error as anyhow::context::ext::StdError>::ext_context::<alloc::string::String>
-   2: cargo_util::paths::read
-   3: cargo::core::compiler::fingerprint::_compare_old_fingerprint
-   4: cargo::core::compiler::fingerprint::prepare_target
-   5: cargo::core::compiler::compile
-   6: cargo::core::compiler::compile
-   7: cargo::core::compiler::compile
-   8: cargo::core::compiler::compile
-   9: cargo::core::compiler::compile
-  10: cargo::core::compiler::compile
-  11: cargo::core::compiler::compile
-  12: cargo::core::compiler::compile
-  13: <cargo::core::compiler::build_runner::BuildRunner>::compile
-  14: cargo::ops::cargo_compile::compile_ws
-  15: cargo::ops::cargo_compile::compile_with_exec
-  16: cargo::ops::cargo_compile::compile
-  17: cargo::commands::check::exec
-  18: <cargo::cli::Exec>::exec
-  19: cargo::cli::main
-  20: cargo::main
-  21: std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
-  22: std::rt::lang_start::<()>::{closure#0}
-  23: std::rt::lang_start_internal
-  24: _main
-   0.313121333s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="aws_lc_sys"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-sys v0.41.0/Check { test: false }/TargetInner { ..: lib_target("aws_lc_sys", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-sys-0.41.0/src/lib.rs", Edition2021) }
-   0.313131208s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="aws_lc_sys"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-sys-acb3caac0758ae17/lib-aws_lc_sys`
+   0.608529334s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="aws_lc_sys"}: cargo::core::compiler::fingerprint: fingerprint error for aws-lc-sys v0.41.0/Check { test: false }/TargetInner { ..: lib_target("aws_lc_sys", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/aws-lc-sys-0.41.0/src/lib.rs", Edition2021) }
+   0.608540209s  INFO prepare_target{force=false package_id=aws-lc-sys v0.41.0 target="aws_lc_sys"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/aws-lc-sys-acb3caac0758ae17/lib-aws_lc_sys`
 
 Caused by:
     No such file or directory (os error 2)
@@ -258,8 +226,8 @@ Stack backtrace:
   20: std::rt::lang_start::<()>::{closure#0}
   21: std::rt::lang_start_internal
   22: _main
-   0.313610291s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for rustls v0.23.40/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.40/build.rs", Edition2021) }
-   0.313618250s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-6b69f9ffd7799cb7/run-build-script-build-script-build`
+   0.609058125s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for rustls v0.23.40/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.40/build.rs", Edition2021) }
+   0.609065125s  INFO prepare_target{force=false package_id=rustls v0.23.40 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-6b69f9ffd7799cb7/run-build-script-build-script-build`
 
 Caused by:
     No such file or directory (os error 2)
@@ -288,8 +256,8 @@ Stack backtrace:
   20: std::rt::lang_start::<()>::{closure#0}
   21: std::rt::lang_start_internal
   22: _main
-   0.313935875s  INFO prepare_target{force=false package_id=rustls-webpki v0.103.13 target="webpki"}: cargo::core::compiler::fingerprint: fingerprint error for rustls-webpki v0.103.13/Check { test: false }/TargetInner { ..: lib_target("webpki", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-webpki-0.103.13/src/lib.rs", Edition2021) }
-   0.313944416s  INFO prepare_target{force=false package_id=rustls-webpki v0.103.13 target="webpki"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-webpki-a763c6a309620f6b/lib-webpki`
+   0.609547584s  INFO prepare_target{force=false package_id=rustls-webpki v0.103.13 target="webpki"}: cargo::core::compiler::fingerprint: fingerprint error for rustls-webpki v0.103.13/Check { test: false }/TargetInner { ..: lib_target("webpki", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-webpki-0.103.13/src/lib.rs", Edition2021) }
+   0.609554709s  INFO prepare_target{force=false package_id=rustls-webpki v0.103.13 target="webpki"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-webpki-a763c6a309620f6b/lib-webpki`
 
 Caused by:
     No such file or directory (os error 2)
@@ -317,8 +285,8 @@ Stack backtrace:
   19: std::rt::lang_start::<()>::{closure#0}
   20: std::rt::lang_start_internal
   21: _main
-   0.314419833s  INFO prepare_target{force=false package_id=tokio-rustls v0.26.4 target="tokio_rustls"}: cargo::core::compiler::fingerprint: fingerprint error for tokio-rustls v0.26.4/Check { test: false }/TargetInner { ..: lib_target("tokio_rustls", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-rustls-0.26.4/src/lib.rs", Edition2021) }
-   0.314428916s  INFO prepare_target{force=false package_id=tokio-rustls v0.26.4 target="tokio_rustls"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/tokio-rustls-32661f1271dc7106/lib-tokio_rustls`
+   0.610055959s  INFO prepare_target{force=false package_id=tokio-rustls v0.26.4 target="tokio_rustls"}: cargo::core::compiler::fingerprint: fingerprint error for tokio-rustls v0.26.4/Check { test: false }/TargetInner { ..: lib_target("tokio_rustls", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-rustls-0.26.4/src/lib.rs", Edition2021) }
+   0.610062959s  INFO prepare_target{force=false package_id=tokio-rustls v0.26.4 target="tokio_rustls"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/tokio-rustls-32661f1271dc7106/lib-tokio_rustls`
 
 Caused by:
     No such file or directory (os error 2)
@@ -345,8 +313,8 @@ Stack backtrace:
   18: std::rt::lang_start::<()>::{closure#0}
   19: std::rt::lang_start_internal
   20: _main
-   0.314947208s  INFO prepare_target{force=false package_id=rustls-platform-verifier v0.7.0 target="rustls_platform_verifier"}: cargo::core::compiler::fingerprint: fingerprint error for rustls-platform-verifier v0.7.0/Check { test: false }/TargetInner { ..: lib_target("rustls_platform_verifier", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-platform-verifier-0.7.0/src/lib.rs", Edition2021) }
-   0.314956208s  INFO prepare_target{force=false package_id=rustls-platform-verifier v0.7.0 target="rustls_platform_verifier"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-platform-verifier-1e09810bb8c98168/lib-rustls_platform_verifier`
+   0.610593459s  INFO prepare_target{force=false package_id=rustls-platform-verifier v0.7.0 target="rustls_platform_verifier"}: cargo::core::compiler::fingerprint: fingerprint error for rustls-platform-verifier v0.7.0/Check { test: false }/TargetInner { ..: lib_target("rustls_platform_verifier", ["lib"], "/Users/darwin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-platform-verifier-0.7.0/src/lib.rs", Edition2021) }
+   0.610600417s  INFO prepare_target{force=false package_id=rustls-platform-verifier v0.7.0 target="rustls_platform_verifier"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/rustls-platform-verifier-1e09810bb8c98168/lib-rustls_platform_verifier`
 
 Caused by:
     No such file or directory (os error 2)
@@ -372,8 +340,8 @@ Stack backtrace:
   17: std::rt::lang_start::<()>::{closure#0}
   18: std::rt::lang_start_internal
   19: _main
-   0.327831083s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/Users/darwin/git/wildflower)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/Users/darwin/git/wildflower/src/main.rs", Edition2021) }
-   0.327849833s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/mpdnavi-94e4c9e9762f1c81/test-bin-mpdnavi`
+   0.635706084s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/Users/darwin/git/wildflower)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/Users/darwin/git/wildflower/src/main.rs", Edition2021) }
+   0.635725292s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/Users/darwin/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/Users/darwin/git/wildflower/target/debug/.fingerprint/mpdnavi-94e4c9e9762f1c81/test-bin-mpdnavi`
 
 Caused by:
     No such file or directory (os error 2)
@@ -398,4 +366,8 @@ Stack backtrace:
   16: std::rt::lang_start_internal
   17: _main
    Compiling aws-lc-sys v0.41.0
-error: could not compile `aws-lc-sys` (build script) due to 1 previous error
+error: failed to write `/Users/darwin/git/wildflower/target/debug/build/aws-lc-sys-9d2b35ae8dce73f1/invoked.timestamp`
+
+Caused by:
+  Permission denied (os error 13)
+warning: build failed, waiting for other jobs to finish...
