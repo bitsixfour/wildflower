@@ -4,6 +4,8 @@ NEED TO KNOW!
  * 500 album limit (working on to fix....)
  * Jellyfin support someday.... But you shouldn't really shouldn't use the music player for jellyfin
  * Can't create custom playlists
+ * No tag system YET
+ * no tag system, but most mpd clients don't use this (ncncmpp, rmpc)
  * Although, it *will* read your servers reqwests but can't create new ones because MPD doesn't have a specfic
  plugin for that 
 
