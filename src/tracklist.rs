@@ -138,7 +138,17 @@ pub struct MpdAlbum<'a> {
 
 /* Actually get MPD Tracklist data from album-id */
 impl SubsIDResponse {
-    async fn new(client: &Client, alb: &NaviData, ser: &str) -> SubsIDResponse{
+    pub async fn new(client: &Client, alb: &NaviData, ser: &str) -> SubsIDResponse{
+    pub async fn from_id(client: &Client, album_id: &str) -> SubsIDResponse {
+        let url = format!("http://192.168.1.20:8097/rest/getAlbum?id={}&u=nix&p=2008&v=1.8.0&c=myapp&f=json", album_id);
+        client
+            .get(url)
+            .send().await.unwrap()
+            .error_for_status().unwrap()
+            .json::<SubsIDResponse>()
+            .await.unwrap()
+    }
+
         println!("currentsong");
         let uid: &str = alb.data.get(ser).unwrap().id.as_str();
         let url = format!("http://192.168.1.20:8097/rest/getAlbum?id={}&u=nix&p=2008&v=1.8.0&c=myapp&f=json", uid);

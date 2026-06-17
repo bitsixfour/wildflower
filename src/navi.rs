@@ -1,6 +1,8 @@
 use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
 use serde::Deserialize;
 use reqwest::Client;
+use crate::tracklist::Song;
 // main way to get metadata and parse actual library. TODO: it's 500 max albums but for a POC (for
 // now) it's good enough
 const URL: &str = "http://192.168.1.20:8097";
@@ -101,6 +103,7 @@ pub struct NaviData {
     pub data: HashMap<String, Album>, 
     pub data_id: HashMap<String, Album>, 
     pub album_list: Vec<Album>,
+    pub songs_cache: Arc<RwLock<HashMap<String, Vec<Song>>>>,
 }
 
 impl NaviData {
@@ -109,6 +112,7 @@ impl NaviData {
             data: HashMap::new(),
             data_id: HashMap::new(),
             album_list: Vec::new(),
+            songs_cache: Arc::new(RwLock::new(HashMap::new())),
         }
 
 
@@ -131,6 +135,7 @@ impl NaviData {
             data: hmap,
             data_id: hmap_2,
             album_list: album,
+            songs_cache: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 }

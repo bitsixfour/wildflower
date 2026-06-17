@@ -1,23 +1,22 @@
-/* This is so that we can use the Enum Expr
- * and Field so that we can get the ID so then it would
- * PROBABLY be possible to use search.rs to return the fat
- * thingy of data (the full tracklist info)
- */
-
 use crate::navi::Album;
-// use crate::search::HandleDatabase;
+use crate::tracklist::Song;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum FieldOp {
+    Contains,
+    Eq,
+    NotEq,
+}
 
 #[derive(Debug, Clone)]
 pub enum Expr {
-    And(Field, Field),
-    Or(Field, Field),
+    And(Box<Field>, Box<Field>),
+    Or(Box<Field>, Box<Field>),
     Def(Field),
     Empty,
 }
 
-
-#[derive(Debug,Clone)] 
+#[derive(Debug, Clone)]
 pub enum HandleDatabase {
     AlbumArt(String, i32),
     Count(String),
@@ -25,24 +24,22 @@ pub enum HandleDatabase {
     LsInfo(String),
     LFiles(String),
     ReadComments(String),
-    /* no sane client uses these commands.. not gonna implement it
-    ListAll(),
-    ListAllInfo(),
-    */
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Field {
     pub field: String,
-    pub op: bool,
+    pub op: FieldOp,
     pub value: String,
+}
+
+fn contains_ci(haystack: &str, needle: &str) -> bool {
+    haystack.to_lowercase().contains(&needle.to_lowercase())
 }
 
 impl Field {
     pub fn matches(&self, album: &Album) -> bool {
         let eq = match self.field.as_str() {
-            // Future me: check if MPD clients can do both or only either
-            // one of em
             "id" | "Id"               => album.id == self.value,
             "name" | "Name"           => album.name == self.value,
             "artist" | "Artist"       => album.artist == self.value,
@@ -59,16 +56,70 @@ impl Field {
             "sortName" | "sort_name"  => album.sort_name.as_deref() == Some(&self.value),
             _ => false,
         };
-        if self.op {
-            eq
-        } else {
-            !eq
+        match self.op {
+            FieldOp::Contains => {
+                let val = match self.field.to_lowercase().as_str() {
+                    "name" => &album.name,
+                    "artist" => &album.artist,
+                    "genre" => album.genre.as_deref().unwrap_or(""),
+                    _ => return eq,
+                };
+                contains_ci(val, &self.value)
+            }
+            FieldOp::Eq => eq,
+            FieldOp::NotEq => !eq,
+        }
+    }
+
+    pub fn matches_song(&self, song: &Song) -> bool {
+        let eq = match self.field.to_lowercase().as_str() {
+            "title" => song.title == self.value,
+            "artist" => song.artist == self.value,
+            "album" => song.album == self.value,
+            "year" | "date" => song.year.to_string() == self.value,
+            "track" => song.track.to_string() == self.value,
+            "id" => song.id == self.value,
+            _ => false,
+        };
+        match self.op {
+            FieldOp::Contains => {
+                let val = match self.field.to_lowercase().as_str() {
+                    "title" => &song.title,
+                    "artist" => &song.artist,
+                    "album" => &song.album,
+                    _ => return eq,
+                };
+                contains_ci(val, &self.value)
+            }
+            FieldOp::Eq => eq,
+            FieldOp::NotEq => !eq,
+        }
+    }
+
+    pub fn group_value(&self, album: &Album) -> String {
+        match self.field.to_lowercase().as_str() {
+            "name" | "album" => album.name.clone(),
+            "artist" => album.artist.clone(),
+            "genre" => album.genre.clone().unwrap_or_default(),
+            "year" | "date" => album.year.map(|y| y.to_string()).unwrap_or_default(),
+            _ => String::new(),
+        }
+    }
+
+    pub fn song_group_value(&self, song: &Song) -> String {
+        match self.field.to_lowercase().as_str() {
+            "title" => song.title.clone(),
+            "artist" => song.artist.clone(),
+            "album" => song.album.clone(),
+            "year" | "date" => song.year.to_string(),
+            "track" => song.track.to_string(),
+            _ => String::new(),
         }
     }
 }
 
 impl Expr {
-    pub fn create_new(&self, album: &Album) -> bool {
+    pub fn matches_album(&self, album: &Album) -> bool {
         match self {
             Expr::And(a, b) => a.matches(album) && b.matches(album),
             Expr::Or(a, b) => a.matches(album) || b.matches(album),
@@ -76,48 +127,37 @@ impl Expr {
             Expr::Empty => true,
         }
     }
+
+    pub fn matches_song(&self, song: &Song) -> bool {
+        match self {
+            Expr::And(a, b) => a.matches_song(song) && b.matches_song(song),
+            Expr::Or(a, b) => a.matches_song(song) || b.matches_song(song),
+            Expr::Def(f) => f.matches_song(song),
+            Expr::Empty => true,
+        }
+    }
+
+    pub fn song_group_value(&self, song: &Song) -> String {
+        match self {
+            Expr::Def(f) => f.song_group_value(song),
+            Expr::And(f, _) => f.song_group_value(song),
+            Expr::Or(f, _) => f.song_group_value(song),
+            Expr::Empty => String::new(),
+        }
+    }
 }
 
-
 #[allow(unused_variables)]
-
 pub fn handle(handle: HandleDatabase) {
     match handle {
         HandleDatabase::AlbumArt(io, _) => {
             parse_album_art(&io);
-
-
         }
-
-
-
-
         _ => {
-            println!("unexpected args"); 
+            println!("unexpected args");
         }
-
-
-
-
     }
-
-
 }
+
 fn parse_album_art(io: &str) {
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
