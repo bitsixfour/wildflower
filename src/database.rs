@@ -328,7 +328,6 @@ pub async fn database_handle(command: DatabaseStatus, client: &Client, navi: Nav
             };
             let songs = collect_songs(&expr, client, &navi).await;
             let tag_label = capitalize_first(&args.tag_type);
-
             if args.group_types.is_empty() {
                 let mut values: Vec<String> = songs.iter()
                     .map(|s| song_tag_value(s, &args.tag_type))
@@ -353,7 +352,6 @@ pub async fn database_handle(command: DatabaseStatus, client: &Client, navi: Nav
                 out.push_str("OK\n");
                 out
             } else {
-                // group not yet implemented
                 let mut out = String::new();
                 for song in &songs {
                     let val = song_tag_value(song, &args.tag_type);
@@ -367,6 +365,17 @@ pub async fn database_handle(command: DatabaseStatus, client: &Client, navi: Nav
                 out.push_str("OK\n");
                 out
             }
+        }
+        DatabaseStatus::ListAll(_x) => {
+            let mut new = String::new();
+            for album in &navi.album_list {
+                let songs = get_album_songs(client, &navi, album).await;
+                for song in &songs {
+                    new.push_str(&format!("file: {}/{}\n", album.name, song.path));
+                }
+            }
+            new.push_str("OK\n");
+            new
         }
         _ => format!("ACK-!"),
     }
