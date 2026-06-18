@@ -15,7 +15,6 @@ pub enum Expr {
     Def(Field),
     Empty,
 }
-
 #[derive(Debug, Clone)]
 pub enum HandleDatabase {
     AlbumArt(String, i32),
@@ -25,7 +24,6 @@ pub enum HandleDatabase {
     LFiles(String),
     ReadComments(String),
 }
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Field {
     pub field: String,
@@ -146,7 +144,7 @@ impl Expr {
         }
     }
 }
-
+/*
 #[allow(unused_variables)]
 pub fn handle(handle: HandleDatabase) {
     match handle {
@@ -158,6 +156,6 @@ pub fn handle(handle: HandleDatabase) {
         }
     }
 }
-
 fn parse_album_art(io: &str) {
 }
+*/

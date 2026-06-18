@@ -1,13 +1,11 @@
 // return tracklist as specified in MPD protocol
 
 
-use std::collections::HashMap;
 use reqwest::Client;
 use serde::Deserialize;
 use crate::NaviData;
-use crate::MpdSong;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct SubsIDResponse {
     #[serde(rename = "subsonic-response")]
     pub subsonic_response: ResponseBody,
@@ -148,8 +146,7 @@ impl SubsIDResponse {
             .await.unwrap()
     }
 
-    pub async fn new(client: &Client, alb: &NaviData, ser: &str) -> SubsIDResponse {
-        let uid: &str = alb.data.get(ser).unwrap().id.as_str();
+    pub async fn new(client: &Client, uid: &str, ser: &str) -> SubsIDResponse {
         let url = format!("http://192.168.1.20:8097/rest/getAlbum?id={}&u=nix&p=2008&v=1.8.0&c=myapp&f=json", uid);
         let root = client
             .get(url)

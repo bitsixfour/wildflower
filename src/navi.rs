@@ -2,6 +2,9 @@ use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use serde::Deserialize;
 use reqwest::Client;
+
+
+use crate::tracklist::SubsIDResponse;
 use crate::tracklist::Song;
 // main way to get metadata and parse actual library. TODO: it's 500 max albums but for a POC (for
 // now) it's good enough
@@ -104,8 +107,10 @@ pub struct NaviData {
     pub data_id: HashMap<String, Album>, 
     pub album_list: Vec<Album>,
     pub songs_cache: Arc<RwLock<HashMap<String, Vec<Song>>>>,
+    /* turn into Arc later??? */
+    pub albums_cache: Hashmap<Album, Vec<Song>>
 }
-
+// turn into hashmap
 impl NaviData {
     pub fn init_empty() -> Self {
         Self {
@@ -113,29 +118,40 @@ impl NaviData {
             data_id: HashMap::new(),
             album_list: Vec::new(),
             songs_cache: Arc::new(RwLock::new(HashMap::new())),
+            albums_cache: Hashmap::new(),
         }
-
+    }
+    // the "key" in the hash is album.name
+    pub async fn init_cache(data: Vec<Album>, client: &Client) -> Hashmap<String, Vec<Song>>  {
+        let mut h_map: Hashmap<String, Vec<Song>> = Hashmap::new();
+        for idx in &data {
+            let key: (&str, &str) = (&idx.id, &idx.name);
+            let metadata: Vec<Song> =  SubsIDResponse::from_id(client, key.0).await
+                .subsonic_response
+                .album
+                .song;
+            h_map.insert(key.0, metadata);
+        } h_map
 
     }
-    pub async fn updt(&self, resp: SubsonicResponse) -> Self {
+    pub async fn updt(resp: SubsonicResponse, clnt: &Client) -> Self {
         let mut hmap: HashMap<String, Album> = HashMap::new();
         let mut hmap_2: HashMap<String, Album> = HashMap::new();
-        println!("new struct");
         let album: Vec<Album> = resp.album_list_2.album;
         for i in &album {
             let name = i.name.clone().to_lowercase();
             let id = i.id.clone().to_lowercase();
-            println!("Yes saar. We are importing this to navidrome");
-            println!("Yes saar. We are importing this to navidrome (2)");
             hmap.insert(name, i.clone());
             hmap_2.insert(id,i.clone());
-            
         }
+        // take ownership, not needed anymore
+        let kv_cache: Hashmap<String, Vec<Song>> = Self::init_cache(album, clnt);
         Self {
             data: hmap,
             data_id: hmap_2,
             album_list: album,
             songs_cache: Arc::new(RwLock::new(HashMap::new())),
+            albums_cache: kv_cache,
         }
     }
 }

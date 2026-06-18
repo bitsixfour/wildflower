@@ -1,9 +1,11 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::navi::{Album, NaviData};
 use crate::parser;
 use crate::search::Expr;
 use crate::tracklist::{self, Song};
+use reqwest::Client;
+use crate::art;
 
 pub enum QueueStatus {
     Add(String, i32),
@@ -29,21 +31,22 @@ pub struct FindArgs {
     pub window_end: Option<u32>,
     pub position: Option<u32>,
 }
+
 pub enum DatabaseStatus {
     AlbumArt(String, i64),
     Count(String, String),
     Find(FindArgs),
     FindAdd(FindArgs),
-    Lis(Vec<&str>),
-    ListAll(Box<&str>),
-    ListAllInfo(Box<&str>),
-    ListFiles(&str),
-    LsInfo(&str),
-    ReadComment(&str),
-    ReadPicture(&str),
-    SearchAdd(Vec<&str>),
-    Searchaddpi(Vec<&str>),
-    SearchCount(Vec<&str>),
+    List(ListArgs),
+    ListAll(Box<String>),
+    ListAllInfo(Box<String>),
+    ListFiles(String),
+    LsInfo(String),
+    ReadComment(String),
+    ReadPicture(String),
+    SearchAdd(Vec<String>),
+    Searchaddpi(Vec<String>),
+    SearchCount(Vec<String>),
     Update(),
     Rescan()
 }
@@ -85,8 +88,64 @@ fn song_group_value(song: &Song, group_type: &str) -> String {
     }
 }
 
+fn capitalize_first(s: &str) -> String {
+    let mut chars = s.chars();
+    match chars.next() {
+        None => String::new(),
+        Some(c) => c.to_uppercase().to_string() + chars.as_str(),
+    }
+}
+
+fn song_tag_value(song: &Song, tag: &str) -> String {
+    match tag.to_lowercase().as_str() {
+        "title" | "name" => song.title.clone(),
+        "artist" => song.artist.clone(),
+        "album" => song.album.clone(),
+        "albumartist" | "album_artist" | "albumartistsort" => {
+            if !song.display_album_artist.is_empty() {
+                song.display_album_artist.clone()
+            } else if !song.display_artist.is_empty() {
+                song.display_artist.clone()
+            } else {
+                song.artist.clone()
+            }
+        }
+        "date" | "year" => song.year.to_string(),
+        "track" | "tracknumber" => song.track.to_string(),
+        "genre" => String::new(),
+        "composer" => String::new(),
+        "performer" => {
+            if !song.display_artist.is_empty() {
+                song.display_artist.clone()
+            } else {
+                song.artist.clone()
+            }
+        }
+        "comment" => song.comment.clone(),
+        "disc" | "discnumber" => String::new(),
+        "filename" | "file" => song.path.clone(),
+        "id" => song.id.clone(),
+        "duration" => song.duration.to_string(),
+        "bitrate" | "bit_rate" => song.bit_rate.to_string(),
+        "sortartist" | "artistsort" => {
+            if !song.sort_name.is_empty() {
+                song.sort_name.clone()
+            } else {
+                song.artist.clone()
+            }
+        }
+        "albumsort" => {
+            if !song.sort_name.is_empty() {
+                song.sort_name.clone()
+            } else {
+                song.album.clone()
+            }
+        }
+        _ => song_group_value(song, tag),
+    }
+}
 fn song_sort_key(song: &Song, field: &str) -> String {
-    match field.to_lowercase() {
+    match field.to_lowercase().as_str() { 
         "title" | "name" => song.title.to_lowercase(),
         "artist" => song.artist.to_lowercase(),
         "album" => song.album.to_lowercase(),
@@ -116,8 +175,10 @@ fn song_sort_key(song: &Song, field: &str) -> String {
         "track" => format!("{:04}", song.track),
         "year" | "date" => song.year.to_string(),
         "duration" => format!("{:08}", song.duration),
-        "last-modified" => song.created.clone(),
-        "id" => song.id.clone(),
+        
+        "last-modified" => song.created.to_string(),
+        "id" => song.id.to_string(),
+        
         _ => String::new(),
     }
 }
@@ -183,7 +244,7 @@ fn apply_window(matches: &mut Vec<Song>, start: Option<u32>, end: Option<u32>) {
 pub async fn database_handle(command: DatabaseStatus, client: &Client, navi: NaviData) -> String {
     match command {
         DatabaseStatus::AlbumArt(id, ost) => {
-            art::return_album_art(id, ost).await
+            String::from_utf8_lossy(&art::return_album_art(&id, ost).await).into_owned()
         }
         DatabaseStatus::Count(filter_str, group_type) => {
             let expr = match parser::parse_filter(&filter_str) {
@@ -259,6 +320,62 @@ pub async fn database_handle(command: DatabaseStatus, client: &Client, navi: Nav
             out.push_str("OK\n");
             out
         }
+
+        DatabaseStatus::List(args) => {
+            let expr = match parser::parse_filter(&args.filter.as_deref().unwrap_or("")) {
+                Some(e) => e,
+                _ => return "ACK [2@00] {list} could not parse filter\n".to_string(),
+            };
+            let songs = collect_songs(&expr, client, &navi).await;
+            let tag_label = capitalize_first(&args.tag_type);
+
+            if args.group_types.is_empty() {
+                let mut values: Vec<String> = songs.iter()
+                    .map(|s| song_tag_value(s, &args.tag_type))
+                    .filter(|v| !v.is_empty())
+                    .collect::<HashSet<_>>()
+                    .into_iter()
+                    .collect();
+                values.sort();
+
+                let start = args.window_start.unwrap_or(0) as usize;
+                let end = args.window_end.map(|e| e as usize).unwrap_or(values.len());
+                if start < values.len() {
+                    values = values[start..end.min(values.len())].to_vec();
+                } else {
+                    values.clear();
+                }
+
+                let mut out = String::new();
+                for v in &values {
+                    out.push_str(&format!("{}: {}\n", tag_label, v));
+                }
+                out.push_str("OK\n");
+                out
+            } else {
+                // group not yet implemented
+                let mut out = String::new();
+                for song in &songs {
+                    let val = song_tag_value(song, &args.tag_type);
+                    if val.is_empty() { continue; }
+                    for g in &args.group_types {
+                        let gv = song_group_value(song, g);
+                        if gv.is_empty() { continue; }
+                        out.push_str(&format!("{}: {}\nGroup: {}\n", tag_label, val, gv));
+                    }
+                }
+                out.push_str("OK\n");
+                out
+            }
+        }
         _ => format!("ACK-!"),
     }
 }
+pub struct ListArgs {
+    pub tag_type: String,
+    pub filter: Option<String>,
+    pub group_types: Vec<String>,
+    pub window_start: Option<u32>,
+    pub window_end: Option<u32>,
+}
+

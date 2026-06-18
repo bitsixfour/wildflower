@@ -15,9 +15,10 @@ mod playback;
 mod search;
 mod parser;
 // mod rodio_stub;
-use crate::navi::{NaviData, SubsonicResponse};
-use crate::tracklist::Song;
+use crate::database::{DatabaseStatus, ListArgs};
+use crate::navi::NaviData;
 use crate::playback::{CurrentSong, PlaybackStatus, PlayerState, AudioState, SharedState};
+use crate::tracklist::Song;
 
 
 
@@ -105,12 +106,12 @@ async fn main() -> anyhow::Result<()> {
         let client_state = Arc::clone(&shared_state);
         let navi = navi.clone();
         tokio::spawn(async move {
-            init_client(socket, client_tx, client_state, navi).await;
+            init_client(socket, client_tx, client_state, navi, heckin_reqwest.clone()).await;
         });
     }
 }
 
-async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<PlaybackStatus>, state: SharedState, music_data: NaviData) {
+async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<PlaybackStatus>, state: SharedState, music_data: NaviData, client: Client) {
     let (reader, mut writer) = tokio::io::split(socket);
     let mut reader = BufReader::new(reader);
     let _ = writer.write_all(b"OK MPD 0.25.0\n").await;
@@ -123,7 +124,7 @@ async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<Playba
             Ok(_) => {
                 let trimmed = line.trim_end();
                 if trimmed.is_empty() { continue; }
-                let response = handle_case(trimmed, &cmd_tx, &state).await;
+                let response = handle_case(trimmed, &cmd_tx, &state, &client, &music_data).await;
                 let _ = writer.write_all(response.as_bytes()).await;
                 if trimmed == "close" {
                     break;
@@ -137,7 +138,7 @@ async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<Playba
 
 
 /* Giant monolithic handling of all 50+ MPD functions. */
-async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackStatus>, state: &SharedState) -> String {
+async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackStatus>, state: &SharedState, client: &Client, navi: &NaviData) -> String {
     let trimmed = input.trim();
     let mut parts: Vec<String> = Vec::new();
     let mut in_quotes = false;
@@ -217,11 +218,7 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             "Ok\n".to_string()
         }
         /* The Queue (Section on MPD API SPEC) */ 
-        "add" => {
-            let _ = cmd_tx.send(
-
-
-        }
+        "add" => "OK\n".to_string(),
 
 
 
@@ -270,6 +267,64 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             out.push_str("OK\n");
             out
         }
+        "list" => {
+            if parts.len() < 2 {
+                return "ACK [2@0] {list} missing tag type\n".to_string();
+            }
+
+            let tag_type = parts[1].clone();
+            let mut i = 2;
+            let mut filter_parts: Vec<String> = Vec::new();
+            let mut group_types: Vec<String> = Vec::new();
+            let mut window: Option<(u32, u32)> = None;
+
+            while i < parts.len() {
+                match parts[i].as_str() {
+                    "group" => {
+                        i += 1;
+                        if i < parts.len() {
+                            group_types.push(parts[i].clone());
+                        }
+                    }
+                    "window" => {
+                        i += 1;
+                        if i < parts.len() {
+                            if let Some((s, e)) = parts[i].split_once(':') {
+                                let start = s.parse().unwrap_or(0);
+                                let end = e.parse().unwrap_or(u32::MAX);
+                                window = Some((start, end));
+                            }
+                        }
+                    }
+                    _ => {
+                        filter_parts.push(parts[i].clone());
+                    }
+                }
+                i += 1;
+            }
+
+            let filter = if filter_parts.is_empty() {
+                None
+            } else {
+                Some(filter_parts.join(" "))
+            };
+
+            let list_args = ListArgs {
+                tag_type,
+                filter,
+                group_types,
+                window_start: window.map(|(s, _)| s),
+                window_end: window.map(|(_, e)| e),
+            };
+
+            database::database_handle(
+                DatabaseStatus::List(list_args),
+                client,
+                navi.clone(),
+            )
+            .await
+        }
+
         "ping" => "OK\n".to_string(),
         "close" => "OK\n".to_string(),
 
