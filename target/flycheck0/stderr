@@ -1,5 +1,5 @@
-   0.150802223s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/wildflower)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/wildflower/src/main.rs", Edition2021) }
-   0.150820949s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/wildflower/target/debug/.fingerprint/mpdnavi-ff4a66df317c06a4/bin-mpdnavi`
+   0.153775108s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/wildflower)/Check { test: false }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/wildflower/src/main.rs", Edition2021) }
+   0.153799233s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/wildflower/target/debug/.fingerprint/mpdnavi-ff4a66df317c06a4/bin-mpdnavi`
 
 Caused by:
     No such file or directory (os error 2)
@@ -24,8 +24,8 @@ Stack backtrace:
   16: __libc_start_call_main
   17: __libc_start_main_alias_2
   18: _start
-   0.171367026s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/wildflower)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/wildflower/src/main.rs", Edition2021) }
-   0.171382906s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/wildflower/target/debug/.fingerprint/mpdnavi-aa7ea7a3701579be/test-bin-mpdnavi`
+   0.174696359s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint: fingerprint error for mpdnavi v0.1.0 (/home/will/git/wildflower)/Check { test: true }/TargetInner { name: "mpdnavi", doc: true, ..: with_path("/home/will/git/wildflower/src/main.rs", Edition2021) }
+   0.174713522s  INFO prepare_target{force=false package_id=mpdnavi v0.1.0 (/home/will/git/wildflower) target="mpdnavi"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/will/git/wildflower/target/debug/.fingerprint/mpdnavi-aa7ea7a3701579be/test-bin-mpdnavi`
 
 Caused by:
     No such file or directory (os error 2)
