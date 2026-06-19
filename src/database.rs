@@ -350,7 +350,7 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: Na
                     .cloned()
                     .unwrap(); 
                 if let Some(matching_song) = songs.iter().find(|&song| &song.title == parts.get(2).unwrap()) {
-                    let comment = matching_song.comment;
+                    let comment = matching_song.comment.clone();
                     out.push_str(&format!("Comment: {}", comment));
                 }
 
@@ -377,6 +377,14 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: Na
             }
             String::from_utf8_lossy(&art::return_album_art(&id, ofsft).await)
                 .into_owned()
+
+        }
+        
+        DatabaseStatus::Update() => {
+            // do nothing because it's cached on every boot on another interface
+            let str = String::new();
+            str
+
 
         }
 

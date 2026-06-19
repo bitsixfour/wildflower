@@ -62,12 +62,12 @@ pub trait SubsonicParse {
 async fn main() -> anyhow::Result<()> {
     println!("starting ze mpd server....");
     let test_id: &str = "23M5Qz4SmDa79E5MR0woPr";
-    let heckin_reqwest: Client = reqwest::Client::new();
     let listener = TcpListener::bind(format!("127.0.0.1:{}", PORT)).await?; // 6600 is where MPD lives
     println!("We are ze running at port {PORT}");
+    let heckin_reqwest: Client = reqwest::Client::new();
 
     let navi: NaviData = NaviData::init_empty();
-    
+ 
 
     let shared_state: SharedState = Arc::new(tokio::sync::RwLock::new(PlayerState {
         volume: 100,
@@ -82,12 +82,8 @@ async fn main() -> anyhow::Result<()> {
 
     let (cmd_tx, mut cmd_rx) = tokio::sync::mpsc::channel::<PlaybackStatus>(100);
 
-
-
-
-
-
     let engine_state = Arc::clone(&shared_state);
+    let heckin_reqwes = heckin_reqwest.clone();
     tokio::spawn(async move {
         let mut engine = CurrentSong::new(&test_id, &heckin_reqwest).await;
         while let Some(cmd) = cmd_rx.recv().await {
@@ -105,8 +101,9 @@ async fn main() -> anyhow::Result<()> {
         let client_tx = cmd_tx.clone();
         let client_state = Arc::clone(&shared_state);
         let navi = navi.clone();
+        let reqwest = heckin_reqwes.clone();
         tokio::spawn(async move {
-            init_client(socket, client_tx, client_state, navi, heckin_reqwest.clone()).await;
+            init_client(socket, client_tx, client_state, navi, reqwest).await;
         });
     }
 }
