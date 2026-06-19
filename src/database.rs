@@ -280,6 +280,7 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: Na
                 out
             }
         }
+        // most mpd client's dont use this
         DatabaseStatus::ListAll(_x) => {
             let mut new = String::new();
             for album in &navi.album_list {
@@ -291,7 +292,57 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: Na
             new.push_str("OK\n");
             new
         }
+        // no mpd client uses this... i ignore the arg for the directory because the main use of
+        // this is to get all things anyway?
+        DatabaseStatus::ListAllInfo(_x) => {
+            let mut new = String::new();
+            for album in &navi.album_list {
+                let songs = get_album_songs(&navi, album).await;
+                for song in &songs {
+                    new.push_str(&format!("file: {}/{}\n", album.name, song.path));
+                    new.push_str(&format!("duration: {}/{}\n", album.duration, song.path));
+                    new.push_str(&format!("created: {}/{}\n", album.created, song.path));
+                    new.push_str(&format!("artist: {}/{}\n", album.artist, song.path));
+                    new.push_str(&format!("file: {}/{}\n", album.year.unwrap_or(0), song.path));
+                }
+            }
+            new.push_str("Ok\n");
+            new
+
+        }
+        #[allow(unused_variables)]
+        DatabaseStatus::LsInfo(str) => {
+           let parts: Vec<String> = str.split('/').map(String::from).collect();
+
+           if let Some(name) = parts.first() {
+               if !navi.album_list.iter().any(|a| a.name == *name) {
+                   return "ACK [2@0] {lsinfo} No such album\n".to_string();
+               }
+           }
+           if let Some(song_path) = parts.get(1) {
+               // find the album, then find the song
+               if let Some(album) = navi.album_list.iter().find(|a| a.name == parts[0]) {
+                   let songs = get_album_songs(&navi, album).await;
+                   if let Some(song) = songs.iter().find(|s| s.path == *song_path) {
+                       return format!("file: {}/{}\nOK\n", album.name, song.path);
+                   }
+               }
+               return "ACK [2@0] {lsinfo} No such song\n".to_string();
+           }
+
+           if let Some(album) = navi.album_list.iter().find(|a| a.name == parts[0]) {
+               let mut out = String::new();
+               for song in get_album_songs(&navi, album).await {
+                   out.push_str(&format!("file: {}/{}\n", album.name, song.path));
+               }
+               out.push_str("OK\n");
+               return out;
+           }
+
+           format!("ACK [2@0] No such directory\n")
+        }
         _ => format!("ACK-!"),
+
     }
 }
 pub struct ListArgs {
