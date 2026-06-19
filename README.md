@@ -9,4 +9,4 @@ NEED TO KNOW!
  * Although, it *will* read your servers reqwests but can't create new ones because MPD doesn't have a specfic
  plugin for that 
 
- More of a POC which will eventually get working because I need this. Just spend a few bucks and let jippity 5.5 xhigh do this if you really want this? I mean I could but I don't want to.
+ More of a POC which will eventually get working because I need this. Just spend a few bucks and let jippity 5.5 xhigh do this if you really want this? I mean I could but I don't want to. No AI because I wanted to learn Rust more, so that means my code probably isn't great.
