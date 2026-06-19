@@ -106,9 +106,8 @@ pub struct NaviData {
     pub data: HashMap<String, Album>, 
     pub data_id: HashMap<String, Album>, 
     pub album_list: Vec<Album>,
-    pub songs_cache: Arc<RwLock<HashMap<String, Vec<Song>>>>,
-    /* turn into Arc later??? */
-    pub albums_cache: Hashmap<Album, Vec<Song>>
+    pub songs_cache: HashMap<String, Vec<Song>>,
+    pub albums_cache: HashMap<String, Vec<Song>>
 }
 // turn into hashmap
 impl NaviData {
@@ -117,20 +116,20 @@ impl NaviData {
             data: HashMap::new(),
             data_id: HashMap::new(),
             album_list: Vec::new(),
-            songs_cache: Arc::new(RwLock::new(HashMap::new())),
+            songs_cache: HashMap::new(),
             albums_cache: HashMap::new(),
         }
     }
     // the "key" in the hash is album.name
-    pub async fn init_cache(data: Vec<Album>, client: &Client) -> Hashmap<String, Vec<Song>>  {
-        let mut h_map: Hashmap<String, Vec<Song>> = Hashmap::new();
+    pub async fn init_cache(data: Vec<Album>, client: &Client) -> HashMap<String, Vec<Song>>  {
+        let mut h_map: HashMap<String, Vec<Song>> = HashMap::new();
         for idx in &data {
             let key: (&str, &str) = (&idx.id, &idx.name);
             let metadata: Vec<Song> =  SubsIDResponse::from_id(client, key.0).await
                 .subsonic_response
                 .album
                 .song;
-            h_map.insert(key.0, metadata);
+            h_map.insert(key.0.to_string(), metadata);
         } h_map
 
     }
@@ -145,12 +144,12 @@ impl NaviData {
             hmap_2.insert(id,i.clone());
         }
         // take ownership, not needed anymore
-        let kv_cache: Hashmap<String, Vec<Song>> = Self::init_cache(album, clnt);
+        let kv_cache: HashMap<String, Vec<Song>> = Self::init_cache(album.clone(), clnt).await;
         Self {
             data: hmap,
             data_id: hmap_2,
             album_list: album,
-            songs_cache: Arc::new(RwLock::new(HashMap::new())),
+            songs_cache: HashMap::new(),
             albums_cache: kv_cache,
         }
     }

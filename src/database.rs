@@ -43,7 +43,7 @@ pub enum DatabaseStatus {
     ListFiles(String),
     LsInfo(String),
     ReadComment(String),
-    ReadPicture(String),
+    ReadPicture((String, i64)),
     SearchAdd(Vec<String>),
     Searchaddpi(Vec<String>),
     SearchCount(Vec<String>),
@@ -196,7 +196,9 @@ async fn handle_find(args: FindArgs, kind: &str, navi: &NaviData) -> String {
     out.push_str("OK\n");
     out
 }
-
+/* We assume that our virtuall FS is just plain /album.name/song.flac. This is different 
+ * from the actual thingy in your server
+ */
 pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: NaviData) -> String {
     match command {
         DatabaseStatus::AlbumArt(id, ost) => {
@@ -320,7 +322,6 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: Na
                }
            }
            if let Some(song_path) = parts.get(1) {
-               // find the album, then find the song
                if let Some(album) = navi.album_list.iter().find(|a| a.name == parts[0]) {
                    let songs = get_album_songs(&navi, album).await;
                    if let Some(song) = songs.iter().find(|s| s.path == *song_path) {
@@ -341,6 +342,44 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: Na
 
            format!("ACK [2@0] No such directory\n")
         }
+        DatabaseStatus::ReadComment(str) => {
+            let mut out = String::new();
+            let parts: Vec<String> = str.split('/').map(String::from).collect();
+            if let Some(path) = parts.get(1) {
+                let songs = navi.songs_cache.get(path)
+                    .cloned()
+                    .unwrap(); 
+                if let Some(matching_song) = songs.iter().find(|&song| &song.title == parts.get(2).unwrap()) {
+                    let comment = matching_song.comment;
+                    out.push_str(&format!("Comment: {}", comment));
+                }
+
+            }
+
+            return out
+
+
+
+        }
+        DatabaseStatus::ReadPicture(turp) => {
+            // match id then use same method as other album method
+            let parts: Vec<String> = turp.0.split('/').map(String::from).collect();
+            let ofsft: i64 = turp.1;
+            let mut id = String::new();
+            if let Some(path) = parts.get(1) {
+                let songs = navi.songs_cache.get(path)
+                    .cloned()
+                    .unwrap();
+                if let Some(matching_song) = songs.iter().find(|&song| &song.title == parts.get(2).unwrap()) {
+                     let _id = matching_song.id.clone();
+                     id = _id;
+                 }
+            }
+            String::from_utf8_lossy(&art::return_album_art(&id, ofsft).await)
+                .into_owned()
+
+        }
+
         _ => format!("ACK-!"),
 
     }
