@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use crate::navi::{Album, NaviData};
 use crate::parser;
 use crate::search::Expr;
-use crate::tracklist::{self, Song};
+use crate::tracklist::Song;
 use reqwest::Client;
 use crate::art;
 
@@ -51,29 +51,8 @@ pub enum DatabaseStatus {
     Rescan()
 }
 
-async fn get_album_songs(client: &Client, navi: &NaviData, album: &Album) -> Vec<Song> {
-    {
-        let cache = navi.songs_cache.read().unwrap();
-        if let Some(songs) = cache.get(&album.id) {
-            return songs.clone();
-        }
-    }
-    if let Ok(resp) = client
-        .get(&format!(
-            "http://192.168.1.20:8097/rest/getAlbum?id={}&u=nix&p=2008&v=1.8.0&c=myapp&f=json",
-            album.id
-        ))
-        .send()
-        .await
-    {
-        if let Ok(parsed) = resp.json::<tracklist::SubsIDResponse>().await {
-            let songs = parsed.subsonic_response.album.song;
-            let mut cache = navi.songs_cache.write().unwrap();
-            cache.insert(album.id.clone(), songs.clone());
-            return songs;
-        }
-    }
-    Vec::new()
+async fn get_album_songs(navi: &NaviData, album: &Album) -> Vec<Song> {
+    navi.albums_cache.get(&album.id).cloned().unwrap_or_default()
 }
 
 fn song_group_value(song: &Song, group_type: &str) -> String {
@@ -112,102 +91,70 @@ fn song_tag_value(song: &Song, tag: &str) -> String {
         }
         "date" | "year" => song.year.to_string(),
         "track" | "tracknumber" => song.track.to_string(),
-        "genre" => String::new(),
-        "composer" => String::new(),
+        "genre" | "composer" | "disc" | "discnumber" => String::new(),
         "performer" => {
-            if !song.display_artist.is_empty() {
-                song.display_artist.clone()
-            } else {
-                song.artist.clone()
-            }
+            if !song.display_artist.is_empty() { song.display_artist.clone() }
+            else { song.artist.clone() }
         }
         "comment" => song.comment.clone(),
-        "disc" | "discnumber" => String::new(),
         "filename" | "file" => song.path.clone(),
         "id" => song.id.clone(),
         "duration" => song.duration.to_string(),
         "bitrate" | "bit_rate" => song.bit_rate.to_string(),
         "sortartist" | "artistsort" => {
-            if !song.sort_name.is_empty() {
-                song.sort_name.clone()
-            } else {
-                song.artist.clone()
-            }
+            if !song.sort_name.is_empty() { song.sort_name.clone() }
+            else { song.artist.clone() }
         }
         "albumsort" => {
-            if !song.sort_name.is_empty() {
-                song.sort_name.clone()
-            } else {
-                song.album.clone()
-            }
+            if !song.sort_name.is_empty() { song.sort_name.clone() }
+            else { song.album.clone() }
         }
         _ => song_group_value(song, tag),
     }
 }
+
 fn song_sort_key(song: &Song, field: &str) -> String {
     match field.to_lowercase().as_str() { 
         "title" | "name" => song.title.to_lowercase(),
-        "artist" => song.artist.to_lowercase(),
-        "album" => song.album.to_lowercase(),
-        "artistsort" => {
-            if !song.sort_name.is_empty() {
-                song.sort_name.to_lowercase()
-            } else {
-                song.artist.to_lowercase()
-            }
+        "artist" | "artistsort" => {
+            if !song.sort_name.is_empty() { song.sort_name.to_lowercase() }
+            else { song.artist.to_lowercase() }
         }
+        "album" => song.album.to_lowercase(),
         "albumartist" | "albumartistsort" => {
-            if !song.display_album_artist.is_empty() {
-                song.display_album_artist.to_lowercase()
-            } else if !song.display_artist.is_empty() {
-                song.display_artist.to_lowercase()
-            } else {
-                song.artist.to_lowercase()
-            }
+            if !song.display_album_artist.is_empty() { song.display_album_artist.to_lowercase() }
+            else if !song.display_artist.is_empty() { song.display_artist.to_lowercase() }
+            else { song.artist.to_lowercase() }
         }
         "albumsort" => {
-            if !song.sort_name.is_empty() {
-                song.sort_name.to_lowercase()
-            } else {
-                song.album.to_lowercase()
-            }
+            if !song.sort_name.is_empty() { song.sort_name.to_lowercase() }
+            else { song.album.to_lowercase() }
         }
         "track" => format!("{:04}", song.track),
         "year" | "date" => song.year.to_string(),
         "duration" => format!("{:08}", song.duration),
-        
         "last-modified" => song.created.to_string(),
         "id" => song.id.to_string(),
-        
         _ => String::new(),
     }
 }
 
 fn format_song(song: &Song) -> String {
-    let mut out = String::new();
-    out.push_str(&format!("file: {}\n", song.path));
-    out.push_str(&format!("Title: {}\n", song.title));
-    out.push_str(&format!("Artist: {}\n", song.artist));
-    out.push_str(&format!("Album: {}\n", song.album));
-    out.push_str(&format!("Track: {}\n", song.track));
-    out.push_str(&format!("Year: {}\n", song.year));
-    out.push_str(&format!("Duration: {}\n", song.duration));
-    out.push_str(&format!("Id: {}\n", song.id));
+    let mut out = format!(
+        "file: {}\nTitle: {}\nArtist: {}\nAlbum: {}\nTrack: {}\nYear: {}\nDuration: {}\nId: {}",
+        song.path, song.title, song.artist, song.album, song.track, song.year, song.duration, song.id
+    );
     if !song.artist_id.is_empty() {
-        out.push_str(&format!("ArtistId: {}\n", song.artist_id));
+        out.push_str(&format!("\nArtistId: {}", song.artist_id));
     }
+    out.push('\n');
     out
 }
 
-async fn collect_songs(
-    expr: &Expr,
-    client: &Client,
-    navi: &NaviData,
-) -> Vec<Song> {
+async fn collect_songs(expr: &Expr, navi: &NaviData) -> Vec<Song> {
     let mut matches = Vec::new();
     for album in &navi.album_list {
-        let songs = get_album_songs(client, navi, album).await;
-        for song in &songs {
+        for song in &get_album_songs(navi, album).await {
             if expr.matches_song(song) {
                 matches.push(song.clone());
             }
@@ -220,28 +167,37 @@ fn apply_sort(matches: &mut Vec<Song>, sort: &Option<String>) {
     let Some(sort_field) = sort else { return };
     let desc = sort_field.starts_with('-');
     let field = sort_field.trim_start_matches('-');
-    if field.is_empty() {
-        return;
-    }
+    if field.is_empty() { return; }
     matches.sort_by(|a, b| {
-        let ka = song_sort_key(a, field);
-        let kb = song_sort_key(b, field);
+        let (ka, kb) = (song_sort_key(a, field), song_sort_key(b, field));
         if desc { kb.cmp(&ka) } else { ka.cmp(&kb) }
     });
 }
 
 fn apply_window(matches: &mut Vec<Song>, start: Option<u32>, end: Option<u32>) {
     let s = start.unwrap_or(0) as usize;
-    let e = end.unwrap_or(matches.len() as u32) as usize;
-    if s >= matches.len() {
-        matches.clear();
-    } else {
-        let e = e.min(matches.len());
-        *matches = matches[s..e].to_vec();
-    }
+    let e = end.map(|e| e as usize).unwrap_or(matches.len()).min(matches.len());
+    if s >= matches.len() { matches.clear(); }
+    else { *matches = matches[s..e].to_vec(); }
 }
 
-pub async fn database_handle(command: DatabaseStatus, client: &Client, navi: NaviData) -> String {
+async fn handle_find(args: FindArgs, kind: &str, navi: &NaviData) -> String {
+    let expr = match parser::parse_filter(&args.filter) {
+        Some(e) => e,
+        None => return format!("ACK [2@0] {{{}}} could not parse filter\n", kind),
+    };
+    let mut matches = collect_songs(&expr, navi).await;
+    apply_sort(&mut matches, &args.sort);
+    apply_window(&mut matches, args.window_start, args.window_end);
+    let mut out = String::new();
+    for song in &matches {
+        out.push_str(&format_song(song));
+    }
+    out.push_str("OK\n");
+    out
+}
+
+pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: NaviData) -> String {
     match command {
         DatabaseStatus::AlbumArt(id, ost) => {
             String::from_utf8_lossy(&art::return_album_art(&id, ost).await).into_owned()
@@ -252,20 +208,18 @@ pub async fn database_handle(command: DatabaseStatus, client: &Client, navi: Nav
                 None => return "ACK [2@0] {count} could not parse filter\n".to_string(),
             };
 
-            let mut total_songs: u32 = 0;
-            let mut total_playtime: u32 = 0;
+            let mut total_songs = 0u32;
+            let mut total_playtime = 0u32;
             let mut groups: HashMap<String, (u32, u32)> = HashMap::new();
             let has_group = !group_type.is_empty();
 
             for album in &navi.album_list {
-                let songs = get_album_songs(client, &navi, album).await;
-                for song in &songs {
+                for song in &get_album_songs(&navi, album).await {
                     if expr.matches_song(song) {
                         total_songs += 1;
                         total_playtime += song.duration;
                         if has_group {
-                            let key = song_group_value(song, &group_type);
-                            let entry = groups.entry(key).or_insert((0, 0));
+                            let entry = groups.entry(song_group_value(song, &group_type)).or_insert((0, 0));
                             entry.0 += 1;
                             entry.1 += song.duration;
                         }
@@ -275,7 +229,7 @@ pub async fn database_handle(command: DatabaseStatus, client: &Client, navi: Nav
 
             let mut out = format!("songs: {}\nplaytime: {}\n", total_songs, total_playtime);
             if has_group {
-                let mut group_vec: Vec<(String, (u32, u32))> = groups.into_iter().collect();
+                let mut group_vec: Vec<_> = groups.into_iter().collect();
                 group_vec.sort_by(|a, b| a.0.cmp(&b.0));
                 for (key, (sc, pt)) in &group_vec {
                     out.push_str(&format!("songs: {}\nplaytime: {}\ngroup: {}\n", sc, pt, key));
@@ -284,71 +238,31 @@ pub async fn database_handle(command: DatabaseStatus, client: &Client, navi: Nav
             out.push_str("OK\n");
             out
         }
-        DatabaseStatus::Find(args) => {
-            let expr = match parser::parse_filter(&args.filter) {
-                Some(e) => e,
-                _ => return "ACK [2@0] {find} could not parse filter\n".to_string(),
-            };
-
-            let mut matches = collect_songs(&expr, client, &navi).await;
-            apply_sort(&mut matches, &args.sort);
-            apply_window(&mut matches, args.window_start, args.window_end);
-
-            let mut out = String::new();
-            for song in &matches {
-                out.push_str(&format_song(song));
-                out.push('\n');
-            }
-            out.push_str("OK\n");
-            out
-        }
-        DatabaseStatus::FindAdd(args) => {
-            let expr = match parser::parse_filter(&args.filter) {
-                Some(e) => e,
-                _ => return "ACK [2@0] {findadd} could not parse filter\n".to_string(),
-            };
-
-            let mut matches = collect_songs(&expr, client, &navi).await;
-            apply_sort(&mut matches, &args.sort);
-            apply_window(&mut matches, args.window_start, args.window_end);
-
-            let mut out = String::new();
-            for song in &matches {
-                out.push_str(&format_song(song));
-                out.push('\n');
-            }
-            out.push_str("OK\n");
-            out
-        }
+        DatabaseStatus::Find(args) => handle_find(args, "find", &navi).await,
+        DatabaseStatus::FindAdd(args) => handle_find(args, "findadd", &navi).await,
 
         DatabaseStatus::List(args) => {
             let expr = match parser::parse_filter(&args.filter.as_deref().unwrap_or("")) {
                 Some(e) => e,
                 _ => return "ACK [2@00] {list} could not parse filter\n".to_string(),
             };
-            let songs = collect_songs(&expr, client, &navi).await;
+            let songs = collect_songs(&expr, &navi).await;
             let tag_label = capitalize_first(&args.tag_type);
+
             if args.group_types.is_empty() {
                 let mut values: Vec<String> = songs.iter()
                     .map(|s| song_tag_value(s, &args.tag_type))
                     .filter(|v| !v.is_empty())
                     .collect::<HashSet<_>>()
-                    .into_iter()
-                    .collect();
+                    .into_iter().collect();
                 values.sort();
 
                 let start = args.window_start.unwrap_or(0) as usize;
-                let end = args.window_end.map(|e| e as usize).unwrap_or(values.len());
-                if start < values.len() {
-                    values = values[start..end.min(values.len())].to_vec();
-                } else {
-                    values.clear();
-                }
+                let end = args.window_end.map(|e| e as usize).unwrap_or(values.len()).min(values.len());
+                if start < values.len() { values = values[start..end].to_vec(); } else { values.clear(); }
 
                 let mut out = String::new();
-                for v in &values {
-                    out.push_str(&format!("{}: {}\n", tag_label, v));
-                }
+                for v in &values { out.push_str(&format!("{}: {}\n", tag_label, v)); }
                 out.push_str("OK\n");
                 out
             } else {
@@ -369,7 +283,7 @@ pub async fn database_handle(command: DatabaseStatus, client: &Client, navi: Nav
         DatabaseStatus::ListAll(_x) => {
             let mut new = String::new();
             for album in &navi.album_list {
-                let songs = get_album_songs(client, &navi, album).await;
+                let songs = get_album_songs(&navi, album).await;
                 for song in &songs {
                     new.push_str(&format!("file: {}/{}\n", album.name, song.path));
                 }

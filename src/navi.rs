@@ -118,7 +118,7 @@ impl NaviData {
             data_id: HashMap::new(),
             album_list: Vec::new(),
             songs_cache: Arc::new(RwLock::new(HashMap::new())),
-            albums_cache: Hashmap::new(),
+            albums_cache: HashMap::new(),
         }
     }
     // the "key" in the hash is album.name
