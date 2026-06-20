@@ -262,7 +262,7 @@ async fn handle_search(args: FindArgs, kind: &str, navi: &NaviData) -> String {
 /* We assume that our virtuall FS is just plain /album.name/song.flac. This is different 
  * from the actual thingy in your server
  */
-pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: NaviData) -> String {
+pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: &NaviData) -> String {
     match command {
         DatabaseStatus::AlbumArt(id, ost) => {
             String::from_utf8_lossy(&art::return_album_art(&id, ost).await).into_owned()

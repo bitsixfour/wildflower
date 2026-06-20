@@ -15,10 +15,9 @@ mod playback;
 mod search;
 mod parser;
 // mod rodio_stub;
-use crate::database::{DatabaseStatus, ListArgs};
+use crate::database::{DatabaseStatus, ListArgs, FindArgs};
 use crate::navi::NaviData;
 use crate::playback::{CurrentSong, PlaybackStatus, PlayerState, AudioState, SharedState};
-use crate::tracklist::Song;
 
 
 
@@ -317,16 +316,47 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             database::database_handle(
                 DatabaseStatus::List(list_args),
                 client,
-                navi.clone(),
+                &navi,
             )
             .await
         }
-
+        // music database
+        "albumart" => {
+            let input: String = parts.get(1).unwrap_or(&String::new()).clone();
+            let offset: i64 = parts.get(2)
+                .and_then(|s| s.parse::<i64>().ok())
+                .unwrap_or(0);
+            let args: DatabaseStatus = DatabaseStatus::AlbumArt(input, offset);
+            let res: String = database::database_handle(args, client, navi).await;
+            res
+        }
+        "count" => {
+            let ptr: (String, String) = (parts.get(1).unwrap_or(&String::new()).clone(), 
+                parts.get(1).unwrap_or(&String::new()).clone());
+            let args = DatabaseStatus::Count(ptr.0, ptr.1);
+            let res: String = database::database_handle(args, client, navi).await;
+            res
+        }
+        "find" => {
+            let strct: FindArgs = FindArgs {
+                filter: parts.get(1).unwrap_or(&String::new()).clone(),
+                sort: parts.get(
+                window_start:
+                window_end:
+                position:
+            }
+            "".to_string()
+        
+        }
+        // most clients don't use this at all and it isn't even enabled by default
+        "getfingerprint" => {
+            "".to_string()
+        }
         "ping" => "OK\n".to_string(),
         "close" => "OK\n".to_string(),
 
+
         
-        // error...
-        _ => format!("ACK [5@0] {{{cmd}}} unknown command\n"),
+        // Change this to be less janky later...
     }
 }
