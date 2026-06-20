@@ -469,3 +469,54 @@ pub struct ListArgs {
     pub window_start: Option<u32>,
     pub window_end: Option<u32>,
 }
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::navi::navi_obj;
+
+    #[tokio::test]
+    async fn find_returns_matching_songs_from_navidrome() {
+        let client = reqwest::Client::new();
+        let subsonic = match navi_obj(&client).await {
+            Ok(r) => r,
+            Err(e) => {
+                eprintln!("navidrome unreachable, skipping: {e}");
+                return;
+            }
+        };
+        let navi = NaviData::updt(subsonic, &client).await;
+
+        // pick the first non-empty artist from the library
+        let artist = match navi.album_list.iter().find_map(|a| {
+            (!a.artist.is_empty()).then(|| a.artist.clone())
+        }) {
+            Some(a) => a,
+            None => {
+                eprintln!("library has no artists, skipping");
+                return;
+            }
+        };
+
+        let args = FindArgs {
+            filter: format!(r#"(Artist == "{}")"#, artist),
+            sort: None,
+            window_start: None,
+            window_end: None,
+            position: None,
+        };
+        let response = handle_find(args, "find", &navi).await;
+
+        eprintln!("filter artist: {artist}");
+        eprintln!("response:\n{response}");
+
+        assert!(response.ends_with("OK\n"), "expected trailing OK, got: {response}");
+        assert!(response.contains("file: "), "expected at least one song block, got: {response}");
+        assert!(
+            response.contains(&format!("Artist: {artist}")),
+            "expected song by {artist}, got: {response}"
+        );
+    }
+}

@@ -1,20 +1,14 @@
 use std::time::Duration;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use bytes::Bytes;
-use std::collections::VecDeque;
-
-
-
-// use reqwest::header::ALLOW;
 use reqwest::Client;
 use std::io::Cursor;
 use rodio::{Decoder, Player, MixerDeviceSink};
-use std::io::BufReader;
-use crate::MpdSong;
 use crate::tracklist::Song;
 
 const URL: &str = "192.168.1.20:8097";
 
+#[allow(dead_code)]
 pub struct CurrentSong {
     pub song_id: String,
     pub stream: Bytes,
@@ -28,6 +22,7 @@ pub struct PlaybackQueue {
 }
 
 
+#[allow(dead_code)]
 pub enum PlaybackStatus {
     Seek((u64, String)),
     Next(),
@@ -41,15 +36,16 @@ pub enum PlaybackStatus {
     Stop,
 }
 
-/* Move these two args 
+/* Move these two args
  * somewhere else when all core functions are satisfied */
+#[allow(dead_code)]
 pub enum QueueStatus {
     Add(String, i32),
     AddId(String, i32),
-    Clear(), 
+    Clear(),
     Delete(String),
     DeleteId(String),
-    // parse regex for this 
+    // parse regex for this
     Move(String),
     MoveId(String, String),
     // Playlist(),
@@ -84,9 +80,8 @@ pub enum DatabaseStatus {
 }
 */
 
-
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum AudioState {
     Play,
     Stop,
@@ -136,7 +131,7 @@ impl CurrentSong {
         match command {
             PlaybackStatus::Next() => {
                 println!("dbg... we're going to the next song...");
-                self.queue.next(client);
+                self.queue.next(client).await;
             }
             PlaybackStatus::Pause(io) => {
                 println!("pause");
@@ -154,14 +149,13 @@ impl CurrentSong {
             }
             PlaybackStatus::Play => {
                 println!("play (resume)");
-                self.queue.rebuild_buffer(client);
+                self.queue.rebuild_buffer(client).await;
                 self.queue.player.play();
             }
             PlaybackStatus::PlayPos(pos) => {
                 println!("play pos {}", pos);
                 let dur = Duration::from_secs(pos as u64);
-                self.queue.player.try_seek(dur);
-
+                self.queue.player.try_seek(dur).unwrap();
             }
             #[allow(unused_variables)]
             PlaybackStatus::PlayId(io) => {
@@ -182,50 +176,38 @@ impl CurrentSong {
             }
             PlaybackStatus::Previous => {
                 println!("previous");
-                self.queue.previous(client);
+                self.queue.previous(client).await;
             }
             PlaybackStatus::Seek(io) => {
                 let pos_seek = io.0.clone();
-                // self.queue.jump_to(client, pos_seek);
-                self.queue.jump_to(client, pos_seek as i32);
+                self.queue.jump_to(client, pos_seek as i32).await;
             }
             #[allow(unused_variables)]
             PlaybackStatus::SeekId(id) => {
-                let sec_seek = Duration::from_secs(id.0); 
+                let sec_seek = Duration::from_secs(id.0);
                 for idx in 0..self.queue.items.len() {
-                    match self.queue.items.get(idx) {
-                        id => for i in 0..self.queue.items.len() {
-                            println!("found id");
-                            self.queue.jump_to(client, i as i32);
-                            self.queue.player.try_seek(sec_seek);
-                        }
+                    if let Some(item_id) = self.queue.items.get(idx).map(|s| s.id.clone()) {
+                        let _ = item_id;
+                        self.queue.jump_to(client, idx as i32).await;
+                        self.queue.player.try_seek(sec_seek).unwrap();
                     }
                 }
             }
             #[allow(unused_variables)]
             PlaybackStatus::SeekCur(io) => {
-                let var = self.queue.player.get_pos().clone();
+                let var = self.queue.player.get_pos();
                 let delta = Duration::from_secs(io);
                 for idx in 0..self.queue.items.len() {
-                    match self.queue.items.get(idx) {
-                        id => for i in 0..self.queue.items.len() {
-                            println!("found id");
-                            self.queue.jump_to(client, i as i32);
-                            self.queue.player.try_seek(var + delta);
-                        }
+                    if let Some(_) = self.queue.items.get(idx) {
+                        self.queue.jump_to(client, idx as i32).await;
+                        self.queue.player.try_seek(var + delta).unwrap();
                     }
                 }
             }
             PlaybackStatus::Stop => {
                 println!("stop!");
                 self.queue.player.stop();
-
             }
-            // move later 
-
-
-
-
         }
 
 
@@ -247,26 +229,26 @@ impl CurrentSong {
  * by just using a vec which we display out using the mpd spec...
  */
 
-#[allow(unused_variables)]
+#[allow(unused_variables, dead_code)]
 impl PlaybackQueue {
 
-    pub fn next(&mut self, client: &Client) {
+    pub async fn next(&mut self, client: &Client) {
         self.cursor += 1;
         self.player.play();
-        self.buffer(client, false);
+        self.buffer(client, false).await;
 
     }
 
 
 
-    pub fn previous(&mut self, client: &Client) {
+    pub async fn previous(&mut self, client: &Client) {
         self.cursor -= 1;
-        self.buffer(client, true);
+        self.buffer(client, true).await;
     
     }
 
 
-    pub fn remove(&mut self, client: &Client, idx: i32) {
+    pub async fn remove(&mut self, client: &Client, idx: i32) {
         let rm = idx as usize;
         self.items.remove(rm);
     }
@@ -282,10 +264,10 @@ impl PlaybackQueue {
 
 
     /* heckin backend functions */
-    fn sink_init(&mut self, stream: Vec<u8>, client: &Client) {
+    async fn sink_init(&mut self, stream: Vec<u8>, client: &Client) {
         let source = Decoder::new(Cursor::new(stream)).unwrap();
         self.player.append(source);
-        self.rebuild_buffer(client);
+        self.rebuild_buffer(client).await;
         self.player.play();
     }
     /* true to decrement */

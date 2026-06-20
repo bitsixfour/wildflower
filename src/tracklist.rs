@@ -2,7 +2,7 @@
 
 
 use reqwest::Client;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use crate::NaviData;
 
 #[derive(Debug, Deserialize, Clone)]
@@ -24,37 +24,46 @@ pub struct ResponseBody {
     pub album: Album,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Default, Deserialize, Clone)]
 pub struct Album {
+    #[serde(default)]
     pub id: String,
+    #[serde(default)]
     pub name: String,
+    #[serde(default)]
     pub artist: String,
-    #[serde(rename = "artistId")]
+    #[serde(rename = "artistId", default)]
     pub artist_id: String,
-    #[serde(rename = "coverArt")]
+    #[serde(rename = "coverArt", default)]
     pub cover_art: String,
-    #[serde(rename = "songCount")]
+    #[serde(rename = "songCount", default)]
     pub song_count: u32,
+    #[serde(default)]
     pub duration: u32,
-    #[serde(rename = "playCount")]
+    #[serde(rename = "playCount", default)]
     pub play_count: u32,
+    #[serde(default)]
     pub created: String,
+    #[serde(default)]
     pub year: u32,
+    #[serde(default)]
     pub played: Option<String>,
-    #[serde(rename = "userRating")]
+    #[serde(rename = "userRating", default)]
     pub user_rating: u32,
+    #[serde(default)]
     pub genres: Vec<serde_json::Value>,
-    #[serde(rename = "musicBrainzId")]
+    #[serde(rename = "musicBrainzId", default)]
     pub music_brainz_id: String,
-#[serde(rename = "isCompilation")]
+    #[serde(rename = "isCompilation", default)]
     pub is_compilation: bool,
-    #[serde(rename = "sortName")]
+    #[serde(rename = "sortName", default)]
     pub sort_name: String,
+    #[serde(default)]
     pub artists: Vec<ArtistRef>,
-    #[serde(rename = "displayArtist")]
+    #[serde(rename = "displayArtist", default)]
     pub display_artist: String,
 
-    /* Song Data.... */
+    #[serde(default)]
     pub song: Vec<Song>,
 }
 
@@ -76,50 +85,65 @@ pub struct ReplayGain {
     pub album_peak: f32,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
 pub struct Song {
+    #[serde(default)]
     pub id: String,
+    #[serde(default)]
     pub parent: String,
-    #[serde(rename = "isDir")]
+    #[serde(rename = "isDir", default)]
     pub is_dir: bool,
+    #[serde(default)]
     pub title: String,
+    #[serde(default)]
     pub album: String,
+    #[serde(default)]
     pub artist: String,
+    #[serde(default)]
     pub track: u32,
+    #[serde(default)]
     pub year: u32,
-    #[serde(rename = "coverArt")]
+    #[serde(rename = "coverArt", default)]
     pub cover_art: String,
+    #[serde(default)]
     pub size: u64,
-    #[serde(rename = "contentType")]
+    #[serde(rename = "contentType", default)]
     pub content_type: String,
+    #[serde(default)]
     pub suffix: String,
+    #[serde(default)]
     pub duration: u32,
-    #[serde(rename = "bitRate")]
+    #[serde(rename = "bitRate", default)]
     pub bit_rate: u32,
+    #[serde(default)]
     pub path: String,
-    #[serde(rename = "playCount")]
+    #[serde(rename = "playCount", default)]
     pub play_count: Option<u32>,
+    #[serde(default)]
     pub created: String,
-    #[serde(rename = "artistId")]
+    #[serde(rename = "artistId", default)]
     pub artist_id: String,
-    #[serde(rename = "type")]
+    #[serde(rename = "type", default)]
     pub media_type: String,
+    #[serde(default)]
     pub played: Option<String>,
+    #[serde(default)]
     pub bpm: u32,
+    #[serde(default)]
     pub comment: String,
-    #[serde(rename = "sortName")]
+    #[serde(rename = "sortName", default)]
     pub sort_name: String,
-    #[serde(rename = "mediaType")]
+    #[serde(rename = "mediaType", default)]
     pub media_type_tag: String,
-    #[serde(rename = "channelCount")]
+    #[serde(rename = "channelCount", default)]
     pub channel_count: u32,
-    #[serde(rename = "samplingRate")]
+    #[serde(rename = "samplingRate", default)]
     pub sampling_rate: u32,
-    #[serde(rename = "bitDepth")]
+    #[serde(rename = "bitDepth", default)]
     pub bit_depth: u32,
-    #[serde(rename = "displayArtist")]
+    #[serde(rename = "displayArtist", default)]
     pub display_artist: String,
-    #[serde(rename = "displayAlbumArtist")]
+    #[serde(rename = "displayAlbumArtist", default)]
     pub display_album_artist: String,
 }
 

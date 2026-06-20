@@ -1,7 +1,10 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use std::path::Path;
 use std::sync::{Arc, RwLock};
-use serde::Deserialize;
+use std::time::{SystemTime, UNIX_EPOCH};
+use serde::{Deserialize, Serialize};
 use reqwest::Client;
+use anyhow::{Context, Result};
 
 
 use crate::tracklist::SubsIDResponse;
@@ -11,13 +14,13 @@ use crate::tracklist::Song;
 const URL: &str = "http://192.168.1.20:8097";
 const USR: &str = "nix";
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Root {
     #[serde(rename = "subsonic-response")]
     subsonic_response: SubsonicResponse,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SubsonicResponse {
     status: String,
     version: String,
@@ -31,12 +34,12 @@ pub struct SubsonicResponse {
     album_list_2: AlbumList2,
 }
 
-#[derive(Debug, Deserialize, Eq, Hash, Clone,  PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Eq, Hash, Clone, PartialEq)]
 pub struct AlbumList2 {
     album: Vec<Album>,
 }
 
-#[derive(Debug, Clone, Deserialize, Eq, Hash, PartialEq)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, Eq, Hash, PartialEq)]
 pub struct Album {
     pub id: String,
     pub name: String,
@@ -61,7 +64,7 @@ pub struct Album {
     #[serde(rename = "userRating")]
     pub user_rating: Option<u32>,
 
-    genres: Vec<Genre>,
+    pub genres: Vec<Genre>,
 
     #[serde(rename = "musicBrainzId")]
     pub music_brainz_id: Option<String>,
@@ -73,7 +76,7 @@ pub struct Album {
     pub sort_name: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Eq, Hash, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, Eq, Hash, PartialEq, Clone)]
 pub struct Genre {
     name: String,
 }
@@ -152,5 +155,123 @@ impl NaviData {
             songs_cache: HashMap::new(),
             albums_cache: kv_cache,
         }
+    }
+
+    /// Build a NaviData by reusing the on-disk cache and only fetching the
+    /// per-album song lists for albums we haven't seen before. The album-list
+    /// endpoint (`getAlbumList2`) is always called once because it's cheap
+    /// and lets us detect new or removed albums.
+    pub async fn load_or_fetch(client: &Client, cache_path: &Path) -> Result<Self> {
+        let mut cache = Cache::load(cache_path).unwrap_or_default();
+
+        // 1. Cheap: always hit the album list
+        let fresh = navi_obj(client).await.context("getAlbumList2 failed")?;
+        let fresh_albums = fresh.album_list_2.album;
+
+        // 2. Decide which albums we still need to fetch
+        let cached_ids: HashSet<String> = cache.album_songs.keys().cloned().collect();
+        let missing: Vec<Album> = fresh_albums
+            .iter()
+            .filter(|a| !cached_ids.contains(&a.id))
+            .cloned()
+            .collect();
+        let fetched_n = missing.len();
+
+        // 3. Per-album song fetch — only for new albums
+        if !missing.is_empty() {
+            let new_songs = Self::init_cache(missing, client).await;
+            for (id, songs) in new_songs {
+                cache.album_songs.insert(
+                    id,
+                    AlbumSongs {
+                        fetched_at: unix_now(),
+                        songs,
+                    },
+                );
+            }
+        }
+
+        // 4. Build the in-memory NaviData
+        let mut data: HashMap<String, Album> = HashMap::new();
+        let mut data_id: HashMap<String, Album> = HashMap::new();
+ for album in &fresh_albums {
+            data.insert(album.name.to_lowercase(), album.clone());
+            data_id.insert(album.id.to_lowercase(), album.clone());
+        }
+        let mut albums_cache: HashMap<String, Vec<Song>> = HashMap::new();
+        for (id, bucket) in &cache.album_songs {
+            albums_cache.insert(id.clone(), bucket.songs.clone());
+        }
+
+        // 5. Persist (atomic) — skip the write when nothing changed
+        if fetched_n > 0 {
+            cache.album_list_raw = fresh_albums.clone();
+            cache.fetched_at = unix_now();
+            if let Err(e) = cache.save(cache_path) {
+                eprintln!("warning: could not write cache to {}: {e}", cache_path.display());
+            }
+        }
+
+        Ok(NaviData {
+            data,
+            data_id,
+ album_list: fresh_albums,
+            songs_cache: HashMap::new(),
+            albums_cache,
+        })
+    }
+}
+
+fn unix_now() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0)
+}
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+struct Cache {
+    /// Bump when the on-disk format changes incompatibly.
+    #[serde(default)]
+    version: u32,
+    #[serde(default)]
+    fetched_at: u64,
+    /// Raw album list as returned by `getAlbumList2`.
+    #[serde(default)]
+    album_list_raw: Vec<Album>,
+    /// Per-album song buckets, keyed by album id (lowercased).
+    #[serde(default)]
+    album_songs: HashMap<String, AlbumSongs>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AlbumSongs {
+    #[serde(default)]
+    fetched_at: u64,
+    songs: Vec<Song>,
+}
+
+impl Cache {
+    fn load(path: &Path) -> Option<Self> {
+        let bytes = std::fs::read(path).ok()?;
+        match serde_json::from_slice::<Self>(&bytes) {
+            Ok(c) if c.version <= 1 => Some(c),
+            Ok(_) => {
+                eprintln!("cache {} has newer version, ignoring", path.display());
+                None
+            }
+            Err(e) => {
+                eprintln!("cache {} is corrupt ({e}), ignoring", path.display());
+                None
+            }
+        }
+    }
+
+    fn save(&self, path: &Path) -> std::io::Result<()> {
+        let tmp = path.with_extension("json.tmp");
+        let json = serde_json::to_vec_pretty(self)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+        std::fs::write(&tmp, json)?;
+        std::fs::rename(&tmp, path)
     }
 }

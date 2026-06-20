@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -65,7 +66,18 @@ async fn main() -> anyhow::Result<()> {
     println!("We are ze running at port {PORT}");
     let heckin_reqwest: Client = reqwest::Client::new();
 
-    let navi: NaviData = NaviData::init_empty();
+    let navi: NaviData = match NaviData::load_or_fetch(&heckin_reqwest, Path::new("wildflower-cache.json")).await {
+        Ok(n) => {
+            let album_count = n.album_list.len();
+            let song_count: usize = n.albums_cache.values().map(|v| v.len()).sum();
+            println!("loaded {album_count} albums, {song_count} songs (from cache and/or navidrome)");
+            n
+        }
+        Err(e) => {
+            eprintln!("navidrome + cache both unavailable: {e:#}. starting with empty library.");
+            NaviData::init_empty()
+        }
+    };
  
 
     let shared_state: SharedState = Arc::new(tokio::sync::RwLock::new(PlayerState {
@@ -86,7 +98,7 @@ async fn main() -> anyhow::Result<()> {
     tokio::spawn(async move {
         let mut engine = CurrentSong::new(&test_id, &heckin_reqwest).await;
         while let Some(cmd) = cmd_rx.recv().await {
-            engine.handle(cmd, &heckin_reqwest);
+            engine.handle(cmd, &heckin_reqwest).await;
             let mut st = engine_state.write().await;
             let pos: i32 = engine.queue.cursor;
             st.state = AudioState::Play; 
