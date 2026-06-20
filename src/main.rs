@@ -338,15 +338,45 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             res
         }
         "find" => {
-            let strct: FindArgs = FindArgs {
-                filter: parts.get(1).unwrap_or(&String::new()).clone(),
-                sort: parts.get(
-                window_start:
-                window_end:
-                position:
+            let mut filter_parts: Vec<String> = Vec::new();
+            let mut sort: Option<String> = None;
+            let mut window_start: Option<u32> = None;
+            let mut window_end: Option<u32> = None;
+
+            let mut i = 1;
+            while i < parts.len() {
+                match parts[i].as_str() {
+                    "sort" => {
+                        i += 1;
+                        if i < parts.len() {
+                            sort = Some(parts[i].clone());
+                        }
+                    }
+                    "window" => {
+                        i += 1;
+                        if i < parts.len() {
+                            if let Some((s, e)) = parts[i].split_once(':') {
+                                window_start = s.parse().ok();
+                                window_end = e.parse().ok();
+                            }
+                        }
+                    }
+                    _ => {
+                        filter_parts.push(parts[i].clone());
+                    }
+                }
+                i += 1;
             }
-            "".to_string()
-        
+
+            let filter = filter_parts.join(" ");
+            let args = DatabaseStatus::Find(FindArgs {
+                filter,
+                sort,
+                window_start,
+                window_end,
+                position: None,
+            });
+            database::database_handle(args, client, navi).await
         }
         // most clients don't use this at all and it isn't even enabled by default
         "getfingerprint" => {
@@ -354,9 +384,6 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
         }
         "ping" => "OK\n".to_string(),
         "close" => "OK\n".to_string(),
-
-
-        
-        // Change this to be less janky later...
+        _ => format!("ACK [2@0] {{unknown command}} {}\n", cmd),
     }
 }

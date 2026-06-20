@@ -1,1 +1,1 @@
-/home/will/git/mpdnavi/target/debug/mpdnavi: /home/will/git/mpdnavi/src/main.rs /home/will/git/mpdnavi/src/navi.rs
+/home/will/git/wildflower/target/debug/mpdnavi: /home/will/git/wildflower/src/art.rs /home/will/git/wildflower/src/database.rs /home/will/git/wildflower/src/main.rs /home/will/git/wildflower/src/navi.rs /home/will/git/wildflower/src/parser.rs /home/will/git/wildflower/src/playback.rs /home/will/git/wildflower/src/search.rs /home/will/git/wildflower/src/tracklist.rs

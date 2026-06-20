@@ -7,6 +7,7 @@ enum Token {
     Not,
     Eq,
     NotEq,
+    Contains,
     Field(String),
     Value(String),
 }
@@ -74,7 +75,7 @@ fn tokenize(input: &str) -> Vec<Token> {
                     "AND" => Token::And,
                     "OR" => Token::Or,
                     "NOT" => Token::Not,
-                    "contains" => Token::NotEq,
+                    "contains" => Token::Contains,
                     _ => {
                         if expect_value {
                             Token::Value(word)
@@ -111,41 +112,52 @@ fn tokenize(input: &str) -> Vec<Token> {
     tokens
 }
 
-pub fn create_arg_struct(tkn: &[Token], k: usize) -> Field {
+pub fn create_arg_struct(tkn: &[Token], k: usize) -> Option<Field> {
     let field = match tkn.get(k) {
         Some(Token::Field(s)) => s.clone(),
-        _ => panic!("expected Field token at position {k}"),
+        _ => return None,
     };
 
     match tkn.get(k + 1) {
         Some(Token::Eq) => {
             let value = match tkn.get(k + 2) {
                 Some(Token::Value(s)) => s.clone(),
-                _ => panic!("expected Value token after Eq"),
+                _ => return None,
             };
-            Field {
+            Some(Field {
                 field,
                 op: FieldOp::Eq,
                 value,
-            }
+            })
         }
         Some(Token::NotEq) => {
             let value = match tkn.get(k + 2) {
                 Some(Token::Value(s)) => s.clone(),
-                _ => panic!("expected Value token after NotEq"),
+                _ => return None,
             };
-            Field {
+            Some(Field {
                 field,
                 op: FieldOp::NotEq,
                 value,
-            }
+            })
         }
-        Some(Token::Value(v)) => Field {
+        Some(Token::Contains) => {
+            let value = match tkn.get(k + 2) {
+                Some(Token::Value(s)) => s.clone(),
+                _ => return None,
+            };
+            Some(Field {
+                field,
+                op: FieldOp::Contains,
+                value,
+            })
+        }
+        Some(Token::Value(v)) => Some(Field {
             field,
             op: FieldOp::Contains,
             value: v.clone(),
-        },
-        _ => panic!("expected Value or operator after Field at position {k}"),
+        }),
+        _ => None,
     }
 }
 
@@ -155,30 +167,29 @@ impl Expr {
         while i < tkn.len() {
             match tkn[i] {
                 Token::And => {
-                    let left = create_arg_struct(&tkn, 0);
-                    let right = create_arg_struct(&tkn, i + 1);
+                    let left = create_arg_struct(&tkn, 0)?;
+                    let right = create_arg_struct(&tkn, i + 1)?;
                     return Some(Expr::And(Box::new(left), Box::new(right)));
                 }
                 Token::Or => {
-                    let left = create_arg_struct(&tkn, 0);
-                    let right = create_arg_struct(&tkn, i + 1);
+                    let left = create_arg_struct(&tkn, 0)?;
+                    let right = create_arg_struct(&tkn, i + 1)?;
                     return Some(Expr::Or(Box::new(left), Box::new(right)));
                 }
                 Token::Not => {
-                    let inner = create_arg_struct(&tkn, i + 1);
-                    let mut neg = inner;
-                    neg.op = match neg.op {
+                    let mut inner = create_arg_struct(&tkn, i + 1)?;
+                    inner.op = match inner.op {
                         FieldOp::Contains | FieldOp::Eq => FieldOp::NotEq,
                         FieldOp::NotEq => FieldOp::Eq,
                     };
-                    return Some(Expr::Def(neg));
+                    return Some(Expr::Def(inner));
                 }
                 _ => {}
             }
             i += 1;
         }
         if !tkn.is_empty() {
-            let arg = create_arg_struct(&tkn, 0);
+            let arg = create_arg_struct(&tkn, 0)?;
             return Some(Expr::Def(arg));
         }
         None

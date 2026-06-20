@@ -11,7 +11,7 @@ pub struct SubsIDResponse {
     pub subsonic_response: ResponseBody,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct ResponseBody {
     pub status: String,
     pub version: String,
@@ -24,7 +24,7 @@ pub struct ResponseBody {
     pub album: Album,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Album {
     pub id: String,
     pub name: String,
@@ -58,7 +58,7 @@ pub struct Album {
     pub song: Vec<Song>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct ArtistRef {
     pub id: String,
     pub name: String,
