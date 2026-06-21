@@ -1,5 +1,5 @@
-use crate::navi::Album;
-use crate::tracklist::Song;
+use crate::navidrome::navi::Album;
+use crate::play::tracklist::Song;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FieldOp {

@@ -4,7 +4,7 @@ use bytes::Bytes;
 use reqwest::Client;
 use std::io::Cursor;
 use rodio::{Decoder, Player, MixerDeviceSink};
-use crate::tracklist::Song;
+use crate::play::tracklist::Song;
 
 const URL: &str = "192.168.1.20:8097";
 
@@ -233,20 +233,24 @@ impl CurrentSong {
 impl PlaybackQueue {
 
     pub async fn next(&mut self, client: &Client) {
+        if self.items.is_empty() { return; }
+        if (self.cursor as usize) + 1 >= self.items.len() { return; }
+        self.player.skip_one();
         self.cursor += 1;
-        self.player.play();
-        self.buffer(client, false).await;
-
+        if let Some(s) = self.fetch_and_decode(self.cursor as usize + 1, client).await {
+            self.player.append(s);
+        }
     }
-
-
 
     pub async fn previous(&mut self, client: &Client) {
+        if self.items.is_empty() || self.cursor == 0 { return; }
         self.cursor -= 1;
-        self.buffer(client, true).await;
-    
+        self.player.stop();
+        self.player.clear();
+        // up to 200ms but to be honest isn't as egregious as a delay on a next song
+        self.rebuild_buffer(client).await;
+        self.player.play();
     }
-
 
     pub async fn remove(&mut self, client: &Client, idx: i32) {
         let rm = idx as usize;
@@ -256,11 +260,7 @@ impl PlaybackQueue {
     pub async fn jump_to(&mut self, client: &Client, idx: i32) {
         self.cursor = idx;
         self.rebuild_buffer(client).await;
-        
-        
     }
-
-
 
 
     /* heckin backend functions */
@@ -270,64 +270,24 @@ impl PlaybackQueue {
         self.rebuild_buffer(client).await;
         self.player.play();
     }
-    /* true to decrement */
-    async fn buffer(&mut self, client: &Client, backwards: bool) {
-        let mut var: i32 = 1;
-        if backwards {
-            var = var - 2;
-        }
-        let now: i32 = self.cursor.clone() + var;
-        let item_id = self.items.get(now as usize).map(|item| item.id.clone()).unwrap();
-        match self.items.get(now as usize) {
-            Some(now) => {
-                let stream = self.get_audio_stream(item_id.as_str(), client).await;
-                let buf_next = Decoder::new(Cursor::new(stream));
-                self.player.append(buf_next.unwrap());
-
-
-            }
-            _ => {
-                println!("nothing left in queue.. no buff");
-
-            }
-
-        }
-
-
-    }
-
     async fn destroy_buffer(&mut self) {
         self.player.clear();
     }
-    /* queue up to two at a time for "gapless" playback for now"*/
-    async fn rebuild_buffer(&mut self, client: &Client) {                   
-       let var = self.cursor as usize;                                     
-                                                                           
-       let id_prev = self.items.get(var - 1).map(|s| s.id.clone());        
-       let id_curr = self.items.get(var).map(|s| s.id.clone());            
-                                                                           
-       match (id_prev, id_curr) {                                          
-           (Some(ref x_id), Some(ref y_id)) => {                           
-               let str = self.get_audio_stream(x_id, client).await;        
-               let str_2 = self.get_audio_stream(y_id, client).await;      
-               let source_1 = Decoder::new(Cursor::new(str));              
-               let source_2 = Decoder::new(Cursor::new(str_2));            
-               self.player.append(source_1.unwrap());                      
-               self.player.append(source_2.unwrap());                      
-           }                                                               
-           (Some(ref x_id), None) => {                                     
-               let str = self.get_audio_stream(x_id, client).await;        
-               let source = Decoder::new(Cursor::new(str));                
-               self.player.append(source.unwrap());                        
-           }                                                               
-           _ => {                                                          
-               println!("msg: no need to buffer");                         
-           }                                                               
-       }                                                                   
+    async fn rebuild_buffer(&mut self, client: &Client) {
+        self.player.clear();
+        if let Some(s) = self.fetch_and_decode(self.cursor as usize, client).await {
+            self.player.append(s);
+        }
+        if let Some(s) = self.fetch_and_decode(self.cursor as usize + 1, client).await {
+            self.player.append(s);
+        }
     }
-    /* return Result<T> later, but use unwrap now
-     * until later */
-    async fn get_audio_stream(&mut self, search_id: &str, client: &Client) -> Vec<u8> {
+    async fn fetch_and_decode(&self, idx: usize, client: &Client) -> Option<Decoder<Cursor<Vec<u8>>>> {
+        let song = self.items.get(idx)?;
+        let bytes = self.get_audio_stream(&song.id, client).await;
+        Decoder::new(Cursor::new(bytes)).ok()
+    }
+    async fn get_audio_stream(&self, search_id: &str, client: &Client) -> Vec<u8> {
         let req = format!("http://nix:2008@192.168.1.20:8097/rest/stream.view?u=nix&p=2008&v=1.16.1& c=app&id={}", search_id);
         let mut vec: Vec<u8> = Vec::new();
         let mut bytes: Vec<u8> = reqwest::Client::new()
@@ -337,13 +297,6 @@ impl PlaybackQueue {
             .bytes().await.unwrap()
             .to_vec();
         vec.append(&mut bytes);
-
         vec
-
-
-        
-
         }
-        
-
 }

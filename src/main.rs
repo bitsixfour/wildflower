@@ -1,24 +1,18 @@
+mod navidrome;
+mod play;
+
 use std::path::Path;
 use std::sync::Arc;
 use std::time::Duration;
 
 use clap::Parser;
 use reqwest::Client;
-use event_listener::{Event, Listener};
+
 use tokio::net::{TcpListener, TcpStream};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-
-mod navi;
-mod art;
-mod database;
-mod tracklist;
-mod playback;
-mod search;
-mod parser;
-// mod rodio_stub;
-use crate::database::{DatabaseStatus, ListArgs, FindArgs};
-use crate::navi::NaviData;
-use crate::playback::{CurrentSong, PlaybackStatus, PlayerState, AudioState, SharedState};
+use crate::navidrome::database::{self, DatabaseStatus, ListArgs, FindArgs};
+use crate::navidrome::navi::NaviData;
+use crate::play::playback::{CurrentSong, PlaybackStatus, PlayerState, AudioState, SharedState};
 
 
 
@@ -318,9 +312,10 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             };
 
             let list_args = ListArgs {
-                tag_type,
+                tag_type: Some(tag_type),
                 filter,
                 group_types,
+                window,
                 window_start: window.map(|(s, _)| s),
                 window_end: window.map(|(_, e)| e),
             };
@@ -350,45 +345,38 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             res
         }
         "find" => {
-            let mut filter_parts: Vec<String> = Vec::new();
-            let mut sort: Option<String> = None;
-            let mut window_start: Option<u32> = None;
-            let mut window_end: Option<u32> = None;
-
-            let mut i = 1;
-            while i < parts.len() {
-                match parts[i].as_str() {
-                    "sort" => {
-                        i += 1;
-                        if i < parts.len() {
-                            sort = Some(parts[i].clone());
-                        }
-                    }
-                    "window" => {
-                        i += 1;
-                        if i < parts.len() {
-                            if let Some((s, e)) = parts[i].split_once(':') {
-                                window_start = s.parse().ok();
-                                window_end = e.parse().ok();
-                            }
-                        }
-                    }
-                    _ => {
-                        filter_parts.push(parts[i].clone());
-                    }
-                }
-                i += 1;
-            }
-
-            let filter = filter_parts.join(" ");
+            let fltr: String = parts.get(1).unwrap_or(&String::new()).clone();
+            let sort: String = parts.get(2).unwrap_or(&String::new()).clone();
+            let a: (u32, u32) = parts.get(3).unwrap_or(&String::new()).clone()
+                .split_once(':')
+                .map(|(left, right)| (left.parse().unwrap(), right.parse().unwrap()))
+                .unwrap();
             let args = DatabaseStatus::Find(FindArgs {
-                filter,
-                sort,
-                window_start,
-                window_end,
+                filter: fltr,
+                sort: Some(sort),
+                window_start: Some(a.0),
+                window_end: Some(a.1),
                 position: None,
             });
-            database::database_handle(args, client, navi).await
+            database::database_handle(args, &client, &navi).await
+        }
+        "findadd" => {
+            let fltr: String = parts.get(1).unwrap_or(&String::new()).clone();
+            let sort: String = parts.get(2).unwrap_or(&String::new()).clone();
+            let a: (u32, u32) = parts.get(3).unwrap_or(&String::new()).clone()
+                .split_once(':')
+                .map(|(left, right)| (left.parse().unwrap(), right.parse().unwrap()))
+                .unwrap();
+            let args = DatabaseStatus::Find(FindArgs {
+                filter: fltr,
+                sort: Some(sort),
+                window_start: Some(a.0),
+                window_end: Some(a.1),
+                position: None,
+            });
+            let _ = database::database_handle(args, &client, &navi).await;
+            // TODO: ADD HELPER FUNCTION TO ADD SONG (when I actually add "add)
+            "".to_string()
         }
         // most clients don't use this at all and it isn't even enabled by default
         "getfingerprint" => {

@@ -3,7 +3,7 @@
 
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use crate::NaviData;
+use crate::navidrome::navi::NaviData;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct SubsIDResponse {

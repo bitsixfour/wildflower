@@ -1,4 +1,4 @@
-use crate::search::{Expr, Field, FieldOp};
+use crate::navidrome::search::{Expr, Field, FieldOp};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum Token {

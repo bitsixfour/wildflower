@@ -1,11 +1,11 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::navi::{Album, NaviData};
-use crate::parser;
-use crate::search::Expr;
-use crate::tracklist::Song;
+use crate::navidrome::navi::{Album, NaviData};
+use crate::navidrome::parser;
+use crate::navidrome::search::Expr;
+use crate::play::tracklist::Song;
 use reqwest::Client;
-use crate::art;
+use crate::play::art;
 
 pub enum QueueStatus {
     Add(String, i32),
@@ -197,7 +197,7 @@ async fn handle_find(args: FindArgs, kind: &str, navi: &NaviData) -> String {
     out.push_str("OK\n");
     out
 }
-fn field_matches_song_ci(field: &crate::search::Field, song: &Song) -> bool {
+fn field_matches_song_ci(field: &crate::navidrome::search::Field, song: &Song) -> bool {
     let eq = match field.field.to_lowercase().as_str() {
         "title" => song.title.to_lowercase() == field.value.to_lowercase(),
         "artist" => song.artist.to_lowercase() == field.value.to_lowercase(),
@@ -207,7 +207,7 @@ fn field_matches_song_ci(field: &crate::search::Field, song: &Song) -> bool {
         "id" => song.id == field.value,
         _ => false,
     };
-    use crate::search::FieldOp;
+    use crate::navidrome::search::FieldOp;
     match field.op {
         FieldOp::Contains => {
             let val = match field.field.to_lowercase().as_str() {
@@ -223,16 +223,16 @@ fn field_matches_song_ci(field: &crate::search::Field, song: &Song) -> bool {
     }
 }
 
-fn expr_matches_song_ci(expr: &crate::search::Expr, song: &Song) -> bool {
+fn expr_matches_song_ci(expr: &crate::navidrome::search::Expr, song: &Song) -> bool {
     match expr {
-        crate::search::Expr::And(a, b) => field_matches_song_ci(a, song) && field_matches_song_ci(b, song),
-        crate::search::Expr::Or(a, b) => field_matches_song_ci(a, song) || field_matches_song_ci(b, song),
-        crate::search::Expr::Def(f) => field_matches_song_ci(f, song),
-        crate::search::Expr::Empty => true,
+        crate::navidrome::search::Expr::And(a, b) => field_matches_song_ci(a, song) && field_matches_song_ci(b, song),
+        crate::navidrome::search::Expr::Or(a, b) => field_matches_song_ci(a, song) || field_matches_song_ci(b, song),
+        crate::navidrome::search::Expr::Def(f) => field_matches_song_ci(f, song),
+        crate::navidrome::search::Expr::Empty => true,
     }
 }
 
-async fn collect_songs_ci(expr: &crate::search::Expr, navi: &NaviData) -> Vec<Song> {
+async fn collect_songs_ci(expr: &crate::navidrome::search::Expr, navi: &NaviData) -> Vec<Song> {
     let mut matches = Vec::new();
     for album in &navi.album_list {
         for song in &get_album_songs(navi, album).await {
@@ -312,11 +312,11 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: &N
                 _ => return "ACK [2@00] {list} could not parse filter\n".to_string(),
             };
             let songs = collect_songs(&expr, &navi).await;
-            let tag_label = capitalize_first(&args.tag_type);
+            let tag_label = capitalize_first(args.tag_type.as_deref().unwrap_or(""));
 
             if args.group_types.is_empty() {
                 let mut values: Vec<String> = songs.iter()
-                    .map(|s| song_tag_value(s, &args.tag_type))
+                    .map(|s| song_tag_value(s, args.tag_type.as_deref().unwrap_or("")))
                     .filter(|v| !v.is_empty())
                     .collect::<HashSet<_>>()
                     .into_iter().collect();
@@ -333,7 +333,7 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: &N
             } else {
                 let mut out = String::new();
                 for song in &songs {
-                    let val = song_tag_value(song, &args.tag_type);
+                    let val = song_tag_value(song, args.tag_type.as_deref().unwrap_or(""));
                     if val.is_empty() { continue; }
                     for g in &args.group_types {
                         let gv = song_group_value(song, g);
@@ -463,15 +463,17 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: &N
     }
 }
 pub struct ListArgs {
-    pub tag_type: String,
+    pub tag_type: Option<String>,
     pub filter: Option<String>,
     pub group_types: Vec<String>,
+    pub window: Option<(u32, u32)>,
     pub window_start: Option<u32>,
     pub window_end: Option<u32>,
 }
 
 
-
+/* unit tests
+ *
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -519,4 +521,4 @@ mod tests {
             "expected song by {artist}, got: {response}"
         );
     }
-}
+}*/

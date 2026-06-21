@@ -7,8 +7,8 @@ use reqwest::Client;
 use anyhow::{Context, Result};
 
 
-use crate::tracklist::SubsIDResponse;
-use crate::tracklist::Song;
+use crate::play::tracklist::SubsIDResponse;
+use crate::play::tracklist::Song;
 // main way to get metadata and parse actual library. TODO: it's 500 max albums but for a POC (for
 // now) it's good enough
 const URL: &str = "http://192.168.1.20:8097";
