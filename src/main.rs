@@ -338,45 +338,210 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             res
         }
         "count" => {
-            let ptr: (String, String) = (parts.get(1).unwrap_or(&String::new()).clone(), 
-                parts.get(1).unwrap_or(&String::new()).clone());
-            let args = DatabaseStatus::Count(ptr.0, ptr.1);
-            let res: String = database::database_handle(args, client, navi).await;
-            res
+            if parts.len() < 2 {
+                return "ACK [2@0] {count} missing filter\n".to_string();
+            }
+            let filter = parts[1].clone();
+            let mut group = String::new();
+            let mut i = 2;
+            while i < parts.len() {
+                if parts[i] == "group" && i + 1 < parts.len() {
+                    group = parts[i + 1].clone();
+                    i += 2;
+                } else {
+                    i += 1;
+                }
+            }
+            database::database_handle(DatabaseStatus::Count(filter, group), client, navi).await
         }
         "find" => {
-            let fltr: String = parts.get(1).unwrap_or(&String::new()).clone();
-            let sort: String = parts.get(2).unwrap_or(&String::new()).clone();
-            let a: (u32, u32) = parts.get(3).unwrap_or(&String::new()).clone()
-                .split_once(':')
-                .map(|(left, right)| (left.parse().unwrap(), right.parse().unwrap()))
-                .unwrap();
-            let args = DatabaseStatus::Find(FindArgs {
-                filter: fltr,
-                sort: Some(sort),
-                window_start: Some(a.0),
-                window_end: Some(a.1),
-                position: None,
-            });
-            database::database_handle(args, &client, &navi).await
+            if parts.len() < 2 {
+                return "ACK [2@0] {find} missing filter\n".to_string();
+            }
+            let fltr = parts[1].clone();
+            let mut sort = None;
+            let mut window_start = None;
+            let mut window_end = None;
+            let mut i = 2;
+            while i < parts.len() {
+                match parts[i].as_str() {
+                    "sort" if i + 1 < parts.len() => {
+                        sort = Some(parts[i + 1].clone());
+                        i += 2;
+                    }
+                    "window" if i + 1 < parts.len() => {
+                        if let Some((s, e)) = parts[i + 1].split_once(':') {
+                            window_start = s.parse().ok();
+                            window_end = e.parse().ok();
+                        }
+                        i += 2;
+                    }
+                    _ => { i += 1; }
+                }
+            }
+            database::database_handle(
+                DatabaseStatus::Find(FindArgs {
+                    filter: fltr, sort, window_start, window_end, position: None,
+                }),
+                client, navi,
+            ).await
         }
         "findadd" => {
-            let fltr: String = parts.get(1).unwrap_or(&String::new()).clone();
-            let sort: String = parts.get(2).unwrap_or(&String::new()).clone();
-            let a: (u32, u32) = parts.get(3).unwrap_or(&String::new()).clone()
-                .split_once(':')
-                .map(|(left, right)| (left.parse().unwrap(), right.parse().unwrap()))
-                .unwrap();
-            let args = DatabaseStatus::Find(FindArgs {
-                filter: fltr,
-                sort: Some(sort),
-                window_start: Some(a.0),
-                window_end: Some(a.1),
-                position: None,
-            });
-            let _ = database::database_handle(args, &client, &navi).await;
-            // TODO: ADD HELPER FUNCTION TO ADD SONG (when I actually add "add)
+            if parts.len() < 2 {
+                return "ACK [2@0] {findadd} missing filter\n".to_string();
+            }
+            let fltr = parts[1].clone();
+            let mut sort = None;
+            let mut window_start = None;
+            let mut window_end = None;
+            let mut i = 2;
+            while i < parts.len() {
+                match parts[i].as_str() {
+                    "sort" if i + 1 < parts.len() => {
+                        sort = Some(parts[i + 1].clone());
+                        i += 2;
+                    }
+                    "window" if i + 1 < parts.len() => {
+                        if let Some((s, e)) = parts[i + 1].split_once(':') {
+                            window_start = s.parse().ok();
+                            window_end = e.parse().ok();
+                        }
+                        i += 2;
+                    }
+                    _ => { i += 1; }
+                }
+            }
+            let _ = database::database_handle(
+                DatabaseStatus::FindAdd(FindArgs {
+                    filter: fltr, sort, window_start, window_end, position: None,
+                }),
+                client, navi,
+            ).await;
+            // TODO: ADD HELPER FUNCTION TO ADD SONG (when I actually add "add")
             "".to_string()
+        }
+        "listall" => {
+            let path = parts.get(1).cloned().unwrap_or_default();
+            database::database_handle(DatabaseStatus::ListAll(Box::new(path)), client, navi).await
+        }
+        "listallinfo" => {
+            let path = parts.get(1).cloned().unwrap_or_default();
+            database::database_handle(DatabaseStatus::ListAllInfo(Box::new(path)), client, navi).await
+        }
+        "lsinfo" => {
+            let path = parts.get(1).cloned().unwrap_or_default();
+            database::database_handle(DatabaseStatus::LsInfo(path), client, navi).await
+        }
+        "readcomment" => {
+            let path = parts.get(1).cloned().unwrap_or_default();
+            database::database_handle(DatabaseStatus::ReadComment(path), client, navi).await
+        }
+        "readpicture" => {
+            let path = parts.get(1).cloned().unwrap_or_default();
+            let offset: i64 = parts.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
+            database::database_handle(DatabaseStatus::ReadPicture((path, offset)), client, navi).await
+        }
+        "search" => {
+            if parts.len() < 2 {
+                return "ACK [2@0] {search} missing filter\n".to_string();
+            }
+            let fltr = parts[1].clone();
+            let mut sort = None;
+            let mut window_start = None;
+            let mut window_end = None;
+            let mut i = 2;
+            while i < parts.len() {
+                match parts[i].as_str() {
+                    "sort" if i + 1 < parts.len() => {
+                        sort = Some(parts[i + 1].clone());
+                        i += 2;
+                    }
+                    "window" if i + 1 < parts.len() => {
+                        if let Some((s, e)) = parts[i + 1].split_once(':') {
+                            window_start = s.parse().ok();
+                            window_end = e.parse().ok();
+                        }
+                        i += 2;
+                    }
+                    _ => { i += 1; }
+                }
+            }
+            database::database_handle(
+                DatabaseStatus::Search(FindArgs {
+                    filter: fltr, sort, window_start, window_end, position: None,
+                }),
+                client, navi,
+            ).await
+        }
+        "searchadd" => {
+            if parts.len() < 2 {
+                return "ACK [2@0] {searchadd} missing filter\n".to_string();
+            }
+            let fltr = parts[1].clone();
+            let mut sort = None;
+            let mut window_start = None;
+            let mut window_end = None;
+            let mut i = 2;
+            while i < parts.len() {
+                match parts[i].as_str() {
+                    "sort" if i + 1 < parts.len() => {
+                        sort = Some(parts[i + 1].clone());
+                        i += 2;
+                    }
+                    "window" if i + 1 < parts.len() => {
+                        if let Some((s, e)) = parts[i + 1].split_once(':') {
+                            window_start = s.parse().ok();
+                            window_end = e.parse().ok();
+                        }
+                        i += 2;
+                    }
+                    _ => { i += 1; }
+                }
+            }
+            let _ = database::database_handle(
+                DatabaseStatus::SearchAdd(FindArgs {
+                    filter: fltr, sort, window_start, window_end, position: None,
+                }),
+                client, navi,
+            ).await;
+            "".to_string()
+        }
+        "searchaddpl" => {
+            if parts.len() < 3 {
+                return "ACK [2@0] {searchaddpl} missing arguments\n".to_string();
+            }
+            let name = parts[1].clone();
+            let fltr = parts[2].clone();
+            let mut sort = None;
+            let mut window_start = None;
+            let mut window_end = None;
+            let mut i = 3;
+            while i < parts.len() {
+                match parts[i].as_str() {
+                    "sort" if i + 1 < parts.len() => {
+                        sort = Some(parts[i + 1].clone());
+                        i += 2;
+                    }
+                    "window" if i + 1 < parts.len() => {
+                        if let Some((s, e)) = parts[i + 1].split_once(':') {
+                            window_start = s.parse().ok();
+                            window_end = e.parse().ok();
+                        }
+                        i += 2;
+                    }
+                    _ => { i += 1; }
+                }
+            }
+            database::database_handle(
+                DatabaseStatus::Searchaddpi(name, FindArgs {
+                    filter: fltr, sort, window_start, window_end, position: None,
+                }),
+                client, navi,
+            ).await
+        }
+        "update" => {
+            let _ = parts.get(1);
+            database::database_handle(DatabaseStatus::Update(), client, navi).await
         }
         // most clients don't use this at all and it isn't even enabled by default
         "getfingerprint" => {
