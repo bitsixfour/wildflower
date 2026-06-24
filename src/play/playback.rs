@@ -34,6 +34,10 @@ pub enum PlaybackStatus {
     SeekId((u64, String)),
     SeekCur(u64),
     Stop,
+    /// Append a song to the end of the queue.
+    Add(Song),
+    /// Insert a song at an absolute position (or push if None / out of range).
+    AddId(Song, Option<usize>),
 }
 
 /* Move these two args
@@ -98,36 +102,35 @@ pub struct PlayerState {
     pub duration: Duration,
     pub playlist_length: usize,
     pub playlist_version: u32,
+    pub repeat: bool,
+    pub random: bool,
+    pub single: bool,
+    pub consume: bool,
 }
-
 pub type SharedState = Arc<tokio::sync::RwLock<PlayerState>>;
 
-
 impl CurrentSong {
-    pub async fn new(song_id: &str, client: &Client) -> Self {
-        let le_url: String = CurrentSong::fmt_url(song_id);
-        let bytes = client
-            .get(&le_url)
-            .send()
-            .await
-            .unwrap()
-            .bytes()
-            .await.unwrap();
+     pub async fn new(_song_id: &str, _client: &Client) -> Self {
+        // Note: the original implementation pre-downloaded a "test song" at
+        // startup. That fetch took 30–60s and blocked the engine task from
+        // entering its recv loop, so every command queued in the mpsc until
+        // it finished. The downloaded bytes were never actually read by
+        // anything (`play` fetches from `queue.items` instead). Skip the
+        // fetch — open the device, return immediately.
         let handle = rodio::DeviceSinkBuilder::open_default_sink().unwrap();
         let mixer = handle.mixer().clone();
         Self {
-            song_id: le_url,
+            song_id: String::new(),
             var: handle,
-            stream: bytes,
+            stream: Bytes::new(),
             queue: PlaybackQueue {
                 items: Vec::new(),
                 cursor: 0,
                 player: Player::connect_new(&mixer),
             }
         }
-
     }
-    pub async fn handle(&mut self,command: PlaybackStatus, client: &Client)  {
+    pub async fn handle(&mut self, command: PlaybackStatus, client: &Client) {
         match command {
             PlaybackStatus::Next() => {
                 println!("dbg... we're going to the next song...");
@@ -158,17 +161,15 @@ impl CurrentSong {
                 self.queue.player.try_seek(dur).unwrap();
             }
             #[allow(unused_variables)]
-            PlaybackStatus::PlayId(io) => {
+            PlaybackStatus::PlayId(_io) => {
                 println!("play by id");
                 self.queue.player.stop();
                 for idx in 0..self.queue.items.len() {
-                    match &self.queue.items.get(idx) {
-                        io => {
-                            println!("match id");
-                            for itr in 0..idx {
-                                println!("{itr}");
-                                self.queue.player.skip_one();
-                            }
+                    if let Some(_item) = self.queue.items.get(idx) {
+                        println!("match id");
+                        for itr in 0..idx {
+                            println!("{itr}");
+                            self.queue.player.skip_one();
                         }
                     }
                 }
@@ -200,7 +201,7 @@ impl CurrentSong {
                 for idx in 0..self.queue.items.len() {
                     if let Some(_) = self.queue.items.get(idx) {
                         self.queue.jump_to(client, idx as i32).await;
-                        self.queue.player.try_seek(var + delta).unwrap();
+                        let _ = self.queue.player.try_seek(var + delta);
                     }
                 }
             }
@@ -208,10 +209,14 @@ impl CurrentSong {
                 println!("stop!");
                 self.queue.player.stop();
             }
+            PlaybackStatus::Add(song) => {
+                self.queue.items.push(song);
+            }
+            PlaybackStatus::AddId(song, pos) => {
+                let p = pos.unwrap_or(self.queue.items.len()).min(self.queue.items.len());
+                self.queue.items.insert(p, song);
+            }
         }
-
-
-
     }
 
 
@@ -299,4 +304,56 @@ impl PlaybackQueue {
         vec.append(&mut bytes);
         vec
         }
+}
+
+use crate::navidrome::navi::NaviData;
+
+/// Build the MPD-style virtual path: `Album Name/song.path`.
+/// Matches what `LsInfo` emits so `add` / `addid` URIs are consistent.
+fn mpd_path(album_name: &str, song_path: &str) -> String {
+    format!("{}/{}", album_name, song_path)
+}
+
+/// Find one song whose full MPD path matches `uri` exactly.
+pub fn find_song_by_uri(navi: &NaviData, uri: &str) -> Option<Song> {
+    for album in &navi.album_list {
+        for song in navi.albums_cache.get(&album.id).map(|v| v.as_slice()).unwrap_or(&[]) {
+            if mpd_path(&album.name, &song.path) == uri || song.path == uri {
+                return Some(song.clone());
+            }
+        }
+    }
+    None
+}
+
+/// Resolve a queue URI to one or more songs.
+///
+/// Behaviour:
+/// - URI == an album name → all songs in that album
+/// - URI == a song path (exact, with or without album prefix) → just that song
+/// - URI is a path prefix → every song whose MPD path starts with it
+pub fn find_songs_by_uri(navi: &NaviData, uri: &str) -> Vec<Song> {
+    let mut out = Vec::new();
+    // 1. Album-level add
+    for album in &navi.album_list {
+        if album.name == uri {
+            if let Some(songs) = navi.albums_cache.get(&album.id) {
+                return songs.clone();
+            }
+        }
+    }
+    // 2. Exact song match (with or without album prefix)
+    if let Some(song) = find_song_by_uri(navi, uri) {
+        out.push(song);
+        return out;
+    }
+    // 3. Path-prefix match (recursive directory add)
+    for album in &navi.album_list {
+        for song in navi.albums_cache.get(&album.id).map(|v| v.as_slice()).unwrap_or(&[]) {
+            if song.path.starts_with(uri) {
+                out.push(song.clone());
+            }
+        }
+    }
+    out
 }

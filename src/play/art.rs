@@ -3,7 +3,7 @@ use crate::navidrome::navi::NaviData;
 use crate::navidrome::database::DatabaseStatus;
 const URL: &str = "http://192.168.1.20";
 
-
+// helper function
 pub async fn return_album_art(req: &str, return_offset: i64) -> Vec<u8> {
     let url: String = format!("{}/rest/getCoverArt?id={}&u=nix&p=2008&v=1.16.1&c=test", URL, req);
     let response = reqwest::get(&url).await.unwrap();

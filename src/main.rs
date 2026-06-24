@@ -1,5 +1,5 @@
-mod navidrome;
 mod play;
+mod navidrome;
 
 use std::path::Path;
 use std::sync::Arc;
@@ -12,8 +12,8 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use crate::navidrome::database::{self, DatabaseStatus, ListArgs, FindArgs};
 use crate::navidrome::navi::NaviData;
-use crate::play::playback::{CurrentSong, PlaybackStatus, PlayerState, AudioState, SharedState};
-
+use crate::play::playback::{find_song_by_uri, find_songs_by_uri, CurrentSong, PlaybackStatus, PlayerState, AudioState, SharedState};
+use crate::play::queue::{QueueHandle, queue_handle};
 
 
 
@@ -83,6 +83,10 @@ async fn main() -> anyhow::Result<()> {
         duration: Duration::from_secs(0),
         playlist_length: 0,
         playlist_version: 0,
+        repeat: false,
+        random: false,
+        single: false,
+        consume: false,
     }));
 
     let (cmd_tx, mut cmd_rx) = tokio::sync::mpsc::channel::<PlaybackStatus>(100);
@@ -219,56 +223,31 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             let _ = cmd_tx.send(PlaybackStatus::Stop).await;
             "Ok\n".to_string()
         }
-        /* The Queue (Section on MPD API SPEC) */ 
-        "add" => "OK\n".to_string(),
-
-
-
-
-        "status" => {
-            let st = state.read().await;
-            let mut out = String::new();
-            out.push_str(&format!("volume: {}\n", st.volume));
-            out.push_str("repeat: 0\n");
-            out.push_str("random: 0\n");
-            out.push_str("single: 0\n");
-            out.push_str("consume: 0\n");
-            out.push_str(&format!("playlist: {}\n", st.playlist_version));
-            out.push_str(&format!("playlistlength: {}\n", st.playlist_length));
-            out.push_str(&format!("state: {}\n", match st.state {
-                AudioState::Play => "play",
-                AudioState::Stop => "stop",
-                AudioState::Pause => "pause",
-            }));
-            if let Some(pos) = st.song_pos {
-                out.push_str(&format!("song: {}\n", pos));
+        /* The Queue (Section on MPD API SPEC) */
+        "add" => {
+            let uri = parts.get(1).cloned().unwrap_or_default();
+            let songs = find_songs_by_uri(navi, &uri);
+            if songs.is_empty() {
+                return "ACK [2@0] {add} no such file or directory\n".to_string();
             }
-            if let Some(ref id) = st.song_id {
-                out.push_str(&format!("songid: {}\n", id));
+            for song in songs {
+                let _ = cmd_tx.send(PlaybackStatus::Add(song)).await;
             }
-            out.push_str(&format!("elapsed: {:.3}\n", st.elapsed.as_secs_f64()));
-            if st.duration > Duration::from_secs(0) {
-                out.push_str(&format!("duration: {:.3}\n", st.duration.as_secs_f64()));
-            }
-            out.push_str("OK\n");
-            out
+            "OK\n".to_string()
         }
-        "currentsong" => {
-            let st = state.read().await;
-            let mut out = String::new();
-            if let Some(ref id) = st.song_id {
-                out.push_str(&format!("file: {}\n", id));
-                out.push_str(&format!("Id: {}\n", id));
-            }
-            out.push_str("OK\n");
-            out
+        "addid" => {
+            let uri = parts.get(1).cloned().unwrap_or_default();
+            let pos = parts.get(2).and_then(|s| s.parse::<usize>().ok());
+            let Some(song) = find_song_by_uri(navi, &uri) else {
+                return "ACK [2@0] {addid} no such song\n".to_string();
+            };
+            let id = song.id.clone();
+            let _ = cmd_tx.send(PlaybackStatus::AddId(song, pos)).await;
+            format!("Id: {}\nOK\n", id)
         }
-        "playlistinfo" => {
-            let st = state.read().await;
-            let mut out = String::new();
-            out.push_str("OK\n");
-            out
-        }
+        "status" => queue_handle(QueueHandle::Status, state, navi).await,
+        "currentsong" => queue_handle(QueueHandle::CurrentSong, state, navi).await,
+        "playlistinfo" => "OK\n".to_string(),
         "list" => {
             if parts.len() < 2 {
                 return "ACK [2@0] {list} missing tag type\n".to_string();

@@ -1,4 +1,5 @@
-// return tracklist as specified in MPD protocol
+// return tracklist from Vec<Song>
+// most of these aren't needed b
 
 
 use reqwest::Client;

@@ -6,7 +6,7 @@ use crate::navidrome::search::Expr;
 use crate::play::tracklist::Song;
 use reqwest::Client;
 use crate::play::art;
-
+/*
 pub enum QueueStatus {
     Add(String, i32),
     AddId(String, i32),
@@ -24,6 +24,7 @@ pub enum QueueStatus {
     Prio(i32, (i32, i32)),
     PrioId(i32, (i32, i32))
 }
+*/
 pub struct FindArgs {
     pub filter: String,
     pub sort: Option<String>,
