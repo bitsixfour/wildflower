@@ -4,7 +4,6 @@
 
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use crate::navidrome::navi::NaviData;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct SubsIDResponse {
@@ -171,7 +170,7 @@ impl SubsIDResponse {
             .await.unwrap()
     }
 
-    pub async fn new(client: &Client, uid: &str, ser: &str) -> SubsIDResponse {
+    pub async fn new(client: &Client, uid: &str, _ser: &str) -> SubsIDResponse {
         let url = format!("http://192.168.1.20:8097/rest/getAlbum?id={}&u=nix&p=2008&v=1.8.0&c=myapp&f=json", uid);
         let root = client
             .get(url)
@@ -195,7 +194,7 @@ impl SubsIDResponse {
             .album
             .song.clone();
         println!("array of song found (dbg");
-        for i in album_list.iter() {
+        for _i in album_list.iter() {
             let mpdretrn: &str  = 
                 "file: {} \n
                 Last-Modified: {} \n

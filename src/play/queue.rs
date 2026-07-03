@@ -1,6 +1,5 @@
 use std::collections::HashSet;
-use std::sync::LazyLock;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use crate::navidrome::navi::NaviData;
 use crate::play::playback::{AudioState, SharedState};

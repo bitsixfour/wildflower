@@ -1,6 +1,6 @@
-mod play;
 mod navidrome;
-
+mod config;
+mod play;
 use std::path::Path;
 use std::sync::Arc;
 use std::time::Duration;

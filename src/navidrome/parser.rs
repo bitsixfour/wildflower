@@ -1,7 +1,7 @@
 use crate::navidrome::search::{Expr, Field, FieldOp};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-enum Token {
+pub(crate) enum Token {
     And,
     Or,
     Not,

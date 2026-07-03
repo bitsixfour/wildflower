@@ -1,6 +1,3 @@
-use reqwest::Client;
-use crate::navidrome::navi::NaviData;
-use crate::navidrome::database::DatabaseStatus;
 const URL: &str = "http://192.168.1.20";
 
 // helper function
