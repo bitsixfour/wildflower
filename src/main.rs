@@ -15,47 +15,19 @@ use crate::navidrome::navi::NaviData;
 use crate::play::playback::{find_song_by_uri, find_songs_by_uri, CurrentSong, PlaybackStatus, PlayerState, AudioState, SharedState};
 use crate::play::queue::{QueueHandle, queue_handle};
 
+const PORT: u32 = 6600;
 
 
-
-const PORT: i32 = 6600;
-
-
-
-#[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
-pub struct Args {
-    #[arg(short = 'l', long)]
-    album: String,
-
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
-}
-#[allow(dead_code)]
-pub struct MpdSong {
-    id: String,
-    title: String,
-    artist: String,
-    album: String,
-    // length: i32,
-}
-
-/* Trait for actual Mpd and
-pub trait SubsonicParse {
-    fn get_length() -> String;
-    fn get_url() -> String;
-    fn navi_to_song(var: &Song) -> MpdSong;
-
+pub trait BytesAlbum {
+    
+    async fn return_album_art(req: &str, 
+        return_offset: i64) -> Vec<u8>;  
 
 }
-*/
-
 
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    println!("starting ze mpd server....");
-    let test_id: &str = "23M5Qz4SmDa79E5MR0woPr";
     let listener = TcpListener::bind(format!("127.0.0.1:{}", PORT)).await?; // 6600 is where MPD lives
     println!("We are ze running at port {PORT}");
     let heckin_reqwest: Client = reqwest::Client::new();
@@ -64,7 +36,6 @@ async fn main() -> anyhow::Result<()> {
         Ok(n) => {
             let album_count = n.album_list.len();
             let song_count: usize = n.albums_cache.values().map(|v| v.len()).sum();
-            println!("loaded {album_count} albums, {song_count} songs (from cache and/or navidrome)");
             n
         }
         Err(e) => {
@@ -94,7 +65,7 @@ async fn main() -> anyhow::Result<()> {
     let engine_state = Arc::clone(&shared_state);
     let heckin_reqwes = heckin_reqwest.clone();
     tokio::spawn(async move {
-        let mut engine = CurrentSong::new(&test_id, &heckin_reqwest).await;
+        let mut engine = CurrentSong::new(&heckin_reqwest).await;
         while let Some(cmd) = cmd_rx.recv().await {
             engine.handle(cmd, &heckin_reqwest).await;
             let mut st = engine_state.write().await;
@@ -143,7 +114,6 @@ async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<Playba
 
 
 
-/* Giant monolithic handling of all 50+ MPD functions. */
 async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackStatus>, state: &SharedState, client: &Client, navi: &NaviData) -> String {
     let trimmed = input.trim();
     let mut parts: Vec<String> = Vec::new();
@@ -169,9 +139,7 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
     let cmd = parts.get(0).map(|s| s.as_str()).unwrap_or("");
 
     match cmd {
-      /* Controlling playback segment on mpd.readthedocs.io */
         "play" => {
-            // let arg = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(1);
             let _ = cmd_tx.send(PlaybackStatus::Play).await;
             "OK\n".to_string()
         }
@@ -223,7 +191,6 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             let _ = cmd_tx.send(PlaybackStatus::Stop).await;
             "Ok\n".to_string()
         }
-        /* The Queue (Section on MPD API SPEC) */
         "add" => {
             let uri = parts.get(1).cloned().unwrap_or_default();
             let songs = find_songs_by_uri(navi, &uri);
