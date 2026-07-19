@@ -3,6 +3,7 @@ mod config;
 mod play;
 use std::path::Path;
 use std::sync::Arc;
+use std::process;
 use std::time::Duration;
 
 use clap::Parser;
@@ -18,12 +19,6 @@ use crate::play::queue::{QueueHandle, queue_handle};
 const PORT: u32 = 6600;
 
 
-pub trait BytesAlbum {
-    
-    async fn return_album_art(req: &str, 
-        return_offset: i64) -> Vec<u8>;  
-
-}
 
 
 #[tokio::main]
@@ -34,12 +29,12 @@ async fn main() -> anyhow::Result<()> {
 
     let navi: NaviData = match NaviData::load_or_fetch(&heckin_reqwest, Path::new("wildflower-cache.json")).await {
         Ok(n) => {
-            let album_count = n.album_list.len();
-            let song_count: usize = n.albums_cache.values().map(|v| v.len()).sum();
+            let _album_count = n.album_list.len();
+            let _song_count: usize = n.albums_cache.values().map(|v| v.len()).sum();
             n
         }
         Err(e) => {
-            eprintln!("navidrome + cache both unavailable: {e:#}. starting with empty library.");
+            eprintln!("navidrome + cache both unavailable: {e:#}. starting with empty library!!!!!");
             NaviData::init_empty()
         }
     };
@@ -341,7 +336,7 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             let mut window_start = None;
             let mut window_end = None;
             let mut i = 2;
-            while i < parts.len() {
+            while i < parts.len() { // TODO: make this functional some day
                 match parts[i].as_str() {
                     "sort" if i + 1 < parts.len() => {
                         sort = Some(parts[i + 1].clone());
@@ -363,7 +358,6 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
                 }),
                 client, navi,
             ).await;
-            // TODO: ADD HELPER FUNCTION TO ADD SONG (when I actually add "add")
             "".to_string()
         }
         "listall" => {
@@ -495,6 +489,8 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
         }
         "ping" => "OK\n".to_string(),
         "close" => "OK\n".to_string(),
+        "kill"=> process::exit(67), // DON'T DO THIS. IT'S ON YOU
+
         _ => format!("ACK [2@0] {{unknown command}} {}\n", cmd),
     }
 }

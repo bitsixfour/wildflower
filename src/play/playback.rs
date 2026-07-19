@@ -27,8 +27,8 @@ pub enum PlaybackStatus {
     Seek((u64, String)),
     Next(),
     Pause(i32),
-    Play,              // resume / play with no arg
-    PlayPos(usize),    // play [songpos]
+    Play,           
+    PlayPos(usize),    
     PlayId(String),
     Previous,
     SeekId((u64, String)),
