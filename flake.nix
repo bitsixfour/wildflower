@@ -24,6 +24,8 @@
           src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
           nativeBuildInputs = [ pkgs.pkg-config ];
+          buildInputs = [ pkgs.alsa-lib ];
+          meta.mainProgram = "mpdnavi";
         };
       in
       {

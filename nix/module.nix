@@ -6,56 +6,61 @@ let
 in
 {
   options.services.wildflower = {
-    enable = lib.mkEnableOption "mpd nix thing??????";
+    enable = lib.mkEnableOption "wildflower MPD server";
 
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = self.packages.${pkgs.system}.default;
+      description = "Wildflower package to run.";
+    };
+
+    createUser = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Create a dedicated system user.";
+    };
+
+    user = lib.mkOption {
+      type = lib.types.str;
+      default = "wildflower";
+      description = "Service user and group.";
+    };
+
+    group = lib.mkOption {
+      type = lib.types.str;
+      default = "wildflower";
+      description = "Service group.";
+    };
+
+    environmentFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "Optional systemd environment file.";
+    };
 
     url = lib.mkOption {
       type = lib.types.str;
       default = "http://192.168.1.20";
-      description = "heckin' url for your server. ex: http://192.168.1.67:6767";
+      description = "Navidrome server URL.";
     };
-    
+
     port = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.port;
       default = 6600;
-      description = "port for your mpd. obviously usually 6600 defaulted";
+      description = "MPD listener port.";
     };
 
     password = lib.mkOption {
       type = lib.types.str;
-      default = "password";
-      description = "plaintext stored password. again your navidrome is read only by design";
+      default = "";
+      description = "Navidrome password.";
     };
 
     usrname = lib.mkOption {
       type = lib.types.str;
       default = "nix";
-      description = "username";
+      description = "Navidrome username.";
     };
-/*
-    navidrome = {
-      baseUrl = lib.mkOption {
-        type = lib.types.str;
-        default = "http://127.0.0.1:4533";
-        description = "Base URL for the Navidrome server.";
-      };
-
-      user = lib.mkOption {
-        type = lib.types.str;
-        default = "nix";
-        description = "Navidrome username.";
-      };
-
-      password = lib.mkOption {
-        type = lib.types.str;
-        default = "";
-        description = ''
-          Navidrome password exposed directly as plain text through
-          OBSIDIANFM_NAVIDROME_PASSWORD.
-        '';
-      };
-    };
-*/
   };
 
   config = lib.mkIf cfg.enable {
@@ -72,28 +77,28 @@ in
       };
     };
 
-    systemd.services.obsidianfm = {
+    systemd.services.wildflower = {
       description = "mpd socket";
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
 
       environment = {
-        PASSWORD = cfg.password;
-        USERNAME = cfg.usrname;
-        PORT = cfg.port;
-        URL = cfg.url;
+        MPD_PASS = cfg.password;
+        MPD_USER = cfg.usrname;
+        MPD_PORT = toString cfg.port;
+        MPD_HOST = cfg.url;
       };
 
       serviceConfig =
         {
-          ExecStart = lib.getExe cfg.package;
+          ExecStart = lib.getExe' cfg.package "mpdnavi";
           User = cfg.user;
           Group = cfg.group;
           Restart = "always";
           RestartSec = "10s";
-          StateDirectory = "obsidianfm";
-          WorkingDirectory = "/var/lib/obsidianfm";
+          StateDirectory = "wildflower";
+          WorkingDirectory = "/var/lib/wildflower";
         }
         // lib.optionalAttrs (cfg.environmentFile != null) {
           EnvironmentFile = [ cfg.environmentFile ];

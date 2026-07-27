@@ -3,10 +3,8 @@ mod config;
 mod play;
 use std::path::Path;
 use std::sync::Arc;
-use std::process;
 use std::time::Duration;
 
-use clap::Parser;
 use reqwest::Client;
 
 use tokio::net::{TcpListener, TcpStream};
@@ -23,7 +21,7 @@ const PORT: u32 = 6600;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", PORT)).await?; // 6600 is where MPD lives
+    let listener = TcpListener::bind(format!("127.0.0.1:{}", PORT)).await?;
     println!("We are ze running at port {PORT}");
     let heckin_reqwest: Client = reqwest::Client::new();
 
@@ -139,19 +137,21 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             "OK\n".to_string()
         }
         "pause" => {
-            let arg: i32 = parts.get(1).unwrap().parse().unwrap();
+            let Some(arg) = parts.get(1).and_then(|value| value.parse::<i32>().ok()) else {
+                return "ACK [2@0] {pause} invalid argument\n".to_string();
+            };
             match arg {
-                0..1 =>  {
+                0..=1 => {
                     let _ = cmd_tx.send(PlaybackStatus::Pause(arg)).await;
-                    "Ok\n".to_string()
+                    "OK\n".to_string()
                 }
-                _ => {
-                    "ACK\n".to_string()
-                }
+                _ => "ACK [2@0] {pause} invalid argument\n".to_string(),
             }
         }
         "playid" => {
-            let arg = parts.get(1).unwrap().parse::<usize>().unwrap() as usize;
+            let Some(arg) = parts.get(1).and_then(|value| value.parse::<usize>().ok()) else {
+                return "ACK [2@0] {playid} invalid position\n".to_string();
+            };
             let _ = cmd_tx.send(PlaybackStatus::PlayPos(arg)).await;
             "OK\n".to_string()
         }
@@ -163,28 +163,26 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             let _ = cmd_tx.send(PlaybackStatus::Previous).await;
             "OK\n".to_string()
         }
-        "seek" => {
-            let songpos: u64 = parts.get(1).unwrap().parse::<u64>().unwrap();
-            let time: String = parts.get(2).unwrap().parse::<String>().unwrap();
-            let turp = (songpos, time);
-            let _ = cmd_tx.send(PlaybackStatus::SeekId(turp)).await;
-            "Ok\n".to_string()
-        }
-        "seekid" => {
-            let songpos: u64 = parts.get(1).unwrap().parse::<u64>().unwrap();
-            let time: String = parts.get(2).unwrap().parse::<String>().unwrap();
-            let turp = (songpos, time);
-            let _ = cmd_tx.send(PlaybackStatus::SeekId(turp)).await;
-            "Ok\n".to_string()
+        "seek" | "seekid" => {
+            let Some(songpos) = parts.get(1).and_then(|value| value.parse::<u64>().ok()) else {
+                return format!("ACK [2@0] {{{cmd}}} invalid song position\n");
+            };
+            let Some(time) = parts.get(2) else {
+                return format!("ACK [2@0] {{{cmd}}} missing time\n");
+            };
+            let _ = cmd_tx.send(PlaybackStatus::SeekId((songpos, time.clone()))).await;
+            "OK\n".to_string()
         }
         "seekcur" => {
-            let dur = parts.get(1).unwrap().parse::<u64>().unwrap();
+            let Some(dur) = parts.get(1).and_then(|value| value.parse::<u64>().ok()) else {
+                return "ACK [2@0] {seekcur} invalid time\n".to_string();
+            };
             let _ = cmd_tx.send(PlaybackStatus::SeekCur(dur)).await;
-            "Ok\n".to_string()
+            "OK\n".to_string()
         }
         "stop" => {
             let _ = cmd_tx.send(PlaybackStatus::Stop).await;
-            "Ok\n".to_string()
+            "OK\n".to_string()
         }
         "add" => {
             let uri = parts.get(1).cloned().unwrap_or_default();
@@ -336,7 +334,7 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             let mut window_start = None;
             let mut window_end = None;
             let mut i = 2;
-            while i < parts.len() { // TODO: make this functional some day
+            while i < parts.len() {
                 match parts[i].as_str() {
                     "sort" if i + 1 < parts.len() => {
                         sort = Some(parts[i + 1].clone());
@@ -352,13 +350,12 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
                     _ => { i += 1; }
                 }
             }
-            let _ = database::database_handle(
+            database::database_handle(
                 DatabaseStatus::FindAdd(FindArgs {
                     filter: fltr, sort, window_start, window_end, position: None,
                 }),
                 client, navi,
-            ).await;
-            "".to_string()
+            ).await
         }
         "listall" => {
             let path = parts.get(1).cloned().unwrap_or_default();
@@ -483,13 +480,10 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             let _ = parts.get(1);
             database::database_handle(DatabaseStatus::Update(), client, navi).await
         }
-        // most clients don't use this at all and it isn't even enabled by default
-        "getfingerprint" => {
-            "".to_string()
-        }
+        "getfingerprint" => "OK\n".to_string(),
         "ping" => "OK\n".to_string(),
         "close" => "OK\n".to_string(),
-        "kill"=> process::exit(67), // DON'T DO THIS. IT'S ON YOU
+        "kill" => "ACK [4@0] {kill} command disabled\n".to_string(),
 
         _ => format!("ACK [2@0] {{unknown command}} {}\n", cmd),
     }

@@ -12,7 +12,7 @@ const URL: &str = "192.168.1.20:8097";
 pub struct CurrentSong {
     pub song_id: String,
     pub stream: Bytes,
-    var: MixerDeviceSink, // Player depends on Mixer (it says on rust document dont forget this)
+    var: MixerDeviceSink,
     pub queue: PlaybackQueue,
 }
 pub struct PlaybackQueue {
@@ -199,9 +199,6 @@ impl CurrentSong {
     }
 
 }
-/* sink such that the actual rodio crate s.t. it's really only 1 active source, but we hide this
- * by just using a vec which we display out using the mpd spec...
- */
 
 #[allow(unused_variables, dead_code)]
 impl PlaybackQueue {
@@ -221,7 +218,6 @@ impl PlaybackQueue {
         self.cursor -= 1;
         self.player.stop();
         self.player.clear();
-        // up to 200ms but to be honest isn't as egregious as a delay on a next song
         self.rebuild_buffer(client).await;
         self.player.play();
     }
@@ -237,7 +233,6 @@ impl PlaybackQueue {
     }
 
 
-    /* heckin backend functions */
     async fn sink_init(&mut self, stream: Vec<u8>, client: &Client) {
         let source = Decoder::new(Cursor::new(stream)).unwrap();
         self.player.append(source);

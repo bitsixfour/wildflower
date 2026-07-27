@@ -1,5 +1,4 @@
-// return tracklist from Vec<Song>
-// most of these aren't needed b
+// Subsonic album and track metadata.
 
 
 use reqwest::Client;
@@ -158,7 +157,7 @@ pub struct MpdAlbum<'a> {
 }
 
 
-/* Actually get MPD Tracklist data from album-id */
+/* Fetch an album's MPD tracklist data. */
 impl SubsIDResponse {
     pub async fn from_id(client: &Client, album_id: &str) -> SubsIDResponse {
         let url = format!("http://192.168.1.20:8097/rest/getAlbum?id={}&u=nix&p=2008&v=1.8.0&c=myapp&f=json", album_id);

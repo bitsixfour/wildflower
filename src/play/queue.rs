@@ -99,7 +99,6 @@ async fn current_song(state: &SharedState, navi: &NaviData) -> String {
 
 fn push_song(out: &mut String, song: &Song) {
     out.push_str(&format!("file: {}\n", song.path));
-    out.push_str(&format!("file: {}\n", song.id));
     out.push_str(&format!("Title: {}\n", song.title));
     out.push_str(&format!("Artist: {}\n", song.artist));
     out.push_str(&format!("Album: {}\n", song.album));

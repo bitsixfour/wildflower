@@ -8,8 +8,6 @@ use anyhow::{Context, Result};
 
 use crate::play::tracklist::SubsIDResponse;
 use crate::play::tracklist::Song;
-// main way to get metadata and parse actual library. TODO: it's 500 max albums but for a POC (for
-// now) it's good enough
 const URL: &str = "http://192.168.1.20:8097";
 const USR: &str = "nix";
 
@@ -85,7 +83,7 @@ pub fn get_url(song_id: &str) -> String {
 
 pub async fn navi_obj(client: &Client) -> Result<SubsonicResponse, reqwest::Error> {
     let root = client
-        .get("http://192.168.1.20:8097/rest/getAlbumList2?u=nix&p=2008&v=1.16.1&c=test&f=json&type=alphabeticalByName&size=500") /* YEAH YOU HAVE MY PASSWORD */
+        .get(format!("{URL}/rest/getAlbumList2").as_str())
         .query(&[
             ("f", "json"),
             ("type", "alphabeticalByName"),
@@ -122,7 +120,6 @@ impl NaviData {
             albums_cache: HashMap::new(),
         }
     }
-    // the "key" in the hash is album.name
     pub async fn init_cache(data: Vec<Album>, client: &Client) -> HashMap<String, Vec<Song>>  {
         let mut h_map: HashMap<String, Vec<Song>> = HashMap::new();
         for idx in &data {
@@ -145,7 +142,6 @@ impl NaviData {
             hmap.insert(name, i.clone());
             hmap_2.insert(id,i.clone());
         }
-        // take ownership, not needed anymore
         let kv_cache: HashMap<String, Vec<Song>> = Self::init_cache(album.clone(), clnt).await;
         Self {
             data: hmap,
@@ -156,18 +152,12 @@ impl NaviData {
         }
     }
 
-    /// Build a NaviData by reusing the on-disk cache and only fetching the
-    /// per-album song lists for albums we haven't seen before. The album-list
-    /// endpoint (`getAlbumList2`) is always called once because it's cheap
-    /// and lets us detect new or removed albums.
+    /// load the album list OR WE  reuse cached song lists
     pub async fn load_or_fetch(client: &Client, cache_path: &Path) -> Result<Self> {
         let mut cache = Cache::load(cache_path).unwrap_or_default();
-
-        // 1. Cheap: always hit the album list
         let fresh = navi_obj(client).await.context("getAlbumList2 failed")?;
         let fresh_albums = fresh.album_list_2.album;
 
-        // 2. Decide which albums we still need to fetch
         let cached_ids: HashSet<String> = cache.album_songs.keys().cloned().collect();
         let missing: Vec<Album> = fresh_albums
             .iter()
@@ -176,7 +166,6 @@ impl NaviData {
             .collect();
         let fetched_n = missing.len();
 
-        // 3. Per-album song fetch — only for new albums
         if !missing.is_empty() {
             let new_songs = Self::init_cache(missing, client).await;
             for (id, songs) in new_songs {
@@ -190,7 +179,6 @@ impl NaviData {
             }
         }
 
-        // 4. Build the in-memory NaviData
         let mut data: HashMap<String, Album> = HashMap::new();
         let mut data_id: HashMap<String, Album> = HashMap::new();
  for album in &fresh_albums {
@@ -202,7 +190,6 @@ impl NaviData {
             albums_cache.insert(id.clone(), bucket.songs.clone());
         }
 
-        // 5. Persist (atomic) — skip the write when nothing changed
         if fetched_n > 0 {
             cache.album_list_raw = fresh_albums.clone();
             cache.fetched_at = unix_now();

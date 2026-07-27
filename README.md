@@ -8,5 +8,5 @@ NEED TO KNOW!
  * Although, it *will* read your servers reqwests but can't create new ones because MPD doesn't have a specfic
  plugin for that 
 
-Simple POC for an MPD server that simply instead of reading your local fs... reads your navidrome server.....\
-Instead of using SQLite or whatever, it makes a simple text file from what subsonic supports. This is why this is a personal POC.
+Personal need I had: MPD server that reads library metadata from the Subsonic API  instead of a local filesystem.
+Very primative as I used a raw json file to store album data instead of using Sqlite or whatever!!

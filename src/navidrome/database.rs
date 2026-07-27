@@ -161,9 +161,12 @@ fn apply_sort(matches: &mut Vec<Song>, sort: &Option<String>) {
 
 fn apply_window(matches: &mut Vec<Song>, start: Option<u32>, end: Option<u32>) {
     let s = start.unwrap_or(0) as usize;
-    let e = end.map(|e| e as usize).unwrap_or(matches.len()).min(matches.len());
-    if s >= matches.len() { matches.clear(); }
-    else { *matches = matches[s..e].to_vec(); }
+    let e = end.map(|value| value as usize).unwrap_or(matches.len()).min(matches.len());
+    if s >= matches.len() || e <= s {
+        matches.clear();
+    } else {
+        *matches = matches[s..e].to_vec();
+    }
 }
 
 async fn handle_find(args: FindArgs, kind: &str, navi: &NaviData) -> String {
@@ -243,9 +246,7 @@ async fn handle_search(args: FindArgs, kind: &str, navi: &NaviData) -> String {
     out.push_str("OK\n");
     out
 }
-/* We assume that our virtuall FS is just plain /album.name/song.flac. This is different 
- * from the actual thingy in your server
- */
+/* The virtual filesystem is /album/song. */
 pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: &NaviData) -> String {
     match command {
         DatabaseStatus::AlbumArt(id, ost) => {
@@ -291,9 +292,12 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: &N
         DatabaseStatus::FindAdd(args) => handle_find(args, "findadd", &navi).await,
 
         DatabaseStatus::List(args) => {
-            let expr = match parser::parse_filter(&args.filter.as_deref().unwrap_or("")) {
-                Some(e) => e,
-                _ => return "ACK [2@00] {list} could not parse filter\n".to_string(),
+            let expr = match args.filter.as_deref().filter(|filter| !filter.is_empty()) {
+                Some(filter) => match parser::parse_filter(filter) {
+                    Some(expr) => expr,
+                    None => return "ACK [2@00] {list} could not parse filter\n".to_string(),
+                },
+                None => Expr::Empty,
             };
             let songs = collect_songs(&expr, &navi).await;
             let tag_label = capitalize_first(args.tag_type.as_deref().unwrap_or(""));
@@ -307,8 +311,12 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: &N
                 values.sort();
 
                 let start = args.window_start.unwrap_or(0) as usize;
-                let end = args.window_end.map(|e| e as usize).unwrap_or(values.len()).min(values.len());
-                if start < values.len() { values = values[start..end].to_vec(); } else { values.clear(); }
+                let end = args.window_end.map(|value| value as usize).unwrap_or(values.len()).min(values.len());
+                if start < values.len() && end > start {
+                    values = values[start..end].to_vec();
+                } else {
+                    values.clear();
+                }
 
                 let mut out = String::new();
                 for v in &values { out.push_str(&format!("{}: {}\n", tag_label, v)); }
@@ -329,7 +337,7 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: &N
                 out
             }
         }
-        // most mpd client's dont use this
+        // List every virtual file.
         DatabaseStatus::ListAll(_x) => {
             let mut new = String::new();
             for album in &navi.album_list {
@@ -341,8 +349,7 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: &N
             new.push_str("OK\n");
             new
         }
-        // no mpd client uses this... i ignore the arg for the directory because the main use of
-        // this is to get all things anyway?
+        // List every file with metadata.
         DatabaseStatus::ListAllInfo(_x) => {
             let mut new = String::new();
             for album in &navi.album_list {
@@ -389,46 +396,42 @@ pub async fn database_handle(command: DatabaseStatus, _client: &Client, navi: &N
 
            format!("ACK [2@0] No such directory\n")
         }
-        DatabaseStatus::ReadComment(str) => {
-            let mut out = String::new();
-            let parts: Vec<String> = str.split('/').map(String::from).collect();
-            if let Some(path) = parts.get(1) {
-                let songs = navi.songs_cache.get(path)
-                    .cloned()
-                    .unwrap(); 
-                if let Some(matching_song) = songs.iter().find(|&song| &song.title == parts.get(2).unwrap()) {
-                    let comment = matching_song.comment.clone();
-                    out.push_str(&format!("Comment: {}", comment));
-                }
-
-            }
-
-            return out
-
-
-
+        DatabaseStatus::ReadComment(path) => {
+            let parts: Vec<&str> = path.split('/').collect();
+            let Some(song_key) = parts.get(1) else {
+                return "ACK [2@0] {readcomment} invalid path\n".to_string();
+            };
+            let Some(songs) = navi.songs_cache.get(*song_key) else {
+                return "OK\n".to_string();
+            };
+            let Some(title) = parts.get(2) else {
+                return "ACK [2@0] {readcomment} invalid path\n".to_string();
+            };
+            songs.iter()
+                .find(|song| song.title == *title)
+                .map(|song| format!("Comment: {}\nOK\n", song.comment))
+                .unwrap_or_else(|| "OK\n".to_string())
         }
-        DatabaseStatus::ReadPicture(turp) => {
-            // match id then use same method as other album method
-            let parts: Vec<String> = turp.0.split('/').map(String::from).collect();
-            let ofsft: i64 = turp.1;
-            let mut id = String::new();
-            if let Some(path) = parts.get(1) {
-                let songs = navi.songs_cache.get(path)
-                    .cloned()
-                    .unwrap();
-                if let Some(matching_song) = songs.iter().find(|&song| &song.title == parts.get(2).unwrap()) {
-                     let _id = matching_song.id.clone();
-                     id = _id;
-                 }
-            }
-            String::from_utf8_lossy(&art::return_album_art(&id, ofsft).await)
-                .into_owned()
+        DatabaseStatus::ReadPicture((path, offset)) => {
+            let parts: Vec<&str> = path.split('/').collect();
+            let Some(song_key) = parts.get(1) else {
+                return "ACK [2@0] {readpicture} invalid path\n".to_string();
+            };
+            let Some(title) = parts.get(2) else {
+                return "ACK [2@0] {readpicture} invalid path\n".to_string();
+            };
+            let Some(songs) = navi.songs_cache.get(*song_key) else {
+                return "ACK [2@0] {readpicture} no such song\n".to_string();
+            };
+            let Some(song) = songs.iter().find(|song| song.title == *title) else {
+                return "ACK [2@0] {readpicture} no such song\n".to_string();
+            };
+            String::from_utf8_lossy(&art::return_album_art(&song.id, offset).await).into_owned()
         }
 
         DatabaseStatus::Search(args) => handle_search(args, "search", &navi).await,
 
-        #[allow(unused_variables)] // ignore playlist functionality FOR NOW...
+        #[allow(unused_variables)]
         DatabaseStatus::Searchaddpi(str, args) => {
             let _handle = handle_find(args, "findadd", &navi).await;
             _handle
