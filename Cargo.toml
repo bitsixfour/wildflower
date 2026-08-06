@@ -24,3 +24,4 @@ event-listener = "5.4.1"
 bytes = "1.11.1"
 rodio = { version = "0.22.2", features = ["playback"] }
 io = "0.0.2"
+rusqlite = { version = "0.40.1", features = ["bundled"] }

@@ -101,16 +101,17 @@ pub async fn navi_obj(client: &Client) -> Result<SubsonicResponse, reqwest::Erro
 
 
 
+
 #[derive(Clone)]
 pub struct NaviData {
-    pub data: HashMap<String, Album>, 
-    pub data_id: HashMap<String, Album>, 
     pub album_list: Vec<Album>,
-    pub songs_cache: HashMap<String, Vec<Song>>,
-    pub albums_cache: HashMap<String, Vec<Song>>
 }
-// turn into hashmap
 impl NaviData {
+
+
+
+
+    
     pub fn init_empty() -> Self {
         Self {
             data: HashMap::new(),
@@ -215,49 +216,3 @@ fn unix_now() -> u64 {
         .unwrap_or(0)
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
-struct Cache {
-    /// Bump when the on-disk format changes incompatibly.
-    #[serde(default)]
-    version: u32,
-    #[serde(default)]
-    fetched_at: u64,
-    /// Raw album list as returned by `getAlbumList2`.
-    #[serde(default)]
-    album_list_raw: Vec<Album>,
-    /// Per-album song buckets, keyed by album id (lowercased).
-    #[serde(default)]
-    album_songs: HashMap<String, AlbumSongs>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct AlbumSongs {
-    #[serde(default)]
-    fetched_at: u64,
-    songs: Vec<Song>,
-}
-
-impl Cache {
-    fn load(path: &Path) -> Option<Self> {
-        let bytes = std::fs::read(path).ok()?;
-        match serde_json::from_slice::<Self>(&bytes) {
-            Ok(c) if c.version <= 1 => Some(c),
-            Ok(_) => {
-                eprintln!("cache {} has newer version, ignoring", path.display());
-                None
-            }
-            Err(e) => {
-                eprintln!("cache {} is corrupt ({e}), ignoring", path.display());
-                None
-            }
-        }
-    }
-
-    fn save(&self, path: &Path) -> std::io::Result<()> {
-        let tmp = path.with_extension("json.tmp");
-        let json = serde_json::to_vec_pretty(self)
-            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-        std::fs::write(&tmp, json)?;
-        std::fs::rename(&tmp, path)
-    }
-}
