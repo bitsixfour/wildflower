@@ -1,5 +1,5 @@
-mod navidrome;
 mod config;
+mod navidrome;
 mod play;
 use std::path::Path;
 use std::sync::Arc;
@@ -7,45 +7,38 @@ use std::time::Duration;
 
 use reqwest::Client;
 
-use tokio::net::{TcpListener, TcpStream};
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use crate::navidrome::database::{self, DatabaseStatus, ListArgs, FindArgs};
+use crate::navidrome::database::{self, DatabaseStatus, FindArgs, ListArgs};
 use crate::navidrome::navi::NaviData;
-use crate::play::playback::{find_song_by_uri, find_songs_by_uri, CurrentSong, PlaybackStatus, PlayerState, AudioState, SharedState};
-use crate::play::queue::{QueueHandle, queue_handle};
-
-const PORT: u32 = 6600;
-
-
-
-
+use crate::play::playback::{
+    find_song_by_uri, find_songs_by_uri, AudioState, CurrentSong, PlaybackStatus, PlayerState,
+    SharedState,
+};
+use crate::play::queue::{queue_handle, QueueHandle};
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tokio::net::{TcpListener, TcpStream};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", PORT)).await?;
-    println!("We are ze running at port {PORT}");
-    let heckin_reqwest: Client = reqwest::Client::new();
+    let config = config::AppConfig::from_env();
+    let listener = TcpListener::bind(("127.0.0.1", config.mpd_port)).await?;
+    println!("wildflower listening on 127.0.0.1:{}", config.mpd_port);
+    let client = reqwest::Client::new();
 
-    let navi: NaviData = match NaviData::load_or_fetch(&heckin_reqwest, Path::new("wildflower-cache.json")).await {
-        Ok(n) => {
-            let _album_count = n.album_list.len();
-            let _song_count: usize = n.albums_cache.values().map(|v| v.len()).sum();
-            n
-        }
-        Err(e) => {
-            eprintln!("navidrome + cache both unavailable: {e:#}. starting with empty library!!!!!");
-            NaviData::init_empty()
-        }
-    };
- 
+    let navi: NaviData = NaviData::load_or_fetch(
+        &client,
+        Path::new(&config.database_path),
+        config.navidrome.clone(),
+    )
+    .await?;
+    // just crash if it fails whatever bruh
 
     let shared_state: SharedState = Arc::new(tokio::sync::RwLock::new(PlayerState {
         volume: 100,
         state: AudioState::Stop,
         song_pos: None,
         song_id: None,
-        elapsed: Duration::from_secs(0),
-        duration: Duration::from_secs(0),
+        elapsed: Duration::ZERO,
+        duration: Duration::ZERO,
         playlist_length: 0,
         playlist_version: 0,
         repeat: false,
@@ -57,32 +50,39 @@ async fn main() -> anyhow::Result<()> {
     let (cmd_tx, mut cmd_rx) = tokio::sync::mpsc::channel::<PlaybackStatus>(100);
 
     let engine_state = Arc::clone(&shared_state);
-    let heckin_reqwes = heckin_reqwest.clone();
+    let engine_client = client.clone();
+    let engine_config = navi.config.clone();
     tokio::spawn(async move {
-        let mut engine = CurrentSong::new(&heckin_reqwest).await;
+        let mut engine = CurrentSong::new(&engine_client, engine_config).await;
         while let Some(cmd) = cmd_rx.recv().await {
-            engine.handle(cmd, &heckin_reqwest).await;
+            engine.handle(cmd, &engine_client).await;
             let mut st = engine_state.write().await;
             let pos: i32 = engine.queue.cursor;
-            st.state = AudioState::Play; 
+            st.state = AudioState::Play;
             st.song_pos = pos.try_into().ok();
             st.playlist_length = engine.queue.items.len();
         }
     });
 
     loop {
-        let (socket, _) = listener.accept().await.unwrap();
+        let (socket, _) = listener.accept().await?;
         let client_tx = cmd_tx.clone();
         let client_state = Arc::clone(&shared_state);
-        let navi = navi.clone();
-        let reqwest = heckin_reqwes.clone();
+        let music_data = navi.clone();
+        let request_client = client.clone();
         tokio::spawn(async move {
-            init_client(socket, client_tx, client_state, navi, reqwest).await;
+            init_client(socket, client_tx, client_state, music_data, request_client).await;
         });
     }
 }
 
-async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<PlaybackStatus>, state: SharedState, music_data: NaviData, client: Client) {
+async fn init_client(
+    socket: TcpStream,
+    cmd_tx: tokio::sync::mpsc::Sender<PlaybackStatus>,
+    state: SharedState,
+    music_data: NaviData,
+    client: Client,
+) {
     let (reader, mut writer) = tokio::io::split(socket);
     let mut reader = BufReader::new(reader);
     let _ = writer.write_all(b"OK MPD 0.25.0\n").await;
@@ -94,7 +94,9 @@ async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<Playba
             Ok(0) => break,
             Ok(_) => {
                 let trimmed = line.trim_end();
-                if trimmed.is_empty() { continue; }
+                if trimmed.is_empty() {
+                    continue;
+                }
                 let response = handle_case(trimmed, &cmd_tx, &state, &client, &music_data).await;
                 let _ = writer.write_all(response.as_bytes()).await;
                 if trimmed == "close" {
@@ -106,9 +108,13 @@ async fn init_client(socket: TcpStream, cmd_tx: tokio::sync::mpsc::Sender<Playba
     }
 }
 
-
-
-async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackStatus>, state: &SharedState, client: &Client, navi: &NaviData) -> String {
+async fn handle_case(
+    input: &str,
+    cmd_tx: &tokio::sync::mpsc::Sender<PlaybackStatus>,
+    state: &SharedState,
+    client: &Client,
+    navi: &NaviData,
+) -> String {
     let trimmed = input.trim();
     let mut parts: Vec<String> = Vec::new();
     let mut in_quotes = false;
@@ -171,7 +177,9 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
             let Some(time) = parts.get(2) else {
                 return format!("ACK [2@0] {{{cmd}}} missing time\n");
             };
-            let _ = cmd_tx.send(PlaybackStatus::SeekId((songpos, time.clone()))).await;
+            let _ = cmd_tx
+                .send(PlaybackStatus::SeekId((songpos, time.clone())))
+                .await;
             "OK\n".to_string()
         }
         "seekcur" => {
@@ -260,17 +268,13 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
                 window_end: window.map(|(_, e)| e),
             };
 
-            database::database_handle(
-                DatabaseStatus::List(list_args),
-                client,
-                &navi,
-            )
-            .await
+            database::database_handle(DatabaseStatus::List(list_args), client, &navi).await
         }
         // music database
         "albumart" => {
             let input: String = parts.get(1).unwrap_or(&String::new()).clone();
-            let offset: i64 = parts.get(2)
+            let offset: i64 = parts
+                .get(2)
                 .and_then(|s| s.parse::<i64>().ok())
                 .unwrap_or(0);
             let args: DatabaseStatus = DatabaseStatus::AlbumArt(input, offset);
@@ -316,15 +320,23 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
                         }
                         i += 2;
                     }
-                    _ => { i += 1; }
+                    _ => {
+                        i += 1;
+                    }
                 }
             }
             database::database_handle(
                 DatabaseStatus::Find(FindArgs {
-                    filter: fltr, sort, window_start, window_end, position: None,
+                    filter: fltr,
+                    sort,
+                    window_start,
+                    window_end,
+                    position: None,
                 }),
-                client, navi,
-            ).await
+                client,
+                navi,
+            )
+            .await
         }
         "findadd" => {
             if parts.len() < 2 {
@@ -348,15 +360,23 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
                         }
                         i += 2;
                     }
-                    _ => { i += 1; }
+                    _ => {
+                        i += 1;
+                    }
                 }
             }
             database::database_handle(
                 DatabaseStatus::FindAdd(FindArgs {
-                    filter: fltr, sort, window_start, window_end, position: None,
+                    filter: fltr,
+                    sort,
+                    window_start,
+                    window_end,
+                    position: None,
                 }),
-                client, navi,
-            ).await
+                client,
+                navi,
+            )
+            .await
         }
         "listall" => {
             let path = parts.get(1).cloned().unwrap_or_default();
@@ -364,7 +384,8 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
         }
         "listallinfo" => {
             let path = parts.get(1).cloned().unwrap_or_default();
-            database::database_handle(DatabaseStatus::ListAllInfo(Box::new(path)), client, navi).await
+            database::database_handle(DatabaseStatus::ListAllInfo(Box::new(path)), client, navi)
+                .await
         }
         "lsinfo" => {
             let path = parts.get(1).cloned().unwrap_or_default();
@@ -377,7 +398,8 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
         "readpicture" => {
             let path = parts.get(1).cloned().unwrap_or_default();
             let offset: i64 = parts.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
-            database::database_handle(DatabaseStatus::ReadPicture((path, offset)), client, navi).await
+            database::database_handle(DatabaseStatus::ReadPicture((path, offset)), client, navi)
+                .await
         }
         "search" => {
             if parts.len() < 2 {
@@ -401,15 +423,23 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
                         }
                         i += 2;
                     }
-                    _ => { i += 1; }
+                    _ => {
+                        i += 1;
+                    }
                 }
             }
             database::database_handle(
                 DatabaseStatus::Search(FindArgs {
-                    filter: fltr, sort, window_start, window_end, position: None,
+                    filter: fltr,
+                    sort,
+                    window_start,
+                    window_end,
+                    position: None,
                 }),
-                client, navi,
-            ).await
+                client,
+                navi,
+            )
+            .await
         }
         "searchadd" => {
             if parts.len() < 2 {
@@ -433,15 +463,23 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
                         }
                         i += 2;
                     }
-                    _ => { i += 1; }
+                    _ => {
+                        i += 1;
+                    }
                 }
             }
             let _ = database::database_handle(
                 DatabaseStatus::SearchAdd(FindArgs {
-                    filter: fltr, sort, window_start, window_end, position: None,
+                    filter: fltr,
+                    sort,
+                    window_start,
+                    window_end,
+                    position: None,
                 }),
-                client, navi,
-            ).await;
+                client,
+                navi,
+            )
+            .await;
             "".to_string()
         }
         "searchaddpl" => {
@@ -467,15 +505,26 @@ async fn handle_case(input: &str, cmd_tx: &tokio::sync::mpsc::Sender<PlaybackSta
                         }
                         i += 2;
                     }
-                    _ => { i += 1; }
+                    _ => {
+                        i += 1;
+                    }
                 }
             }
             database::database_handle(
-                DatabaseStatus::Searchaddpi(name, FindArgs {
-                    filter: fltr, sort, window_start, window_end, position: None,
-                }),
-                client, navi,
-            ).await
+                DatabaseStatus::Searchaddpi(
+                    name,
+                    FindArgs {
+                        filter: fltr,
+                        sort,
+                        window_start,
+                        window_end,
+                        position: None,
+                    },
+                ),
+                client,
+                navi,
+            )
+            .await
         }
         "update" => {
             let _ = parts.get(1);

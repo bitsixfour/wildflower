@@ -1,6 +1,5 @@
 // Subsonic album and track metadata.
 
-
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
@@ -146,7 +145,6 @@ pub struct Song {
     pub display_album_artist: String,
 }
 
-
 pub struct MpdAlbum<'a> {
     file: &'a str,
     title: &'a str,
@@ -156,46 +154,46 @@ pub struct MpdAlbum<'a> {
     track: i16,
 }
 
-
 /* Fetch an album's MPD tracklist data. */
 impl SubsIDResponse {
-    pub async fn from_id(client: &Client, album_id: &str) -> SubsIDResponse {
-        let url = format!("http://192.168.1.20:8097/rest/getAlbum?id={}&u=nix&p=2008&v=1.8.0&c=myapp&f=json", album_id);
+    pub async fn from_id(
+        client: &Client,
+        album_id: &str,
+        config: &crate::config::NavidromeConfig,
+    ) -> SubsIDResponse {
         client
-            .get(url)
-            .send().await.unwrap()
-            .error_for_status().unwrap()
-            .json::<SubsIDResponse>()
-            .await.unwrap()
-    }
-
-    pub async fn new(client: &Client, uid: &str, _ser: &str) -> SubsIDResponse {
-        let url = format!("http://192.168.1.20:8097/rest/getAlbum?id={}&u=nix&p=2008&v=1.8.0&c=myapp&f=json", uid);
-        let root = client
-            .get(url)
+            .get(config.endpoint("getAlbum"))
             .query(&[
+                ("id", album_id),
+                ("u", config.username.as_str()),
+                ("p", config.password.as_str()),
+                ("v", "1.8.0"),
+                ("c", "wildflower"),
                 ("f", "json"),
-                ("type", "alphabeticalByName"),
-                ("size", "500"),
-                ("offset", "0"),
             ])
             .send()
-            .await.unwrap()
-            .error_for_status().unwrap()
+            .await
+            .unwrap()
+            .error_for_status()
+            .unwrap()
             .json::<SubsIDResponse>()
-        .await.unwrap();
-        root
+            .await
+            .unwrap()
+    }
+
+    pub async fn new(
+        client: &Client,
+        uid: &str,
+        config: &crate::config::NavidromeConfig,
+    ) -> SubsIDResponse {
+        Self::from_id(client, uid, config).await
     }
     fn get_tracklist(&self) -> Vec<&str> {
         let mut vec: Vec<&str> = Vec::new();
-        let album_list: Vec<Song> = self
-            .subsonic_response
-            .album
-            .song.clone();
+        let album_list: Vec<Song> = self.subsonic_response.album.song.clone();
         println!("array of song found (dbg");
         for _i in album_list.iter() {
-            let mpdretrn: &str  = 
-                "file: {} \n
+            let mpdretrn: &str = "file: {} \n
                 Last-Modified: {} \n
                 Time: {} \n
                 duration: {} \n
@@ -207,12 +205,7 @@ impl SubsIDResponse {
                 Genre: {} \n
                 ";
             vec.push(mpdretrn);
-
-
         }
         vec
-
     }
-
-
 }
