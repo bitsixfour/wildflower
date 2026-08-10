@@ -5,7 +5,7 @@ use crate::navidrome::navi::NaviData;
 use crate::play::playback::{AudioState, SharedState};
 use crate::play::tracklist::Song;
 
-#[allow(dead_code)] 
+#[allow(dead_code)]
 pub enum QueueHandle {
     ClearError,
     CurrentSong,
@@ -18,7 +18,6 @@ pub enum QueueHandle {
     SetVol(u32),
     GetVol,
 }
-
 
 pub async fn queue_handle(hdle: QueueHandle, state: &SharedState, navi: &NaviData) -> String {
     match hdle {
@@ -60,11 +59,14 @@ async fn status(state: &SharedState) -> String {
     out.push_str(&format!("consume: {}\n", st.consume as i32));
     out.push_str(&format!("playlist: {}\n", st.playlist_version));
     out.push_str(&format!("playlistlength: {}\n", st.playlist_length));
-    out.push_str(&format!("state: {}\n", match st.state {
-        AudioState::Play => "play",
-        AudioState::Stop => "stop",
-        AudioState::Pause => "pause",
-    }));
+    out.push_str(&format!(
+        "state: {}\n",
+        match st.state {
+            AudioState::Play => "play",
+            AudioState::Stop => "stop",
+            AudioState::Pause => "pause",
+        }
+    ));
     if let Some(pos) = st.song_pos {
         out.push_str(&format!("song: {}\n", pos));
     }

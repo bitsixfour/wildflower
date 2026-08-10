@@ -38,20 +38,24 @@ fn contains_ci(haystack: &str, needle: &str) -> bool {
 impl Field {
     pub fn matches(&self, album: &Album) -> bool {
         let eq = match self.field.as_str() {
-            "id" | "Id"               => album.id == self.value,
-            "name" | "Name"           => album.name == self.value,
-            "artist" | "Artist"       => album.artist == self.value,
-            "artistId" | "artist_id"  => album.artist_id == self.value,
-            "coverArt" | "cover_art"  => album.cover_art == self.value,
+            "id" | "Id" => album.id == self.value,
+            "name" | "Name" => album.name == self.value,
+            "artist" | "Artist" => album.artist == self.value,
+            "artistId" | "artist_id" => album.artist_id == self.value,
+            "coverArt" | "cover_art" => album.cover_art == self.value,
             "songCount" | "song_count" => album.song_count.to_string() == self.value,
-            "duration" | "Duration"   => album.duration.to_string() == self.value,
-            "created" | "Created"     => album.created == self.value,
-            "year" | "Year"           => album.year.map_or(false, |y| y.to_string() == self.value),
-            "genre" | "Genre"         => album.genre.as_deref() == Some(&self.value),
-            "userRating" | "user_rating" => album.user_rating.map_or(false, |r| r.to_string() == self.value),
-            "musicBrainzId" | "music_brainz_id" => album.music_brainz_id.as_deref() == Some(&self.value),
+            "duration" | "Duration" => album.duration.to_string() == self.value,
+            "created" | "Created" => album.created == self.value,
+            "year" | "Year" => album.year.map_or(false, |y| y.to_string() == self.value),
+            "genre" | "Genre" => album.genre.as_deref() == Some(&self.value),
+            "userRating" | "user_rating" => album
+                .user_rating
+                .map_or(false, |r| r.to_string() == self.value),
+            "musicBrainzId" | "music_brainz_id" => {
+                album.music_brainz_id.as_deref() == Some(&self.value)
+            }
             "isCompilation" | "is_compilation" => album.is_compilation.to_string() == self.value,
-            "sortName" | "sort_name"  => album.sort_name.as_deref() == Some(&self.value),
+            "sortName" | "sort_name" => album.sort_name.as_deref() == Some(&self.value),
             _ => false,
         };
         match self.op {

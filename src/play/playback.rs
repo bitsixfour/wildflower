@@ -1,12 +1,14 @@
-use std::time::Duration;
+use std::io::Cursor;
 use std::sync::Arc;
+use std::time::Duration;
+
 use bytes::Bytes;
 use reqwest::Client;
-use std::io::Cursor;
-use rodio::{Decoder, Player, MixerDeviceSink};
-use crate::play::tracklist::Song;
+use rodio::{Decoder, MixerDeviceSink, Player};
+use tokio::sync::RwLock;
 
-const URL: &str = "192.168.1.20:8097";
+use crate::config::NavidromeConfig;
+use crate::play::tracklist::Song;
 
 #[allow(dead_code)]
 pub struct CurrentSong {
@@ -15,20 +17,21 @@ pub struct CurrentSong {
     var: MixerDeviceSink,
     pub queue: PlaybackQueue,
 }
+
 pub struct PlaybackQueue {
     pub items: Vec<Song>,
     pub cursor: i32,
     player: Player,
+    config: NavidromeConfig,
 }
-
 
 #[allow(dead_code)]
 pub enum PlaybackStatus {
     Seek((u64, String)),
     Next(),
     Pause(i32),
-    Play,           
-    PlayPos(usize),    
+    Play,
+    PlayPos(usize),
     PlayId(String),
     Previous,
     SeekId((u64, String)),
@@ -56,7 +59,7 @@ pub enum QueueStatus {
     PiChanges(String, (i32, i32)),
     PiChangesPos(String, (i32, i32)),
     Prio(i32, (i32, i32)),
-    PrioId(i32, (i32, i32))
+    PrioId(i32, (i32, i32)),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -82,10 +85,10 @@ pub struct PlayerState {
     pub single: bool,
     pub consume: bool,
 }
-pub type SharedState = Arc<tokio::sync::RwLock<PlayerState>>;
+pub type SharedState = Arc<RwLock<PlayerState>>;
 
 impl CurrentSong {
-     pub async fn new(_client: &Client) -> Self {
+    pub async fn new(_client: &Client, config: NavidromeConfig) -> Self {
         let handle = rodio::DeviceSinkBuilder::open_default_sink().unwrap();
         let mixer = handle.mixer().clone();
         Self {
@@ -96,7 +99,8 @@ impl CurrentSong {
                 items: Vec::new(),
                 cursor: 0,
                 player: Player::connect_new(&mixer),
-            }
+                config,
+            },
         }
     }
     pub async fn handle(&mut self, command: PlaybackStatus, client: &Client) {
@@ -182,56 +186,54 @@ impl CurrentSong {
                 self.queue.items.push(song);
             }
             PlaybackStatus::AddId(song, pos) => {
-                let p = pos.unwrap_or(self.queue.items.len()).min(self.queue.items.len());
+                let p = pos
+                    .unwrap_or(self.queue.items.len())
+                    .min(self.queue.items.len());
                 self.queue.items.insert(p, song);
             }
         }
     }
 
-
-
-
-    pub fn fmt_url(io: &str) -> String {
-        let endpnt = format!("http://{}/rest/stream?u=nix&p=2008&v=1.16.1&c=test&id={}",
-            URL,
-            io);
-        endpnt
+    pub fn fmt_url(config: &NavidromeConfig, song_id: &str) -> String {
+        crate::navidrome::navi::get_url(config, song_id)
     }
-
 }
 
-#[allow(unused_variables, dead_code)]
 impl PlaybackQueue {
-
     pub async fn next(&mut self, client: &Client) {
-        if self.items.is_empty() { return; }
-        if (self.cursor as usize) + 1 >= self.items.len() { return; }
+        if self.items.is_empty() {
+            return;
+        }
+        if (self.cursor as usize) + 1 >= self.items.len() {
+            return;
+        }
         self.player.skip_one();
         self.cursor += 1;
-        if let Some(s) = self.fetch_and_decode(self.cursor as usize + 1, client).await {
+        if let Some(s) = self
+            .fetch_and_decode(self.cursor as usize + 1, client)
+            .await
+        {
             self.player.append(s);
         }
     }
-
     pub async fn previous(&mut self, client: &Client) {
-        if self.items.is_empty() || self.cursor == 0 { return; }
+        if self.items.is_empty() || self.cursor == 0 {
+            return;
+        }
         self.cursor -= 1;
         self.player.stop();
         self.player.clear();
         self.rebuild_buffer(client).await;
         self.player.play();
     }
-
-    pub async fn remove(&mut self, client: &Client, idx: i32) {
+    pub async fn remove(&mut self, _client: &Client, idx: i32) {
         let rm = idx as usize;
         self.items.remove(rm);
     }
-
     pub async fn jump_to(&mut self, client: &Client, idx: i32) {
         self.cursor = idx;
         self.rebuild_buffer(client).await;
     }
-
 
     async fn sink_init(&mut self, stream: Vec<u8>, client: &Client) {
         let source = Decoder::new(Cursor::new(stream)).unwrap();
@@ -248,27 +250,50 @@ impl PlaybackQueue {
         if let Some(s) = self.fetch_and_decode(self.cursor as usize, client).await {
             self.player.append(s);
         }
-        if let Some(s) = self.fetch_and_decode(self.cursor as usize + 1, client).await {
+        if let Some(s) = self
+            .fetch_and_decode(self.cursor as usize + 1, client)
+            .await
+        {
             self.player.append(s);
         }
     }
-    async fn fetch_and_decode(&self, idx: usize, client: &Client) -> Option<Decoder<Cursor<Vec<u8>>>> {
+    async fn fetch_and_decode(
+        &self,
+        idx: usize,
+        client: &Client,
+    ) -> Option<Decoder<Cursor<Vec<u8>>>> {
         let song = self.items.get(idx)?;
         let bytes = self.get_audio_stream(&song.id, client).await;
         Decoder::new(Cursor::new(bytes)).ok()
     }
     async fn get_audio_stream(&self, search_id: &str, client: &Client) -> Vec<u8> {
-        let req = format!("http://nix:2008@192.168.1.20:8097/rest/stream.view?u=nix&p=2008&v=1.16.1& c=app&id={}", search_id);
-        let mut vec: Vec<u8> = Vec::new();
-        let mut bytes: Vec<u8> = reqwest::Client::new()
-            .get(req)
-            .send().await.unwrap()
-            .error_for_status().unwrap()
-            .bytes().await.unwrap()
-            .to_vec();
-        vec.append(&mut bytes);
-        vec
+        let response = match client
+            .get(crate::navidrome::navi::get_url(&self.config, search_id))
+            .send()
+            .await
+        {
+            Ok(response) => response,
+            Err(error) => {
+                eprintln!("audio request failed for {search_id}: {error}");
+                return Vec::new();
+            }
+        };
+        let response = match response.error_for_status() {
+            Ok(response) => response,
+            Err(error) => {
+                eprintln!("audio response failed for {search_id}: {error}");
+                return Vec::new();
+            }
+        };
+
+        match response.bytes().await {
+            Ok(bytes) => bytes.to_vec(),
+            Err(error) => {
+                eprintln!("audio body failed for {search_id}: {error}");
+                Vec::new()
+            }
         }
+    }
 }
 
 use crate::navidrome::navi::NaviData;
@@ -279,7 +304,12 @@ fn mpd_path(album_name: &str, song_path: &str) -> String {
 
 pub fn find_song_by_uri(navi: &NaviData, uri: &str) -> Option<Song> {
     for album in &navi.album_list {
-        for song in navi.albums_cache.get(&album.id).map(|v| v.as_slice()).unwrap_or(&[]) {
+        for song in navi
+            .albums_cache
+            .get(&album.id)
+            .map(|v| v.as_slice())
+            .unwrap_or(&[])
+        {
             if mpd_path(&album.name, &song.path) == uri || song.path == uri {
                 return Some(song.clone());
             }
@@ -302,7 +332,12 @@ pub fn find_songs_by_uri(navi: &NaviData, uri: &str) -> Vec<Song> {
         return out;
     }
     for album in &navi.album_list {
-        for song in navi.albums_cache.get(&album.id).map(|v| v.as_slice()).unwrap_or(&[]) {
+        for song in navi
+            .albums_cache
+            .get(&album.id)
+            .map(|v| v.as_slice())
+            .unwrap_or(&[])
+        {
             if song.path.starts_with(uri) {
                 out.push(song.clone());
             }
