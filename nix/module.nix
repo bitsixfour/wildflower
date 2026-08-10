@@ -40,8 +40,8 @@ in
 
     url = lib.mkOption {
       type = lib.types.str;
-      default = "http://192.168.1.20";
-      description = "Navidrome server URL.";
+      default = "http://127.0.0.1:4533";
+      description = "Navidrome server URL, including scheme and port.";
     };
 
     port = lib.mkOption {
@@ -58,7 +58,7 @@ in
 
     usrname = lib.mkOption {
       type = lib.types.str;
-      default = "nix";
+      default = "navidrome";
       description = "Navidrome username.";
     };
   };
@@ -78,16 +78,16 @@ in
     };
 
     systemd.services.wildflower = {
-      description = "mpd socket";
+      description = "wildflower MPD bridge";
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
 
       environment = {
-        MPD_PASS = cfg.password;
-        MPD_USER = cfg.usrname;
+        NAVIDROME_PASSWORD = cfg.password;
+        NAVIDROME_USER = cfg.usrname;
+        NAVIDROME_URL = cfg.url;
         MPD_PORT = toString cfg.port;
-        MPD_HOST = cfg.url;
       };
 
       serviceConfig =

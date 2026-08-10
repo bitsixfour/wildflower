@@ -1,5 +1,5 @@
 {
-  description = "MPD Protocol spec w/ Navidrome Support";
+  description = "MPD-compatible bridge for Navidrome";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -44,6 +44,7 @@
             rustc
             rustfmt
           ];
+          buildInputs = [ pkgs.alsa-lib ];
         };
 
         formatter = pkgs.nixpkgs-fmt;
